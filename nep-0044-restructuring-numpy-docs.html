@@ -1,0 +1,808 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 44 — Restructuring the NumPy Documentation &#8212; NumPy Enhancement Proposals</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 45 — C Style Guide" href="nep-0045-c_style_guide.html" />
+    <link rel="prev" title="NEP 42 — New and extensible DTypes" href="nep-0042-new-dtypes.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0044-restructuring-numpy-docs.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="content.html">
+  <img src="_static/../source/_static/numpylogo.svg" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Index
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="scope.html">
+  The Scope of NumPy
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="roadmap.html">
+  Current roadmap
+ </a>
+</li>
+
+    
+    <li class="nav-item">
+        <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+    </li>
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/numpy/numpy" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://twitter.com/numpy_team" rel="noopener" target="_blank" title="Twitter">
+            <span><i class="fab fa-twitter-square"></i></span>
+            <label class="sr-only">Twitter</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="scope.html">
+   The Scope of NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="roadmap.html">
+   Current roadmap
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+   Wish list
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0000.html">
+   NEP 0 — Purpose and Process
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-template.html">
+   NEP X — Template and Instructions
+  </a>
+ </li>
+</ul>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0034-infer-dtype-is-object.html">
+   NEP 34 — Disallow inferring ``dtype=object`` from sequences
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0036-fair-play.html">
+   NEP 36 — Fair play
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0038-SIMD-optimizations.html">
+   NEP 38 — Using SIMD optimization instructions for performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0041-improved-dtype-support.html">
+   NEP 41 — First step towards a new Datatype System
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0042-new-dtypes.html">
+   NEP 42 — New and extensible DTypes
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   NEP 44 — Restructuring the NumPy Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0045-c_style_guide.html">
+   NEP 45 — C Style Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0046-sponsorship-guidelines.html">
+   NEP 46 — NumPy Sponsorship Guidelines
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0021-advanced-indexing.html">
+   NEP 21 — Simplified and explicit advanced indexing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0030-duck-array-protocol.html">
+   NEP 30 — Duck Typing for NumPy Arrays - Implementation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0031-uarray.html">
+   NEP 31 — Context-local and global overrides of the NumPy API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0037-array-module.html">
+   NEP 37 — A dispatch protocol for NumPy-like modules
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0043-extensible-ufuncs.html">
+   NEP 43 — Enhancing the Extensibility of UFuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0047-array-api-standard.html">
+   NEP 47 — Adopting the array API standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0048-spending-project-funds.html">
+   NEP 48 — Spending NumPy Project Funds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0049.html">
+   NEP 49 — Data allocation strategies
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0001-npy-format.html">
+   NEP 1 — A Simple File Format for NumPy Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0005-generalized-ufuncs.html">
+   NEP 5 — Generalized Universal Functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0007-datetime-proposal.html">
+   NEP 7 — A proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0010-new-iterator-ufunc.html">
+   NEP 10 — Optimizing Iterator/UFunc Performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0013-ufunc-overrides.html">
+   NEP 13 — A Mechanism for Overriding Ufuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">
+   NEP 14 — Plan for dropping Python 2.7 support
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0015-merge-multiarray-umath.html">
+   NEP 15 — Merging multiarray and umath
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0018-array-function-protocol.html">
+   NEP 18 — A dispatch mechanism for NumPy's high level array functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0019-rng-policy.html">
+   NEP 19 — Random Number Generator Policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">
+   NEP 20 — Expansion of Generalized Universal Function Signatures
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">
+   NEP 22 — Duck typing for NumPy arrays – high level overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0023-backwards-compatibility.html">
+   NEP 23 — Backwards compatibility and deprecation policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0027-zero-rank-arrarys.html">
+   NEP 27 — Zero Rank Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0028-website-redesign.html">
+   NEP 28 — numpy.org website redesign
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0029-deprecation_policy.html">
+   NEP 29 — Recommend Python and NumPy version support as a community policy standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0032-remove-financial-functions.html">
+   NEP 32 — Remove the financial functions from NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">
+   NEP 35 — Array Creation Dispatching With __array_function__
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0040-legacy-datatype-impl.html">
+   NEP 40 — Legacy Datatype Implementation in NumPy
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0002-warnfix.html">
+   NEP 2 — A proposal to build numpy without warning with a big set of warning flags
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0003-math_config_clean.html">
+   NEP 3 — Cleaning the math configuration of numpy.core
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0004-datetime-proposal3.html">
+   NEP 4 — A (third) proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0006-newbugtracker.html">
+   NEP 6 — Replacing Trac with a different bug tracker
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0008-groupby_additions.html">
+   NEP 8 —  A proposal for adding groupby functionality to NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0009-structured_array_extensions.html">
+   NEP 9 — Structured array extensions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">
+   NEP 11 — Deferred UFunc Evaluation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0012-missing-data.html">
+   NEP 12 — Missing Data Functionality in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0024-missing-data-2.html">
+   NEP 24 — Missing Data Functionality - Alternative 1 to NEP 12
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0025-missing-data-3.html">
+   NEP 25 — NA support via special dtypes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0026-missing-data-summary.html">
+   NEP 26 — Summary of Missing Data NEPs and discussion
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0016-abstract-array.html">
+   NEP 16 — An abstract base class for identifying "duck arrays"
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0017-split-out-maskedarray.html">
+   NEP 17 — Split Out Masked Arrays
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#abstract">
+   Abstract
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#motivation-and-scope">
+   Motivation and Scope
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#usage-and-impact">
+   Usage and Impact
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#backward-compatibility">
+   Backward compatibility
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#detailed-description">
+   Detailed description
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#status-and-ideas-of-each-type-of-doc-content">
+     Status and ideas of each type of doc content
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-sets">
+     Data sets
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#related-work">
+   Related Work
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#implementation">
+   Implementation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#ideas-for-follow-up">
+     Ideas for follow-up
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#discussion">
+   Discussion
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references-and-footnotes">
+   References and Footnotes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#copyright">
+   Copyright
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-44-restructuring-the-numpy-documentation">
+<span id="nep44"></span><h1>NEP 44 — Restructuring the NumPy Documentation<a class="headerlink" href="#nep-44-restructuring-the-numpy-documentation" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Ralf Gommers</p>
+</dd>
+<dt class="field-even">Author</dt>
+<dd class="field-even"><p>Melissa Mendonça</p>
+</dd>
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Mars Lee</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Accepted</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Process</p>
+</dd>
+<dt class="field-even">Created</dt>
+<dd class="field-even"><p>2020-02-11</p>
+</dd>
+<dt class="field-odd">Resolution</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2020-March/080467.html">https://mail.python.org/pipermail/numpy-discussion/2020-March/080467.html</a></p>
+</dd>
+</dl>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>This document proposes a restructuring of the NumPy Documentation, both in form
+and content, with the goal of making it more organized and discoverable for
+beginners and experienced users.</p>
+</div>
+<div class="section" id="motivation-and-scope">
+<h2>Motivation and Scope<a class="headerlink" href="#motivation-and-scope" title="Permalink to this headline">¶</a></h2>
+<p>See <a class="reference external" href="https://numpy.org/devdocs/">here</a> for the front page of the latest docs.
+The organization is quite confusing and illogical (e.g. user and developer docs
+are mixed). We propose the following:</p>
+<ul class="simple">
+<li><p>Reorganizing the docs into the four categories mentioned in <a class="footnote-reference brackets" href="#id5" id="id1">1</a>, namely <em>Tutorials</em>, <em>How Tos</em>, <em>Reference Guide</em> and <em>Explanations</em> (more about this below).</p></li>
+<li><p>Creating dedicated sections for Tutorials and How-Tos, including orientation
+on how to create new content;</p></li>
+<li><p>Adding an Explanations section for key concepts and techniques that require
+deeper descriptions, some of which will be rearranged from the Reference Guide.</p></li>
+</ul>
+</div>
+<div class="section" id="usage-and-impact">
+<h2>Usage and Impact<a class="headerlink" href="#usage-and-impact" title="Permalink to this headline">¶</a></h2>
+<p>The documentation is a fundamental part of any software project, especially
+open source projects. In the case of NumPy, many beginners might feel demotivated
+by the current structure of the documentation, since it is difficult to discover
+what to learn (unless the user has a clear view of what to look for in the
+Reference docs, which is not always the case).</p>
+<p>Looking at the results of a “NumPy Tutorial” search on any search engine also
+gives an idea of the demand for this kind of content. Having official high-level
+documentation written using up-to-date content and techniques will certainly
+mean more users (and developers/contributors) are involved in the NumPy
+community.</p>
+</div>
+<div class="section" id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Permalink to this headline">¶</a></h2>
+<p>The restructuring will effectively demand a complete rewrite of links and some
+of the current content. Input from the community will be useful for identifying
+key links and pages that should not be broken.</p>
+</div>
+<div class="section" id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Permalink to this headline">¶</a></h2>
+<p>As discussed in the article <a class="footnote-reference brackets" href="#id5" id="id2">1</a>, there are four categories of doc content:</p>
+<ul class="simple">
+<li><p>Tutorials</p></li>
+<li><p>How-to guides</p></li>
+<li><p>Explanations</p></li>
+<li><p>Reference guide</p></li>
+</ul>
+<p>We propose to use those categories as the ones we use (for writing and
+reviewing) whenever we add a new documentation section.</p>
+<p>The reasoning for this is that it is clearer both for
+developers/documentation writers and to users where each piece of
+information should go, and the scope and tone of each document. For
+example, if explanations are mixed with basic tutorials, beginners
+might be overwhelmed and alienated. On the other hand, if the reference
+guide contains basic how-tos, it might be difficult for experienced
+users to find the information they need, quickly.</p>
+<p>Currently, there are many blogs and tutorials on the internet about NumPy or
+using NumPy. One of the issues with this is that if users search for this
+information they may end up in an outdated (unofficial) tutorial before
+they find the current official documentation. This can be especially
+confusing, especially for beginners. Having a better infrastructure for the
+documentation also aims to solve this problem by giving users high-level,
+up-to-date official documentation that can be easily updated.</p>
+<div class="section" id="status-and-ideas-of-each-type-of-doc-content">
+<h3>Status and ideas of each type of doc content<a class="headerlink" href="#status-and-ideas-of-each-type-of-doc-content" title="Permalink to this headline">¶</a></h3>
+<p><strong>Reference guide</strong></p>
+<p>NumPy has a quite complete reference guide. All functions are documented, most
+have examples, and most are cross-linked well with <em>See Also</em> sections. Further
+improving the reference guide is incremental work that can be done (and is being
+done) by many people. There are, however, many explanations in the reference
+guide. These can be moved to a more dedicated Explanations section on the docs.</p>
+<p><strong>How-to guides</strong></p>
+<p>NumPy does not have many how-to’s. The subclassing and array ducktyping section
+may be an example of a how-to. Others that could be added are:</p>
+<ul class="simple">
+<li><p>Parallelization (controlling BLAS multithreading with <code class="docutils literal notranslate"><span class="pre">threadpoolctl</span></code>, using
+multiprocessing, random number generation, etc.)</p></li>
+<li><p>Storing and loading data (<code class="docutils literal notranslate"><span class="pre">.npy</span></code>/<code class="docutils literal notranslate"><span class="pre">.npz</span></code> format, text formats, Zarr, HDF5,
+Bloscpack, etc.)</p></li>
+<li><p>Performance (memory layout, profiling, use with Numba, Cython, or Pythran)</p></li>
+<li><p>Writing generic code that works with NumPy, Dask, CuPy, pydata/sparse, etc.</p></li>
+</ul>
+<p><strong>Explanations</strong></p>
+<p>There is a reasonable amount of content on fundamental NumPy concepts such as
+indexing, vectorization, broadcasting, (g)ufuncs, and dtypes. This could be
+organized better and clarified to ensure it’s really about explaining the concepts
+and not mixed with tutorial or how-to like content.</p>
+<p>There are few explanations about anything other than those fundamental NumPy
+concepts.</p>
+<p>Some examples of concepts that could be expanded:</p>
+<ul class="simple">
+<li><p>Copies vs. Views;</p></li>
+<li><p>BLAS and other linear algebra libraries;</p></li>
+<li><p>Fancy indexing.</p></li>
+</ul>
+<p>In addition, there are many explanations in the Reference Guide, which should be
+moved to this new dedicated Explanations section.</p>
+<p><strong>Tutorials</strong></p>
+<p>There’s a lot of scope for writing better tutorials. We have a new <em>NumPy for
+absolute beginners tutorial</em> <a class="footnote-reference brackets" href="#id7" id="id3">3</a> (GSoD project of Anne Bonner). In addition we
+need a number of tutorials addressing different levels of experience with Python
+and NumPy. This could be done using engaging data sets, ideas or stories. For
+example, curve fitting with polynomials and functions in <code class="docutils literal notranslate"><span class="pre">numpy.linalg</span></code> could
+be done with the Keeling curve (decades worth of CO2 concentration in air
+measurements) rather than with synthetic random data.</p>
+<p>Ideas for tutorials (these capture the types of things that make sense, they’re
+not necessarily the exact topics we propose to implement):</p>
+<ul class="simple">
+<li><p>Conway’s game of life with only NumPy (note: already in <a class="reference external" href="https://www.labri.fr/perso/nrougier/from-python-to-numpy/#the-game-of-life">Nicolas Rougier’s book</a>)</p></li>
+<li><p>Using masked arrays to deal with missing data in time series measurements</p></li>
+<li><p>Using Fourier transforms to analyze the Keeling curve data, and extrapolate it.</p></li>
+<li><p>Geospatial data (e.g. lat/lon/time to create maps for every year via a stacked
+array, like <a class="reference external" href="http://www.climatologylab.org/gridmet.html">gridMet data</a>)</p></li>
+<li><p>Using text data and dtypes (e.g. use speeches from different people, shape
+<code class="docutils literal notranslate"><span class="pre">(n_speech,</span> <span class="pre">n_sentences,</span> <span class="pre">n_words)</span></code>)</p></li>
+</ul>
+<p>The <em>Preparing to Teach</em> document <a class="footnote-reference brackets" href="#id6" id="id4">2</a> from the Software Carpentry Instructor
+Training materials is a nice summary of how to write effective lesson plans (and
+tutorials would be very similar). In addition to adding new tutorials, we also
+propose a <em>How to write a tutorial</em> document, which would help users contribute
+new high-quality content to the documentation.</p>
+</div>
+<div class="section" id="data-sets">
+<h3>Data sets<a class="headerlink" href="#data-sets" title="Permalink to this headline">¶</a></h3>
+<p>Using interesting data in the NumPy docs requires giving all users access to
+that data, either inside NumPy or in a separate package. The former is not the
+best idea, since it’s hard to do without increasing the size of NumPy
+significantly. Even for SciPy there has so far been no consensus on this (see
+<a class="reference external" href="https://github.com/scipy/scipy/pull/8707">scipy PR 8707</a> on adding a new
+<code class="docutils literal notranslate"><span class="pre">scipy.datasets</span></code> subpackage).</p>
+<p>So we’ll aim for a new (pure Python) package, named <code class="docutils literal notranslate"><span class="pre">numpy-datasets</span></code> or
+<code class="docutils literal notranslate"><span class="pre">scipy-datasets</span></code> or something similar. That package can take some lessons from
+how, e.g., scikit-learn ships data sets. Small data sets can be included in the
+repo, large data sets can be accessed via a downloader class or function.</p>
+</div>
+</div>
+<div class="section" id="related-work">
+<h2>Related Work<a class="headerlink" href="#related-work" title="Permalink to this headline">¶</a></h2>
+<p>Some examples of documentation organization in other projects:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jupyter.org/documentation">Documentation for Jupyter</a></p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/">Documentation for Python</a></p></li>
+<li><p><a class="reference external" href="https://www.tensorflow.org/learn">Documentation for TensorFlow</a></p></li>
+</ul>
+<p>These projects make the intended audience for each part of the documentation
+more explicit, as well as previewing some of the content in each section.</p>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>Currently, the <a class="reference external" href="https://numpy.org/devdocs/">documentation for NumPy</a> can be
+confusing, especially for beginners. Our proposal is to reorganize the docs in
+the following structure:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>For users:</dt><dd><ul>
+<li><p>Absolute Beginners Tutorial</p></li>
+<li><p>main Tutorials section</p></li>
+<li><p>How Tos for common tasks with NumPy</p></li>
+<li><p>Reference Guide (API Reference)</p></li>
+<li><p>Explanations</p></li>
+<li><p>F2Py Guide</p></li>
+<li><p>Glossary</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>For developers/contributors:</dt><dd><ul>
+<li><p>Contributor’s Guide</p></li>
+<li><p>Under-the-hood docs</p></li>
+<li><p>Building and extending the documentation</p></li>
+<li><p>Benchmarking</p></li>
+<li><p>NumPy Enhancement Proposals</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Meta information</dt><dd><ul>
+<li><p>Reporting bugs</p></li>
+<li><p>Release Notes</p></li>
+<li><p>About NumPy</p></li>
+<li><p>License</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="section" id="ideas-for-follow-up">
+<h3>Ideas for follow-up<a class="headerlink" href="#ideas-for-follow-up" title="Permalink to this headline">¶</a></h3>
+<p>Besides rewriting the current documentation to some extent, it would be ideal
+to have a technical infrastructure that would allow more contributions from the
+community. For example, if Jupyter Notebooks could be submitted as-is as
+tutorials or How-Tos, this might create more contributors and broaden the NumPy
+community.</p>
+<p>Similarly, if people could download some of the documentation in Notebook
+format, this would certainly mean people would use less outdated material for
+learning NumPy.</p>
+<p>It would also be interesting if the new structure for the documentation makes
+translations easier.</p>
+</div>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+<p>Discussion around this NEP can be found on the NumPy mailing list:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2020-February/080419.html">https://mail.python.org/pipermail/numpy-discussion/2020-February/080419.html</a></p></li>
+</ul>
+</div>
+<div class="section" id="references-and-footnotes">
+<h2>References and Footnotes<a class="headerlink" href="#references-and-footnotes" title="Permalink to this headline">¶</a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="id5"><span class="brackets">1</span><span class="fn-backref">(<a href="#id1">1</a>,<a href="#id2">2</a>)</span></dt>
+<dd><p><a class="reference external" href="https://www.divio.com/blog/documentation/">What nobody tells you about documentation</a></p>
+</dd>
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id4">2</a></span></dt>
+<dd><p><a class="reference external" href="https://carpentries.github.io/instructor-training/15-lesson-study/index.html">Preparing to Teach</a> (from the <a class="reference external" href="https://software-carpentry.org/">Software Carpentry</a> Instructor Training materials)</p>
+</dd>
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p><a class="reference external" href="https://numpy.org/devdocs/user/absolute_beginners.html">NumPy for absolute beginners Tutorial</a> by Anne Bonner</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<p>This document has been placed in the public domain.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2018, NumPy Developers.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

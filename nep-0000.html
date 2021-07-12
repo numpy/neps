@@ -1,0 +1,795 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 0 — Purpose and Process &#8212; NumPy Enhancement Proposals</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP X — Template and Instructions" href="nep-template.html" />
+    <link rel="prev" title="NumPy Roadmap" href="roadmap.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0000.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="content.html">
+  <img src="_static/../source/_static/numpylogo.svg" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Index
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="scope.html">
+  The Scope of NumPy
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="roadmap.html">
+  Current roadmap
+ </a>
+</li>
+
+    
+    <li class="nav-item">
+        <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+    </li>
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/numpy/numpy" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://twitter.com/numpy_team" rel="noopener" target="_blank" title="Twitter">
+            <span><i class="fab fa-twitter-square"></i></span>
+            <label class="sr-only">Twitter</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="scope.html">
+   The Scope of NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="roadmap.html">
+   Current roadmap
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+   Wish list
+  </a>
+ </li>
+</ul>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   NEP 0 — Purpose and Process
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-template.html">
+   NEP X — Template and Instructions
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0034-infer-dtype-is-object.html">
+   NEP 34 — Disallow inferring ``dtype=object`` from sequences
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0036-fair-play.html">
+   NEP 36 — Fair play
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0038-SIMD-optimizations.html">
+   NEP 38 — Using SIMD optimization instructions for performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0041-improved-dtype-support.html">
+   NEP 41 — First step towards a new Datatype System
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0042-new-dtypes.html">
+   NEP 42 — New and extensible DTypes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">
+   NEP 44 — Restructuring the NumPy Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0045-c_style_guide.html">
+   NEP 45 — C Style Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0046-sponsorship-guidelines.html">
+   NEP 46 — NumPy Sponsorship Guidelines
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0021-advanced-indexing.html">
+   NEP 21 — Simplified and explicit advanced indexing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0030-duck-array-protocol.html">
+   NEP 30 — Duck Typing for NumPy Arrays - Implementation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0031-uarray.html">
+   NEP 31 — Context-local and global overrides of the NumPy API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0037-array-module.html">
+   NEP 37 — A dispatch protocol for NumPy-like modules
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0043-extensible-ufuncs.html">
+   NEP 43 — Enhancing the Extensibility of UFuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0047-array-api-standard.html">
+   NEP 47 — Adopting the array API standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0048-spending-project-funds.html">
+   NEP 48 — Spending NumPy Project Funds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0049.html">
+   NEP 49 — Data allocation strategies
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0001-npy-format.html">
+   NEP 1 — A Simple File Format for NumPy Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0005-generalized-ufuncs.html">
+   NEP 5 — Generalized Universal Functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0007-datetime-proposal.html">
+   NEP 7 — A proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0010-new-iterator-ufunc.html">
+   NEP 10 — Optimizing Iterator/UFunc Performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0013-ufunc-overrides.html">
+   NEP 13 — A Mechanism for Overriding Ufuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">
+   NEP 14 — Plan for dropping Python 2.7 support
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0015-merge-multiarray-umath.html">
+   NEP 15 — Merging multiarray and umath
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0018-array-function-protocol.html">
+   NEP 18 — A dispatch mechanism for NumPy's high level array functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0019-rng-policy.html">
+   NEP 19 — Random Number Generator Policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">
+   NEP 20 — Expansion of Generalized Universal Function Signatures
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">
+   NEP 22 — Duck typing for NumPy arrays – high level overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0023-backwards-compatibility.html">
+   NEP 23 — Backwards compatibility and deprecation policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0027-zero-rank-arrarys.html">
+   NEP 27 — Zero Rank Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0028-website-redesign.html">
+   NEP 28 — numpy.org website redesign
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0029-deprecation_policy.html">
+   NEP 29 — Recommend Python and NumPy version support as a community policy standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0032-remove-financial-functions.html">
+   NEP 32 — Remove the financial functions from NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">
+   NEP 35 — Array Creation Dispatching With __array_function__
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0040-legacy-datatype-impl.html">
+   NEP 40 — Legacy Datatype Implementation in NumPy
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0002-warnfix.html">
+   NEP 2 — A proposal to build numpy without warning with a big set of warning flags
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0003-math_config_clean.html">
+   NEP 3 — Cleaning the math configuration of numpy.core
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0004-datetime-proposal3.html">
+   NEP 4 — A (third) proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0006-newbugtracker.html">
+   NEP 6 — Replacing Trac with a different bug tracker
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0008-groupby_additions.html">
+   NEP 8 —  A proposal for adding groupby functionality to NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0009-structured_array_extensions.html">
+   NEP 9 — Structured array extensions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">
+   NEP 11 — Deferred UFunc Evaluation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0012-missing-data.html">
+   NEP 12 — Missing Data Functionality in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0024-missing-data-2.html">
+   NEP 24 — Missing Data Functionality - Alternative 1 to NEP 12
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0025-missing-data-3.html">
+   NEP 25 — NA support via special dtypes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0026-missing-data-summary.html">
+   NEP 26 — Summary of Missing Data NEPs and discussion
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0016-abstract-array.html">
+   NEP 16 — An abstract base class for identifying "duck arrays"
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0017-split-out-maskedarray.html">
+   NEP 17 — Split Out Masked Arrays
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-is-a-nep">
+   What is a NEP?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#types">
+     Types
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#nep-workflow">
+   NEP Workflow
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#review-and-resolution">
+     Review and Resolution
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#how-a-nep-becomes-accepted">
+     How a NEP becomes Accepted
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#maintenance">
+     Maintenance
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#format-and-template">
+   Format and Template
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#header-preamble">
+     Header Preamble
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#discussion">
+   Discussion
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references-and-footnotes">
+   References and Footnotes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#copyright">
+   Copyright
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-0-purpose-and-process">
+<span id="nep00"></span><h1>NEP 0 — Purpose and Process<a class="headerlink" href="#nep-0-purpose-and-process" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Jarrod Millman &lt;<a class="reference external" href="mailto:millman&#37;&#52;&#48;berkeley&#46;edu">millman<span>&#64;</span>berkeley<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Active</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Process</p>
+</dd>
+<dt class="field-even">Created</dt>
+<dd class="field-even"><p>2017-12-11</p>
+</dd>
+</dl>
+<div class="section" id="what-is-a-nep">
+<h2>What is a NEP?<a class="headerlink" href="#what-is-a-nep" title="Permalink to this headline">¶</a></h2>
+<p>NEP stands for NumPy Enhancement Proposal.  A NEP is a design
+document providing information to the NumPy community, or describing
+a new feature for NumPy or its processes or environment.  The NEP
+should provide a concise technical specification of the feature and a
+rationale for the feature.</p>
+<p>We intend NEPs to be the primary mechanisms for proposing major new
+features, for collecting community input on an issue, and for
+documenting the design decisions that have gone into NumPy.  The NEP
+author is responsible for building consensus within the community and
+documenting dissenting opinions.</p>
+<p>Because the NEPs are maintained as text files in a versioned
+repository, their revision history is the historical record of the
+feature proposal <a class="footnote-reference brackets" href="#id3" id="id1">1</a>.</p>
+<div class="section" id="types">
+<h3>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h3>
+<p>There are three kinds of NEPs:</p>
+<ol class="arabic simple">
+<li><p>A <strong>Standards Track</strong> NEP describes a new feature or implementation
+for NumPy.</p></li>
+<li><p>An <strong>Informational</strong> NEP describes a NumPy design issue, or provides
+general guidelines or information to the Python community, but does not
+propose a new feature. Informational NEPs do not necessarily represent a
+NumPy community consensus or recommendation, so users and implementers are
+free to ignore Informational NEPs or follow their advice.</p></li>
+<li><p>A <strong>Process</strong> NEP describes a process surrounding NumPy, or
+proposes a change to (or an event in) a process.  Process NEPs are
+like Standards Track NEPs but apply to areas other than the NumPy
+language itself.  They may propose an implementation, but not to
+NumPy’s codebase; they require community consensus.  Examples include
+procedures, guidelines, changes to the decision-making process, and
+changes to the tools or environment used in NumPy development.
+Any meta-NEP is also considered a Process NEP.</p></li>
+</ol>
+</div>
+</div>
+<div class="section" id="nep-workflow">
+<h2>NEP Workflow<a class="headerlink" href="#nep-workflow" title="Permalink to this headline">¶</a></h2>
+<p>The NEP process begins with a new idea for NumPy.  It is highly
+recommended that a single NEP contain a single key proposal or new
+idea. Small enhancements or patches often don’t need
+a NEP and can be injected into the NumPy development workflow with a
+pull request to the NumPy <a class="reference external" href="https://github.com/numpy/numpy">repo</a>. The more focused the
+NEP, the more successful it tends to be.
+If in doubt, split your NEP into several well-focused ones.</p>
+<p>Each NEP must have a champion—someone who writes the NEP using the style
+and format described below, shepherds the discussions in the appropriate
+forums, and attempts to build community consensus around the idea.  The NEP
+champion (a.k.a. Author) should first attempt to ascertain whether the idea is
+suitable for a NEP. Posting to the numpy-discussion <a class="reference external" href="https://mail.python.org/mailman/listinfo/numpy-discussion">mailing list</a> is the best
+way to go about doing this.</p>
+<p>The proposal should be submitted as a draft NEP via a <a class="reference external" href="https://github.com/numpy/numpy/pulls">GitHub pull
+request</a> to the <code class="docutils literal notranslate"><span class="pre">doc/neps</span></code> directory with the name <code class="docutils literal notranslate"><span class="pre">nep-&lt;n&gt;.rst</span></code>
+where <code class="docutils literal notranslate"><span class="pre">&lt;n&gt;</span></code> is an appropriately assigned four-digit number (e.g.,
+<code class="docutils literal notranslate"><span class="pre">nep-0000.rst</span></code>). The draft must use the <a class="reference internal" href="nep-template.html"><span class="doc">NEP X — Template and Instructions</span></a> file.</p>
+<p>Once the PR for the NEP is in place, a post should be made to the
+mailing list containing the sections up to “Backward compatibility”,
+with the purpose of limiting discussion there to usage and impact.
+Discussion on the pull request will have a broader scope, also including
+details of implementation.</p>
+<p>At the earliest convenience, the PR should be merged (regardless of
+whether it is accepted during discussion).  Additional PRs may be made
+by the Author to update or expand the NEP, or by maintainers to set
+its status, discussion URL, etc.</p>
+<p>Standards Track NEPs consist of two parts, a design document and a
+reference implementation.  It is generally recommended that at least a
+prototype implementation be co-developed with the NEP, as ideas that sound
+good in principle sometimes turn out to be impractical when subjected to the
+test of implementation.  Often it makes sense for the prototype implementation
+to be made available as PR to the NumPy repo (making sure to appropriately
+mark the PR as a WIP).</p>
+<div class="section" id="review-and-resolution">
+<h3>Review and Resolution<a class="headerlink" href="#review-and-resolution" title="Permalink to this headline">¶</a></h3>
+<p>NEPs are discussed on the mailing list.  The possible paths of the
+status of NEPs are as follows:</p>
+<img alt="_images/nep-0000.png" src="_images/nep-0000.png" />
+<p>All NEPs should be created with the <code class="docutils literal notranslate"><span class="pre">Draft</span></code> status.</p>
+<p>Eventually, after discussion, there may be a consensus that the NEP
+should be accepted – see the next section for details. At this point
+the status becomes <code class="docutils literal notranslate"><span class="pre">Accepted</span></code>.</p>
+<p>Once a NEP has been <code class="docutils literal notranslate"><span class="pre">Accepted</span></code>, the reference implementation must be
+completed.  When the reference implementation is complete and incorporated
+into the main source code repository, the status will be changed to <code class="docutils literal notranslate"><span class="pre">Final</span></code>.</p>
+<p>To allow gathering of additional design and interface feedback before
+committing to long term stability for a language feature or standard library
+API, a NEP may also be marked as “Provisional”. This is short for
+“Provisionally Accepted”, and indicates that the proposal has been accepted for
+inclusion in the reference implementation, but additional user feedback is
+needed before the full design can be considered “Final”. Unlike regular
+accepted NEPs, provisionally accepted NEPs may still be Rejected or Withdrawn
+even after the related changes have been included in a Python release.</p>
+<p>Wherever possible, it is considered preferable to reduce the scope of a
+proposal to avoid the need to rely on the “Provisional” status (e.g. by
+deferring some features to later NEPs), as this status can lead to version
+compatibility challenges in the wider NumPy ecosystem.</p>
+<p>A NEP can also be assigned status <code class="docutils literal notranslate"><span class="pre">Deferred</span></code>.  The NEP author or a
+core developer can assign the NEP this status when no progress is being made
+on the NEP.</p>
+<p>A NEP can also be <code class="docutils literal notranslate"><span class="pre">Rejected</span></code>.  Perhaps after all is said and done it
+was not a good idea.  It is still important to have a record of this
+fact. The <code class="docutils literal notranslate"><span class="pre">Withdrawn</span></code> status is similar—it means that the NEP author
+themselves has decided that the NEP is actually a bad idea, or has
+accepted that a competing proposal is a better alternative.</p>
+<p>When a NEP is <code class="docutils literal notranslate"><span class="pre">Accepted</span></code>, <code class="docutils literal notranslate"><span class="pre">Rejected</span></code>, or <code class="docutils literal notranslate"><span class="pre">Withdrawn</span></code>, the NEP should be
+updated accordingly. In addition to updating the status field, at the very
+least the <code class="docutils literal notranslate"><span class="pre">Resolution</span></code> header should be added with a link to the relevant
+thread in the mailing list archives.</p>
+<p>NEPs can also be <code class="docutils literal notranslate"><span class="pre">Superseded</span></code> by a different NEP, rendering the
+original obsolete.  The <code class="docutils literal notranslate"><span class="pre">Replaced-By</span></code> and <code class="docutils literal notranslate"><span class="pre">Replaces</span></code> headers
+should be added to the original and new NEPs respectively.</p>
+<p>Process NEPs may also have a status of <code class="docutils literal notranslate"><span class="pre">Active</span></code> if they are never
+meant to be completed, e.g. NEP 0 (this NEP).</p>
+</div>
+<div class="section" id="how-a-nep-becomes-accepted">
+<h3>How a NEP becomes Accepted<a class="headerlink" href="#how-a-nep-becomes-accepted" title="Permalink to this headline">¶</a></h3>
+<p>A NEP is <code class="docutils literal notranslate"><span class="pre">Accepted</span></code> by consensus of all interested contributors. We
+need a concrete way to tell whether consensus has been reached. When
+you think a NEP is ready to accept, send an email to the
+numpy-discussion mailing list with a subject like:</p>
+<blockquote>
+<div><p>Proposal to accept NEP #&lt;number&gt;: &lt;title&gt;</p>
+</div></blockquote>
+<p>In the body of your email, you should:</p>
+<ul class="simple">
+<li><p>link to the latest version of the NEP,</p></li>
+<li><p>briefly describe any major points of contention and how they were
+resolved,</p></li>
+<li><p>include a sentence like: “If there are no substantive objections
+within 7 days from this email, then the NEP will be accepted; see
+NEP 0 for more details.”</p></li>
+</ul>
+<p>For an example, see: <a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2018-June/078345.html">https://mail.python.org/pipermail/numpy-discussion/2018-June/078345.html</a></p>
+<p>After you send the email, you should make sure to link to the email
+thread from the <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> section of the NEP, so that people can
+find it later.</p>
+<p>Generally the NEP author will be the one to send this email, but
+anyone can do it – the important thing is to make sure that everyone
+knows when a NEP is on the verge of acceptance, and give them a final
+chance to respond. If there’s some special reason to extend this final
+comment period beyond 7 days, then that’s fine, just say so in the
+email. You shouldn’t do less than 7 days, because sometimes people are
+travelling or similar and need some time to respond.</p>
+<p>In general, the goal is to make sure that the community has consensus,
+not provide a rigid policy for people to try to game. When in doubt,
+err on the side of asking for more feedback and looking for
+opportunities to compromise.</p>
+<p>If the final comment period passes without any substantive objections,
+then the NEP can officially be marked <code class="docutils literal notranslate"><span class="pre">Accepted</span></code>. You should send a
+followup email notifying the list (celebratory emoji optional but
+encouraged 🎉✨), and then update the NEP by setting its <code class="docutils literal notranslate"><span class="pre">:Status:</span></code>
+to <code class="docutils literal notranslate"><span class="pre">Accepted</span></code>, and its <code class="docutils literal notranslate"><span class="pre">:Resolution:</span></code> header to a link to your
+followup email.</p>
+<p>If there <em>are</em> substantive objections, then the NEP remains in
+<code class="docutils literal notranslate"><span class="pre">Draft</span></code> state, discussion continues as normal, and it can be
+proposed for acceptance again later once the objections are resolved.</p>
+<p>In unusual cases, the <a class="reference external" href="https://docs.scipy.org/doc/numpy/dev/governance/governance.html">NumPy Steering Council</a> may be asked to decide
+whether a controversial NEP is <code class="docutils literal notranslate"><span class="pre">Accepted</span></code>.</p>
+</div>
+<div class="section" id="maintenance">
+<h3>Maintenance<a class="headerlink" href="#maintenance" title="Permalink to this headline">¶</a></h3>
+<p>In general, Standards track NEPs are no longer modified after they have
+reached the Final state as the code and project documentation are considered
+the ultimate reference for the implemented feature.
+However, finalized Standards track NEPs may be updated as needed.</p>
+<p>Process NEPs may be updated over time to reflect changes
+to development practices and other details. The precise process followed in
+these cases will depend on the nature and purpose of the NEP being updated.</p>
+</div>
+</div>
+<div class="section" id="format-and-template">
+<h2>Format and Template<a class="headerlink" href="#format-and-template" title="Permalink to this headline">¶</a></h2>
+<p>NEPs are UTF-8 encoded text files using the <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> format.  Please
+see the <a class="reference internal" href="nep-template.html"><span class="doc">NEP X — Template and Instructions</span></a> file and the <a class="reference external" href="http://www.sphinx-doc.org/en/stable/rest.html">reStructuredTextPrimer</a> for more
+information.  We use <a class="reference external" href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> to convert NEPs to HTML for viewing on the web
+<a class="footnote-reference brackets" href="#id4" id="id2">2</a>.</p>
+<div class="section" id="header-preamble">
+<h3>Header Preamble<a class="headerlink" href="#header-preamble" title="Permalink to this headline">¶</a></h3>
+<p>Each NEP must begin with a header preamble.  The headers
+must appear in the following order.  Headers marked with <code class="docutils literal notranslate"><span class="pre">*</span></code> are
+optional.  All other headers are required.</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>  <span class="nc">:Author:</span> <span class="nt">&lt;list of authors&#39; real names and optionally, email addresses&gt;</span>
+  <span class="nc">:Status:</span> &lt;Draft | Active | Accepted | Deferred | Rejected |
+           Withdrawn | Final | Superseded&gt;
+  <span class="nc">:Type:</span> <span class="nt">&lt;Standards Track | Process&gt;</span>
+  <span class="nc">:Created:</span> <span class="nt">&lt;date created on, in dd-mmm-yyyy format&gt;</span>
+<span class="m">*</span> :Requires: &lt;nep numbers&gt;
+<span class="m">*</span> :NumPy-Version: &lt;version number&gt;
+<span class="m">*</span> :Replaces: &lt;nep number&gt;
+<span class="m">*</span> :Replaced-By: &lt;nep number&gt;
+<span class="m">*</span> :Resolution: &lt;url&gt;
+</pre></div>
+</div>
+<p>The Author header lists the names, and optionally the email addresses
+of all the authors of the NEP.  The format of the Author header
+value must be</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Random J. User &lt;address@dom.ain&gt;
+</pre></div>
+</div>
+<p>if the email address is included, and just</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Random J. User
+</pre></div>
+</div>
+<p>if the address is not given.  If there are multiple authors, each should be on
+a separate line.</p>
+</div>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2017-December/077481.html">https://mail.python.org/pipermail/numpy-discussion/2017-December/077481.html</a></p></li>
+</ul>
+</div>
+<div class="section" id="references-and-footnotes">
+<h2>References and Footnotes<a class="headerlink" href="#references-and-footnotes" title="Permalink to this headline">¶</a></h2>
+<dl class="footnote brackets">
+<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>This historical record is available by the normal git commands
+for retrieving older revisions, and can also be browsed on
+<a class="reference external" href="https://github.com/numpy/numpy/tree/main/doc/neps">GitHub</a>.</p>
+</dd>
+<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>The URL for viewing NEPs on the web is
+<a class="reference external" href="https://www.numpy.org/neps/">https://www.numpy.org/neps/</a>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<p>This document has been placed in the public domain.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2018, NumPy Developers.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

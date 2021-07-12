@@ -1,0 +1,697 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 36 — Fair play &#8212; NumPy Enhancement Proposals</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 38 — Using SIMD optimization instructions for performance" href="nep-0038-SIMD-optimizations.html" />
+    <link rel="prev" title="NEP 34 — Disallow inferring dtype=object from sequences" href="nep-0034-infer-dtype-is-object.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0036-fair-play.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="content.html">
+  <img src="_static/../source/_static/numpylogo.svg" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Index
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="scope.html">
+  The Scope of NumPy
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="roadmap.html">
+  Current roadmap
+ </a>
+</li>
+
+    
+    <li class="nav-item">
+        <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+    </li>
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/numpy/numpy" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://twitter.com/numpy_team" rel="noopener" target="_blank" title="Twitter">
+            <span><i class="fab fa-twitter-square"></i></span>
+            <label class="sr-only">Twitter</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="scope.html">
+   The Scope of NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="roadmap.html">
+   Current roadmap
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+   Wish list
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0000.html">
+   NEP 0 — Purpose and Process
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-template.html">
+   NEP X — Template and Instructions
+  </a>
+ </li>
+</ul>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0034-infer-dtype-is-object.html">
+   NEP 34 — Disallow inferring ``dtype=object`` from sequences
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   NEP 36 — Fair play
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0038-SIMD-optimizations.html">
+   NEP 38 — Using SIMD optimization instructions for performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0041-improved-dtype-support.html">
+   NEP 41 — First step towards a new Datatype System
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0042-new-dtypes.html">
+   NEP 42 — New and extensible DTypes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">
+   NEP 44 — Restructuring the NumPy Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0045-c_style_guide.html">
+   NEP 45 — C Style Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0046-sponsorship-guidelines.html">
+   NEP 46 — NumPy Sponsorship Guidelines
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0021-advanced-indexing.html">
+   NEP 21 — Simplified and explicit advanced indexing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0030-duck-array-protocol.html">
+   NEP 30 — Duck Typing for NumPy Arrays - Implementation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0031-uarray.html">
+   NEP 31 — Context-local and global overrides of the NumPy API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0037-array-module.html">
+   NEP 37 — A dispatch protocol for NumPy-like modules
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0043-extensible-ufuncs.html">
+   NEP 43 — Enhancing the Extensibility of UFuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0047-array-api-standard.html">
+   NEP 47 — Adopting the array API standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0048-spending-project-funds.html">
+   NEP 48 — Spending NumPy Project Funds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0049.html">
+   NEP 49 — Data allocation strategies
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0001-npy-format.html">
+   NEP 1 — A Simple File Format for NumPy Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0005-generalized-ufuncs.html">
+   NEP 5 — Generalized Universal Functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0007-datetime-proposal.html">
+   NEP 7 — A proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0010-new-iterator-ufunc.html">
+   NEP 10 — Optimizing Iterator/UFunc Performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0013-ufunc-overrides.html">
+   NEP 13 — A Mechanism for Overriding Ufuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">
+   NEP 14 — Plan for dropping Python 2.7 support
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0015-merge-multiarray-umath.html">
+   NEP 15 — Merging multiarray and umath
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0018-array-function-protocol.html">
+   NEP 18 — A dispatch mechanism for NumPy's high level array functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0019-rng-policy.html">
+   NEP 19 — Random Number Generator Policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">
+   NEP 20 — Expansion of Generalized Universal Function Signatures
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">
+   NEP 22 — Duck typing for NumPy arrays – high level overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0023-backwards-compatibility.html">
+   NEP 23 — Backwards compatibility and deprecation policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0027-zero-rank-arrarys.html">
+   NEP 27 — Zero Rank Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0028-website-redesign.html">
+   NEP 28 — numpy.org website redesign
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0029-deprecation_policy.html">
+   NEP 29 — Recommend Python and NumPy version support as a community policy standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0032-remove-financial-functions.html">
+   NEP 32 — Remove the financial functions from NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">
+   NEP 35 — Array Creation Dispatching With __array_function__
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0040-legacy-datatype-impl.html">
+   NEP 40 — Legacy Datatype Implementation in NumPy
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0002-warnfix.html">
+   NEP 2 — A proposal to build numpy without warning with a big set of warning flags
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0003-math_config_clean.html">
+   NEP 3 — Cleaning the math configuration of numpy.core
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0004-datetime-proposal3.html">
+   NEP 4 — A (third) proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0006-newbugtracker.html">
+   NEP 6 — Replacing Trac with a different bug tracker
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0008-groupby_additions.html">
+   NEP 8 —  A proposal for adding groupby functionality to NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0009-structured_array_extensions.html">
+   NEP 9 — Structured array extensions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">
+   NEP 11 — Deferred UFunc Evaluation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0012-missing-data.html">
+   NEP 12 — Missing Data Functionality in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0024-missing-data-2.html">
+   NEP 24 — Missing Data Functionality - Alternative 1 to NEP 12
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0025-missing-data-3.html">
+   NEP 25 — NA support via special dtypes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0026-missing-data-summary.html">
+   NEP 26 — Summary of Missing Data NEPs and discussion
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0016-abstract-array.html">
+   NEP 16 — An abstract base class for identifying "duck arrays"
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0017-split-out-maskedarray.html">
+   NEP 17 — Split Out Masked Arrays
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#abstract">
+   Abstract
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#motivation">
+   Motivation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#scope">
+   Scope
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fair-play-rules">
+   Fair play rules
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#questions-and-answers">
+   Questions and answers
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#discussion">
+   Discussion
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references-and-footnotes">
+   References and footnotes
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#copyright">
+   Copyright
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-36-fair-play">
+<h1>NEP 36 — Fair play<a class="headerlink" href="#nep-36-fair-play" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Stéfan van der Walt &lt;<a class="reference external" href="mailto:stefanv&#37;&#52;&#48;berkeley&#46;edu">stefanv<span>&#64;</span>berkeley<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Status</dt>
+<dd class="field-even"><p>Accepted</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Informational</p>
+</dd>
+<dt class="field-even">Created</dt>
+<dd class="field-even"><p>2019-10-24</p>
+</dd>
+<dt class="field-odd">Resolution</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2021-June/081890.html">https://mail.python.org/pipermail/numpy-discussion/2021-June/081890.html</a></p>
+</dd>
+</dl>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>This document sets out Rules of Play for companies and outside
+developers that engage with the NumPy project. It covers:</p>
+<ul class="simple">
+<li><p>Restrictions on use of the NumPy name</p></li>
+<li><p>How and whether to publish a modified distribution</p></li>
+<li><p>How to make us aware of patched versions</p></li>
+</ul>
+<p>Companies and developers will know after reading this NEP what kinds
+of behavior the community would like to see, and which we consider
+troublesome, bothersome, and unacceptable.</p>
+</div>
+<div class="section" id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Permalink to this headline">¶</a></h2>
+<p>Every so often, we learn of NumPy versions modified and circulated by outsiders.
+These patched versions can cause problems for the NumPy community
+(see, e.g., <a class="footnote-reference brackets" href="#erf" id="id1">1</a> and <a class="footnote-reference brackets" href="#cve-2019-6446" id="id2">2</a>).
+When issues like these arise, our developers waste time identifying
+the problematic release, locating alterations, and determining an
+appropriate course of action.</p>
+<p>In addition, packages on the Python Packaging Index are sometimes
+named such that users assume they are sanctioned or maintained by
+NumPy.  We wish to reduce the number of such incidents.</p>
+<p>During a community call on <a class="reference external" href="https://github.com/numpy/archive/blob/main/status_meetings/status-2019-10-16.md">October 16th, 2019</a>
+the community resolved to draft guidelines to address these matters.</p>
+<dl class="footnote brackets">
+<dt class="label" id="erf"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>In December 2018, a
+<a class="reference external" href="https://github.com/numpy/numpy/issues/12515">bug report</a>
+was filed against <cite>np.erf</cite> – a function that didn’t exist in the
+NumPy distribution.  It came to light that a company had published
+a NumPy version with an extended API footprint. After several
+months of discussion, the company agreed to make its patches
+public, and we added a label to the NumPy issue tracker to identify
+issues pertaining to that distribution.</p>
+</dd>
+<dt class="label" id="cve-2019-6446"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>After a security issue (CVE-2019-6446) was filed
+against NumPy, distributions put in their own fixes, most often by
+changing a default keyword value. As a result the NumPy API was
+inconsistent across distributions.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="scope">
+<h2>Scope<a class="headerlink" href="#scope" title="Permalink to this headline">¶</a></h2>
+<p>This document aims to define a minimal set of rules that, when
+followed, will be considered good-faith efforts in line with the
+expectations of the NumPy developers.</p>
+<p>Our hope is that developers who feel they need to modify NumPy will
+first consider contributing to the project, or use one of several existing
+mechanisms for extending our APIs and for operating on
+externally defined array objects.</p>
+<p>When in doubt, please <a class="reference external" href="https://numpy.org/community/">talk to us first</a>. We may suggest an alternative; at
+minimum, we’ll be prepared.</p>
+</div>
+<div class="section" id="fair-play-rules">
+<h2>Fair play rules<a class="headerlink" href="#fair-play-rules" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p>Do not reuse the NumPy name for projects not developed by the NumPy
+community.</p>
+<p>At time of writing, there are only a handful of <code class="docutils literal notranslate"><span class="pre">numpy</span></code>-named
+packages developed by the community, including <code class="docutils literal notranslate"><span class="pre">numpy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">numpy-financial</span></code>, and <code class="docutils literal notranslate"><span class="pre">unumpy</span></code>.  We ask that external packages not
+include the phrase <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, i.e., avoid names such as
+<code class="docutils literal notranslate"><span class="pre">mycompany_numpy</span></code>.</p>
+<p>To be clear, this rule only applies to modules (package names); it
+is perfectly acceptable to have a <em>submodule</em> of your own library
+named <code class="docutils literal notranslate"><span class="pre">mylibrary.numpy</span></code>.</p>
+<p>NumPy is a trademark owned by NumFOCUS.</p>
+</li>
+<li><p>Do not republish modified versions of NumPy.</p>
+<p>Modified versions of NumPy make it very difficult for the
+developers to address bug reports, since we typically do not know
+which parts of NumPy have been modified.</p>
+<p>If you have to break this rule (and we implore you not
+to!), then make it clear in the <code class="docutils literal notranslate"><span class="pre">__version__</span></code> tag that
+you have modified NumPy, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="go">&#39;1.17.2+mycompany.15`</span>
+</pre></div>
+</div>
+<p>We understand that minor patches are often required to make a
+library work inside of a distribution.  E.g., Debian may patch
+NumPy so that it searches for optimized BLAS libraries in the
+correct locations.  This is acceptable, but we ask that no
+substantive changes are made.</p>
+</li>
+<li><p>Do not extend or modify NumPy’s API.</p>
+<p>If you absolutely have to break rule two, please do not add
+additional functions to the namespace, or modify the API of
+existing functions.  NumPy’s API is already
+quite large, and we are working hard to reduce it where feasible.
+Having additional functions exposed in distributed versions is
+confusing for users and developers alike.</p>
+</li>
+<li><p><em>DO</em> use official mechanism to engage with the API.</p>
+<p>Protocols such as <a class="reference external" href="https://numpy.org/neps/nep-0013-ufunc-overrides.html">__array_ufunc__</a> and
+<a class="reference external" href="https://numpy.org/neps/nep-0018-array-function-protocol.html">__array_function__</a>
+were designed to help external packages interact more easily with
+NumPy.  E.g., the latter allows objects from foreign libraries to
+pass through NumPy.  We actively encourage using any of
+these “officialy sanctioned” mechanisms for overriding or
+interacting with NumPy.</p>
+<p>If these mechanisms are deemed insufficient, please start a
+discussion on the mailing list before monkeypatching NumPy.</p>
+</li>
+</ol>
+</div>
+<div class="section" id="questions-and-answers">
+<h2>Questions and answers<a class="headerlink" href="#questions-and-answers" title="Permalink to this headline">¶</a></h2>
+<p><strong>Q:</strong> We would like to distribute an optimized version of NumPy that
+utilizes special instructions for our company’s CPU.  You recommend
+against that, so what are we to do?</p>
+<p><strong>A:</strong> Please consider including the patches required in the official
+NumPy repository.  Not only do we encourage such contributions, but we
+already have optimized loops for some platforms available.</p>
+<p><strong>Q:</strong> We would like to ship a much faster version of FFT than NumPy
+provides, but NumPy has no mechanism for overriding its FFT routines.
+How do we proceed?</p>
+<p><strong>A:</strong> There are two solutions that we approve of: let the users
+install your optimizations using a piece of code, such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">my_company_accel</span> <span class="kn">import</span> <span class="n">patch_numpy_fft</span>
+<span class="n">patch_numpy_fft</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>or have your distribution automatically perform the above, but print a
+message to the terminal clearly stating what is happening:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">We</span> <span class="n">are</span> <span class="n">now</span> <span class="n">patching</span> <span class="n">NumPy</span> <span class="k">for</span> <span class="n">optimal</span> <span class="n">performance</span> <span class="n">under</span> <span class="n">MyComp</span>
+<span class="n">Special</span> <span class="n">Platform</span><span class="o">.</span>  <span class="n">Please</span> <span class="n">direct</span> <span class="nb">all</span> <span class="n">bug</span> <span class="n">reports</span> <span class="n">to</span>
+<span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">mycomp</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">numpy</span><span class="o">-</span><span class="n">bugs</span>
+</pre></div>
+</div>
+<p>If you require additional mechanisms for overriding code, please
+discuss this with the development team on the mailing list.</p>
+<p><strong>Q:</strong> We would like to distribute NumPy with faster linear algebra
+routines. Are we allowed to do this?</p>
+<p><strong>A:</strong> Yes, this is explicitly supported by linking to a different
+version of BLAS.</p>
+</div>
+<div class="section" id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<p>This document has been placed in the public domain.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2018, NumPy Developers.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

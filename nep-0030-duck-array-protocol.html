@@ -1,0 +1,714 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEP 30 — Duck Typing for NumPy Arrays - Implementation &#8212; NumPy Enhancement Proposals</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 31 — Context-local and global overrides of the NumPy API" href="nep-0031-uarray.html" />
+    <link rel="prev" title="NEP 21 — Simplified and explicit advanced indexing" href="nep-0021-advanced-indexing.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+<link rel="stylesheet" href="_static/numpy.css" type="text/css" />
+
+    <!-- PR #17220: This is added via javascript in versionwarning.js  -->
+    <!-- link rel="canonical" href="http://numpy.org/doc/stable/nep-0030-duck-array-protocol.html" / -->
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+
+<a class="navbar-brand" href="content.html">
+  <img src="_static/../source/_static/numpylogo.svg" class="logo" alt="logo">
+</a>
+
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Index
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="scope.html">
+  The Scope of NumPy
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="roadmap.html">
+  Current roadmap
+ </a>
+</li>
+
+    
+    <li class="nav-item">
+        <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wishlist<i class="fas fa-external-link-alt"></i></a>
+    </li>
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/numpy/numpy" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://twitter.com/numpy_team" rel="noopener" target="_blank" title="Twitter">
+            <span><i class="fab fa-twitter-square"></i></span>
+            <label class="sr-only">Twitter</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="scope.html">
+   The Scope of NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="roadmap.html">
+   Current roadmap
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+   Wish list
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0000.html">
+   NEP 0 — Purpose and Process
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-template.html">
+   NEP X — Template and Instructions
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0034-infer-dtype-is-object.html">
+   NEP 34 — Disallow inferring ``dtype=object`` from sequences
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0036-fair-play.html">
+   NEP 36 — Fair play
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0038-SIMD-optimizations.html">
+   NEP 38 — Using SIMD optimization instructions for performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0041-improved-dtype-support.html">
+   NEP 41 — First step towards a new Datatype System
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0042-new-dtypes.html">
+   NEP 42 — New and extensible DTypes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">
+   NEP 44 — Restructuring the NumPy Documentation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0045-c_style_guide.html">
+   NEP 45 — C Style Guide
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0046-sponsorship-guidelines.html">
+   NEP 46 — NumPy Sponsorship Guidelines
+  </a>
+ </li>
+</ul>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0021-advanced-indexing.html">
+   NEP 21 — Simplified and explicit advanced indexing
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   NEP 30 — Duck Typing for NumPy Arrays - Implementation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0031-uarray.html">
+   NEP 31 — Context-local and global overrides of the NumPy API
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0037-array-module.html">
+   NEP 37 — A dispatch protocol for NumPy-like modules
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0043-extensible-ufuncs.html">
+   NEP 43 — Enhancing the Extensibility of UFuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0047-array-api-standard.html">
+   NEP 47 — Adopting the array API standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0048-spending-project-funds.html">
+   NEP 48 — Spending NumPy Project Funds
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0049.html">
+   NEP 49 — Data allocation strategies
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0001-npy-format.html">
+   NEP 1 — A Simple File Format for NumPy Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0005-generalized-ufuncs.html">
+   NEP 5 — Generalized Universal Functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0007-datetime-proposal.html">
+   NEP 7 — A proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0010-new-iterator-ufunc.html">
+   NEP 10 — Optimizing Iterator/UFunc Performance
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0013-ufunc-overrides.html">
+   NEP 13 — A Mechanism for Overriding Ufuncs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">
+   NEP 14 — Plan for dropping Python 2.7 support
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0015-merge-multiarray-umath.html">
+   NEP 15 — Merging multiarray and umath
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0018-array-function-protocol.html">
+   NEP 18 — A dispatch mechanism for NumPy's high level array functions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0019-rng-policy.html">
+   NEP 19 — Random Number Generator Policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">
+   NEP 20 — Expansion of Generalized Universal Function Signatures
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">
+   NEP 22 — Duck typing for NumPy arrays – high level overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0023-backwards-compatibility.html">
+   NEP 23 — Backwards compatibility and deprecation policy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0027-zero-rank-arrarys.html">
+   NEP 27 — Zero Rank Arrays
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0028-website-redesign.html">
+   NEP 28 — numpy.org website redesign
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0029-deprecation_policy.html">
+   NEP 29 — Recommend Python and NumPy version support as a community policy standard
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0032-remove-financial-functions.html">
+   NEP 32 — Remove the financial functions from NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">
+   NEP 35 — Array Creation Dispatching With __array_function__
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0040-legacy-datatype-impl.html">
+   NEP 40 — Legacy Datatype Implementation in NumPy
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0002-warnfix.html">
+   NEP 2 — A proposal to build numpy without warning with a big set of warning flags
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0003-math_config_clean.html">
+   NEP 3 — Cleaning the math configuration of numpy.core
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0004-datetime-proposal3.html">
+   NEP 4 — A (third) proposal for implementing some date/time types in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0006-newbugtracker.html">
+   NEP 6 — Replacing Trac with a different bug tracker
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0008-groupby_additions.html">
+   NEP 8 —  A proposal for adding groupby functionality to NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0009-structured_array_extensions.html">
+   NEP 9 — Structured array extensions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">
+   NEP 11 — Deferred UFunc Evaluation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0012-missing-data.html">
+   NEP 12 — Missing Data Functionality in NumPy
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0024-missing-data-2.html">
+   NEP 24 — Missing Data Functionality - Alternative 1 to NEP 12
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0025-missing-data-3.html">
+   NEP 25 — NA support via special dtypes
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0026-missing-data-summary.html">
+   NEP 26 — Summary of Missing Data NEPs and discussion
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0016-abstract-array.html">
+   NEP 16 — An abstract base class for identifying "duck arrays"
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="nep-0017-split-out-maskedarray.html">
+   NEP 17 — Split Out Masked Arrays
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
+
+<nav id="bd-toc-nav">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#abstract">
+   Abstract
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#detailed-description">
+   Detailed description
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#usage-guidance">
+     Usage Guidance
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#implementation">
+   Implementation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#example-for-a-project-implementing-numpy-like-arrays">
+     Example for a project implementing NumPy-like arrays
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#usage">
+   Usage
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#backward-compatibility">
+   Backward compatibility
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#previous-proposals-and-discussion">
+   Previous proposals and discussion
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#copyright">
+   Copyright
+  </a>
+ </li>
+</ul>
+
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="nep-30-duck-typing-for-numpy-arrays-implementation">
+<span id="nep30"></span><h1>NEP 30 — Duck Typing for NumPy Arrays - Implementation<a class="headerlink" href="#nep-30-duck-typing-for-numpy-arrays-implementation" title="Permalink to this headline">¶</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author</dt>
+<dd class="field-odd"><p>Peter Andreas Entschev &lt;<a class="reference external" href="mailto:pentschev&#37;&#52;&#48;nvidia&#46;com">pentschev<span>&#64;</span>nvidia<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author</dt>
+<dd class="field-even"><p>Stephan Hoyer &lt;<a class="reference external" href="mailto:shoyer&#37;&#52;&#48;google&#46;com">shoyer<span>&#64;</span>google<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-odd">Status</dt>
+<dd class="field-odd"><p>Draft</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>Standards Track</p>
+</dd>
+<dt class="field-odd">Created</dt>
+<dd class="field-odd"><p>2019-07-31</p>
+</dd>
+<dt class="field-even">Updated</dt>
+<dd class="field-even"><p>2019-07-31</p>
+</dd>
+<dt class="field-odd">Resolution</dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="section" id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Permalink to this headline">¶</a></h2>
+<p>We propose the <code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> protocol, following the high-level overview
+described in NEP 22, allowing downstream libraries to return arrays of their
+defined types, in contrast to <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code>, that coerces those <code class="docutils literal notranslate"><span class="pre">array_like</span></code>
+objects to NumPy arrays.</p>
+</div>
+<div class="section" id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Permalink to this headline">¶</a></h2>
+<p>NumPy’s API, including array definitions, is implemented and mimicked in
+countless other projects. By definition, many of those arrays are fairly
+similar in how they operate to the NumPy standard. The introduction of
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> allowed dispatching of functions implemented by several
+of these projects directly via NumPy’s API. This introduces a new requirement,
+returning the NumPy-like array itself, rather than forcing a coercion into a
+pure NumPy array.</p>
+<p>For the purpose above, NEP 22 introduced the concept of duck typing to NumPy
+arrays. The suggested solution described in the NEP allows libraries to avoid
+coercion of a NumPy-like array to a pure NumPy array where necessary, while
+still allowing that NumPy-like array libraries that do not wish to implement
+the protocol to coerce arrays to a pure NumPy array via <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code>.</p>
+<div class="section" id="usage-guidance">
+<h3>Usage Guidance<a class="headerlink" href="#usage-guidance" title="Permalink to this headline">¶</a></h3>
+<p>Code that uses <code class="docutils literal notranslate"><span class="pre">np.duckarray</span></code> is meant for supporting other ndarray-like objects
+that “follow the NumPy API”. That is an ill-defined concept at the moment –
+every known library implements the NumPy API only partly, and many deviate
+intentionally in at least some minor ways. This cannot be easily remedied, so
+for users of <code class="docutils literal notranslate"><span class="pre">np.duckarray</span></code> we recommend the following strategy: check if the
+NumPy functionality used by the code that follows your use of <code class="docutils literal notranslate"><span class="pre">np.duckarray</span></code>
+is present in Dask, CuPy and Sparse. If so, it’s reasonable to expect any duck
+array to work here. If not, we suggest you indicate in your docstring what kinds
+of duck arrays are accepted, or what properties they need to have.</p>
+<p>To exemplify the usage of duck arrays, suppose one wants to take the <code class="docutils literal notranslate"><span class="pre">mean()</span></code>
+of an array-like object <code class="docutils literal notranslate"><span class="pre">arr</span></code>. Using NumPy to achieve that, one could write
+<code class="docutils literal notranslate"><span class="pre">np.asarray(arr).mean()</span></code> to achieve the intended result. If <code class="docutils literal notranslate"><span class="pre">arr</span></code> is not
+a NumPy array, this would create an actual NumPy array in order to call
+<code class="docutils literal notranslate"><span class="pre">.mean()</span></code>. However, if the array is an object that is compliant with the NumPy
+API (either in full or partially) such as a CuPy, Sparse or a Dask array, then
+that copy would have been unnecessary. On the other hand, if one were to use the new
+<code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> protocol: <code class="docutils literal notranslate"><span class="pre">np.duckarray(arr).mean()</span></code>, and <code class="docutils literal notranslate"><span class="pre">arr</span></code> is an object
+compliant with the NumPy API, it would simply be returned rather than coerced
+into a pure NumPy array, avoiding unnecessary copies and potential loss of
+performance.</p>
+</div>
+</div>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>The implementation idea is fairly straightforward, requiring a new function
+<code class="docutils literal notranslate"><span class="pre">duckarray</span></code> to be introduced in NumPy, and a new method <code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> in
+NumPy-like array classes. The new <code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> method shall return the
+downstream array-like object itself, such as the <code class="docutils literal notranslate"><span class="pre">self</span></code> object, while the
+<code class="docutils literal notranslate"><span class="pre">__array__</span></code> method raises <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.  Alternatively, the <code class="docutils literal notranslate"><span class="pre">__array__</span></code>
+method could create an actual NumPy array and return that.</p>
+<p>The new NumPy <code class="docutils literal notranslate"><span class="pre">duckarray</span></code> function can be implemented as follows:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">duckarray</span><span class="p">(</span><span class="n">array_like</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">array_like</span><span class="p">,</span> <span class="s1">&#39;__duckarray__&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">array_like</span><span class="o">.</span><span class="n">__duckarray__</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">array_like</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="example-for-a-project-implementing-numpy-like-arrays">
+<h3>Example for a project implementing NumPy-like arrays<a class="headerlink" href="#example-for-a-project-implementing-numpy-like-arrays" title="Permalink to this headline">¶</a></h3>
+<p>Now consider a library that implements a NumPy-compatible array class called
+<code class="docutils literal notranslate"><span class="pre">NumPyLikeArray</span></code>, this class shall implement the methods described above, and
+a complete implementation would look like the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NumPyLikeArray</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__duckarray__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__array__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;NumPyLikeArray can not be converted to a NumPy &quot;</span>
+                         <span class="s2">&quot;array. You may want to use np.duckarray() instead.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The implementation above exemplifies the simplest case, but the overall idea
+is that libraries will implement a <code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> method that returns the
+original object, and an <code class="docutils literal notranslate"><span class="pre">__array__</span></code> method that either creates and returns an
+appropriate NumPy array, or raises a``TypeError`` to prevent unintentional use
+as an object in a NumPy array (if <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code> is called on an arbitrary
+object that does not implement <code class="docutils literal notranslate"><span class="pre">__array__</span></code>, it will create a NumPy array
+scalar).</p>
+<p>In case of existing libraries that don’t already implement <code class="docutils literal notranslate"><span class="pre">__array__</span></code> but
+would like to use duck array typing, it is advised that they introduce
+both <code class="docutils literal notranslate"><span class="pre">__array__</span></code> and``__duckarray__`` methods.</p>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>An example of how the <code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> protocol could be used to write a
+<code class="docutils literal notranslate"><span class="pre">stack</span></code> function based on <code class="docutils literal notranslate"><span class="pre">concatenate</span></code>, and its produced outcome, can be
+seen below. The example here was chosen not only to demonstrate the usage of
+the <code class="docutils literal notranslate"><span class="pre">duckarray</span></code> function, but also to demonstrate its dependency on the NumPy
+API, demonstrated by checks on the array’s <code class="docutils literal notranslate"><span class="pre">shape</span></code> attribute. Note that the
+example is merely a simplified version of NumPy’s actual implementation of
+<code class="docutils literal notranslate"><span class="pre">stack</span></code> working on the first axis, and it is assumed that Dask has implemented
+the <code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> method.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">duckarray_stack</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+    <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">duckarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">]</span>
+
+    <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;all input arrays must have the same shape&#39;</span><span class="p">)</span>
+
+    <span class="n">expanded_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">expanded_arrays</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">dask_arr</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">np_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">np_like</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">duckarray_stack</span><span class="p">((</span><span class="n">dask_arr</span><span class="p">,</span> <span class="n">dask_arr</span><span class="p">))</span>   <span class="c1"># Returns dask.array</span>
+<span class="n">duckarray_stack</span><span class="p">((</span><span class="n">dask_arr</span><span class="p">,</span> <span class="n">np_arr</span><span class="p">))</span>     <span class="c1"># Returns dask.array</span>
+<span class="n">duckarray_stack</span><span class="p">((</span><span class="n">dask_arr</span><span class="p">,</span> <span class="n">np_like</span><span class="p">))</span>    <span class="c1"># Returns dask.array</span>
+</pre></div>
+</div>
+<p>In contrast, using only <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code> (at the time of writing of this NEP, this
+is the usual method employed by library developers to ensure arrays are
+NumPy-like) has a different outcome:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">asarray_stack</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+    <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">]</span>
+
+    <span class="c1"># The remaining implementation is the same as that of</span>
+    <span class="c1"># ``duckarray_stack`` above</span>
+
+<span class="n">asarray_stack</span><span class="p">((</span><span class="n">dask_arr</span><span class="p">,</span> <span class="n">dask_arr</span><span class="p">))</span>     <span class="c1"># Returns np.ndarray</span>
+<span class="n">asarray_stack</span><span class="p">((</span><span class="n">dask_arr</span><span class="p">,</span> <span class="n">np_arr</span><span class="p">))</span>       <span class="c1"># Returns np.ndarray</span>
+<span class="n">asarray_stack</span><span class="p">((</span><span class="n">dask_arr</span><span class="p">,</span> <span class="n">np_like</span><span class="p">))</span>      <span class="c1"># Returns np.ndarray</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Permalink to this headline">¶</a></h2>
+<p>This proposal does not raise any backward compatibility issues within NumPy,
+given that it only introduces a new function. However, downstream libraries
+that opt to introduce the <code class="docutils literal notranslate"><span class="pre">__duckarray__</span></code> protocol may choose to remove the
+ability of coercing arrays back to a NumPy array via <code class="docutils literal notranslate"><span class="pre">np.array</span></code> or
+<code class="docutils literal notranslate"><span class="pre">np.asarray</span></code> functions, preventing unintended effects of coercion of such
+arrays back to a pure NumPy array (as some libraries already do, such as CuPy
+and Sparse), but still leaving libraries not implementing the protocol with the
+choice of utilizing <code class="docutils literal notranslate"><span class="pre">np.duckarray</span></code> to promote <code class="docutils literal notranslate"><span class="pre">array_like</span></code> objects to pure
+NumPy arrays.</p>
+</div>
+<div class="section" id="previous-proposals-and-discussion">
+<h2>Previous proposals and discussion<a class="headerlink" href="#previous-proposals-and-discussion" title="Permalink to this headline">¶</a></h2>
+<p>The duck typing protocol proposed here was described in a high level in
+<a class="reference external" href="https://numpy.org/neps/nep-0022-ndarray-duck-typing-overview.html">NEP 22</a>.</p>
+<p>Additionally, longer discussions about the protocol and related proposals
+took place in
+<a class="reference external" href="https://github.com/numpy/numpy/issues/13831">numpy/numpy #13831</a></p>
+</div>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<p>This document has been placed in the public domain.</p>
+</div>
+</div>
+
+
+              </div>
+              
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2017-2018, NumPy Developers.<br/>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.1.0.<br/>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
