@@ -1,0 +1,576 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NumPy roadmap &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script src="_static/documentation_options.js?v=3b5cce75"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'roadmap';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Meta-NEPs (NEPs about NEPs or active Processes)" href="meta.html" />
+    <link rel="prev" title="Scope of NumPy" href="scope.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/numpylogo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Index
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="scope.html">
+                        The Scope of NumPy
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Current roadmap
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+                    Wishlist
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Index
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="scope.html">
+                        The Scope of NumPy
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Current roadmap
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+                    Wishlist
+                  </a>
+                </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">NumPy roadmap</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="numpy-roadmap">
+<h1>NumPy roadmap<a class="headerlink" href="#numpy-roadmap" title="Link to this heading">#</a></h1>
+<p>This is a live snapshot of tasks and features we will be investing resources
+in. It may be used to encourage and inspire developers and to search for
+funding.</p>
+<section id="interoperability">
+<h2>Interoperability<a class="headerlink" href="#interoperability" title="Link to this heading">#</a></h2>
+<p>We aim to make it easier to interoperate with NumPy. There are many NumPy-like
+packages that add interesting new capabilities to the Python ecosystem, as well
+as many libraries that extend NumPy’s model in various ways.  Work in NumPy to
+facilitate interoperability with all such packages, and the code that uses them,
+may include (among other things) interoperability protocols, better duck typing
+support and ndarray subclass handling.</p>
+<p>The key goal is: <em>make it easy for code written for NumPy to also work with
+other NumPy-like projects.</em> This will enable GPU support via, e.g, CuPy or JAX,
+distributed array support via Dask, and writing special-purpose arrays (either
+from scratch, or as a <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> subclass) that work well with SciPy,
+scikit-learn and other such packages.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> protocols are stable, but
+do not cover the whole API.  New protocols for overriding other functionality
+in NumPy are needed. Work in this area aims to bring to completion one or more
+of the following proposals:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="nep-0030-duck-array-protocol.html#nep30"><span class="std std-ref">NEP 30 — Duck typing for NumPy arrays - implementation</span></a></p></li>
+<li><p><a class="reference internal" href="nep-0031-uarray.html#nep31"><span class="std std-ref">NEP 31 — Context-local and global overrides of the NumPy API</span></a></p></li>
+<li><p><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html#nep35"><span class="std std-ref">NEP 35 — Array creation dispatching with __array_function__</span></a></p></li>
+<li><p><a class="reference internal" href="nep-0037-array-module.html#nep37"><span class="std std-ref">NEP 37 — A dispatch protocol for NumPy-like modules</span></a></p></li>
+</ul>
+<p>In addition we aim to provide ways to make it easier for other libraries to
+implement a NumPy-compatible API. This may include defining consistent subsets
+of the API, as discussed in <a class="reference external" href="https://numpy.org/neps/nep-0037-array-module.html#requesting-restricted-subsets-of-numpy-s-api">this section of NEP 37</a>.</p>
+</section>
+<section id="performance">
+<h2>Performance<a class="headerlink" href="#performance" title="Link to this heading">#</a></h2>
+<p>Improvements to NumPy’s performance are important to many users. We have
+focused this effort on Universal SIMD (see <a class="reference internal" href="nep-0038-SIMD-optimizations.html#nep38"><span class="std std-ref">NEP 38 — Using SIMD optimization instructions for performance</span></a>) intrinsics which
+provide nice improvements across various hardware platforms via an abstraction
+layer.  The infrastructure is in place, and we welcome follow-on PRs to add
+SIMD support across all relevant NumPy functions.</p>
+<p>Other performance improvement ideas include:</p>
+<ul class="simple">
+<li><p>A better story around parallel execution.</p></li>
+<li><p>Optimizations in individual functions.</p></li>
+<li><p>Reducing ufunc and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> overhead.</p></li>
+</ul>
+<p>Furthermore we would like to improve the benchmarking system, in terms of coverage,
+easy of use, and publication of the results (now
+<a class="reference external" href="https://pv.github.io/numpy-bench">here</a>) as part of the docs or website.</p>
+</section>
+<section id="documentation-and-website">
+<h2>Documentation and website<a class="headerlink" href="#documentation-and-website" title="Link to this heading">#</a></h2>
+<p>The NumPy <a class="reference external" href="https://www.numpy.org/devdocs">documentation</a> is of varying
+quality. The API documentation is in good shape; tutorials and high-level
+documentation on many topics are missing or outdated. See <a class="reference internal" href="nep-0044-restructuring-numpy-docs.html#nep44"><span class="std std-ref">NEP 44 — Restructuring the NumPy documentation</span></a> for
+planned improvements. Adding more tutorials is underway in the
+<a class="reference external" href="https://github.com/numpy/numpy-tutorials">numpy-tutorials repo</a>.</p>
+<p>Our website (<a class="reference external" href="https://numpy.org">https://numpy.org</a>) was completely redesigned recently. We aim to
+further improve it by adding translations, more case studies and other
+high-level content, and more (see <a class="reference external" href="https://github.com/numpy/numpy.org/issues/266">this tracking issue</a>).</p>
+</section>
+<section id="extensibility">
+<h2>Extensibility<a class="headerlink" href="#extensibility" title="Link to this heading">#</a></h2>
+<p>We aim to make it much easier to extend NumPy. The primary topic here is to
+improve the dtype system - see <a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41 — First step towards a new datatype system</span></a> and related NEPs linked from it.
+Concrete goals for the dtype system rewrite are:</p>
+<ul class="simple">
+<li><p>Easier custom dtypes:</p>
+<ul>
+<li><p>Simplify and/or wrap the current C-API</p></li>
+<li><p>More consistent support for dtype metadata</p></li>
+<li><p>Support for writing a dtype in Python</p></li>
+</ul>
+</li>
+<li><p>Allow adding (a) new string dtype(s). This could be encoded strings with
+fixed-width storage (e.g., <code class="docutils literal notranslate"><span class="pre">utf8</span></code> or <code class="docutils literal notranslate"><span class="pre">latin1</span></code>), and/or a variable length
+string dtype. The latter could share an implementation with <code class="docutils literal notranslate"><span class="pre">dtype=object</span></code>,
+but be explicitly type-checked.
+One of these should probably be the default for text data. The current
+string dtype support is neither efficient nor user friendly.</p></li>
+</ul>
+</section>
+<section id="user-experience">
+<h2>User experience<a class="headerlink" href="#user-experience" title="Link to this heading">#</a></h2>
+<section id="type-annotations">
+<h3>Type annotations<a class="headerlink" href="#type-annotations" title="Link to this heading">#</a></h3>
+<p>NumPy 1.20 adds type annotations for most NumPy functionality, so users can use
+tools like <a class="reference external" href="https://mypy.readthedocs.io">mypy</a> to type check their code and IDEs can improve their support
+for NumPy. Improving those type annotations, for example to support annotating
+array shapes and dtypes, is ongoing.</p>
+</section>
+<section id="platform-support">
+<h3>Platform support<a class="headerlink" href="#platform-support" title="Link to this heading">#</a></h3>
+<p>We aim to increase our support for different hardware architectures. This
+includes adding CI coverage when CI services are available, providing wheels on
+PyPI for POWER8/9 (<code class="docutils literal notranslate"><span class="pre">ppc64le</span></code>), providing better build and install
+documentation, and resolving build issues on other platforms like AIX.</p>
+</section>
+</section>
+<section id="maintenance">
+<h2>Maintenance<a class="headerlink" href="#maintenance" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MaskedArray</span></code> needs to be improved, ideas include:</p>
+<ul>
+<li><p>Rewrite masked arrays to not be a ndarray subclass – maybe in a separate project?</p></li>
+<li><p>MaskedArray as a duck-array type, and/or</p></li>
+<li><p>dtypes that support missing values</p></li>
+</ul>
+</li>
+<li><p>Fortran integration via <code class="docutils literal notranslate"><span class="pre">numpy.f2py</span></code> requires a number of improvements, see
+<a class="reference external" href="https://github.com/numpy/numpy/issues/14938">this tracking issue</a>.</p></li>
+<li><p>A backend system for <code class="docutils literal notranslate"><span class="pre">numpy.fft</span></code> (so that e.g. <code class="docutils literal notranslate"><span class="pre">fft-mkl</span></code> doesn’t need to monkeypatch numpy).</p></li>
+<li><p>Write a strategy on how to deal with overlap between NumPy and SciPy for <code class="docutils literal notranslate"><span class="pre">linalg</span></code>.</p></li>
+<li><p>Deprecate <code class="docutils literal notranslate"><span class="pre">np.matrix</span></code> (very slowly).</p></li>
+<li><p>Add new indexing modes for “vectorized indexing” and “outer indexing” (see <a class="reference internal" href="nep-0021-advanced-indexing.html#nep21"><span class="std std-ref">NEP 21 — Simplified and explicit advanced indexing</span></a>).</p></li>
+<li><p>Make the polynomial API easier to use.</p></li>
+<li><p>Integrate an improved text file loader.</p></li>
+<li><p>Ufunc and gufunc improvements, see <a class="reference external" href="https://github.com/numpy/numpy/issues/8892">gh-8892</a>
+and <a class="reference external" href="https://github.com/numpy/numpy/issues/11492">gh-11492</a>.</p></li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interoperability">Interoperability</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performance">Performance</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-and-website">Documentation and website</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extensibility">Extensibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-experience">User experience</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#type-annotations">Type annotations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#platform-support">Platform support</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#maintenance">Maintenance</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2017-2018, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
