@@ -1,0 +1,1022 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 48 — Spending NumPy project funds &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0048-spending-project-funds';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP X — Template and instructions" href="nep-template.html" />
+    <link rel="prev" title="NEP 46 — NumPy sponsorship guidelines" href="nep-0046-sponsorship-guidelines.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 16, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="meta.html" class="nav-link">Meta-NEPs (NEPs about NEPs or active Processes)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 48 — Spending NumPy project funds</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-48-spending-numpy-project-funds">
+<span id="nep48"></span><h1>NEP 48 — Spending NumPy project funds<a class="headerlink" href="#nep-48-spending-numpy-project-funds" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ralf Gommers &lt;<a class="reference external" href="mailto:ralf&#46;gommers&#37;&#52;&#48;gmail&#46;com">ralf<span>&#46;</span>gommers<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Inessa Pawson &lt;<a class="reference external" href="mailto:inessa&#37;&#52;&#48;albuscode&#46;org">inessa<span>&#64;</span>albuscode<span>&#46;</span>org</a>&gt;</p>
+</dd>
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Stefan van der Walt &lt;<a class="reference external" href="mailto:stefanv&#37;&#52;&#48;berkeley&#46;edu">stefanv<span>&#64;</span>berkeley<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Active</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Informational</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2021-02-07</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>The NumPy project has historically never received significant <strong>unrestricted</strong>
+funding. However, that is starting to change.  This NEP aims to provide
+guidance about spending NumPy project unrestricted funds by formulating a set
+of principles about <em>what</em> to pay for and <em>who</em> to pay. It will also touch on
+how decisions regarding spending funds get made, how funds get administered,
+and transparency around these topics.</p>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>NumPy is a fiscally sponsored project of NumFOCUS, a 501(c)(3) nonprofit
+organization headquartered in Austin, TX. Therefore, for all legal and
+accounting matters the NumPy project has to follow the rules and regulations
+for US nonprofits. All nonprofit donations are classified into two categories:
+<strong>unrestricted funds</strong> which may be used for any legal purpose appropriate
+to the organization and <strong>restricted funds</strong>, monies set aside for a
+particular purpose (e.g., project, educational program, etc.).</p>
+<p>For the detailed timeline of NumPy funding refer to
+<a class="reference internal" href="#numpy-funding-history"><span class="std std-ref">NumPy funding – history and current status</span></a>.</p>
+<p>Since its inception and until 2020, the NumPy project has only spent on the order of
+$10,000 USD of funds that were not restricted to a particular program.  Project
+income of this type has been relying on donations from individuals and, from
+mid 2019, recurring monthly contributions from Tidelift. By the end of 2020,
+the Tidelift contributions increased to $3,000/month, and there’s also a
+potential for an increase of donations and grants going directly to the
+project. Having a clear set of principles around how to use these funds will
+facilitate spending them fairly and effectively. Additionally, it will make it
+easier to solicit donations and other contributions.</p>
+<p>A key assumption this NEP makes is that NumPy remains a largely
+volunteer-driven project, and that the project funds are not enough to employ
+maintainers full-time. If funding increases to the point where that assumption
+is no longer true, this NEP should be updated.</p>
+<p>In scope for this NEP are:</p>
+<ul class="simple">
+<li><p>Principles of spending project funds: what to pay for, and who to pay.</p></li>
+<li><p>Describing how NumPy’s funds get administered.</p></li>
+<li><p>Describing how decisions to spend funds get proposed and made.</p></li>
+</ul>
+<p>Out of scope for this NEP are:</p>
+<ul class="simple">
+<li><p>Making any decisions about spending project funds on a specific project or
+activity.</p></li>
+<li><p>Principles for spending funds that are intended for NumPy development, but
+don’t fall in the category of NumPy unrestricted funds. This includes most of
+the grant funding, which is usually earmarked for certain
+activities/deliverables and goes to an Institutional Partner rather than
+directly to the NumPy project, and companies or institutions funding specific
+features.
+<em>Rationale: As a project, we have no direct control over how this work gets
+executed (at least formally, until issues or PRs show up). In some cases, we
+may not even know the contributions were funded or done by an employee on
+work time. (Whether that’s the case or not should not change how we approach
+a contribution).  For grants though, we do expect the research/project leader
+and funded team to align their work with the needs of NumPy and be
+receptive to feedback from other NumPy maintainers and contributors.</em></p></li>
+</ul>
+</section>
+<section id="principles-of-spending-project-funds">
+<h2>Principles of spending project funds<a class="headerlink" href="#principles-of-spending-project-funds" title="Link to this heading">#</a></h2>
+<p>NumPy will likely always be a project with many times more volunteer
+contributors than funded people. Therefore having those funded people operate
+in ways that attract more volunteers and enhance their participation experience
+is critical. That key principle motivates many of the more detailed principles
+given below for what to pay for and whom to pay.</p>
+<p>The approach for spending funds will be:</p>
+<ul class="simple">
+<li><p>first figure out what we want to fund,</p></li>
+<li><p>then look for a great candidate,</p></li>
+<li><p>after that’s settled, determine a fair compensation level.</p></li>
+</ul>
+<p>The next sections go into detail on each of these three points.</p>
+<section id="what-to-pay-for">
+<span id="section-what-to-pay-for"></span><h3>What to pay for<a class="headerlink" href="#what-to-pay-for" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Pay for things that are important <em>and</em> otherwise won’t get done.
+<em>Rationale: there is way more to be done than there are funds to do all
+those things. So count on interested volunteers or external sponsored work
+to do many of those things.</em></p></li>
+<li><p>Plan for sustainability. Don’t rely on money always being there.</p></li>
+<li><p>Consider potential positive benefits for NumPy maintainers and contributors,
+maintainers of other projects, end users, and other stakeholders like
+packagers and educators.</p></li>
+<li><p>Think broadly. There’s more to a project than code: websites, documentation,
+community building, governance - it’s all important.</p></li>
+<li><p>For proposed funded work, include paid time for others to review your work
+if such review is expected to be significant effort - do not just increase
+the load on volunteer maintainers.
+<em>Rationale: we want the effect of spending funds to be positive for
+everyone, not just for the people getting paid. This is also a matter of
+fairness.</em></p></li>
+</ol>
+<p>When considering development work, principle (1) implies that priority should
+be giving to (a) the most boring/painful tasks that no one likes doing, and to
+necessary structural changes to the code base that are too large to be done by
+a volunteer in a reasonable amount of time.</p>
+<p>There are also many tasks, activities, and projects outside of
+development work that are important and could enhance the project or community
+- think of, for example, user surveys, translations, outreach, dedicated
+mentoring of newcomers, community organizing, website improvements, and
+administrative tasks.</p>
+<p>Time of people to perform tasks is also not the only thing that funds can be
+used for: expenses for in-person developer meetings or sprints, hosted hardware
+for benchmarking or development work, and CI or other software services could
+all be good candidates to spend funds on.</p>
+</section>
+<section id="whom-to-pay">
+<h3>Whom to pay<a class="headerlink" href="#whom-to-pay" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>All else being equal, give preference to existing maintainers/contributors.</p></li>
+<li><p>When looking outside of the current team, consider this an opportunity to
+make the project more diverse.</p></li>
+<li><p>Pay attention to the following when considering paying someone:</p>
+<ul class="simple">
+<li><p>the necessary technical or domain-specific skills to execute the tasks,</p></li>
+<li><p>communication and self-management skills,</p></li>
+<li><p>experience contributing to and working with open source projects.</p></li>
+</ul>
+</li>
+</ol>
+<p>It will likely depend on the project/tasks whether there’s already a clear best
+candidate within the NumPy team, or whether we look for new people to get
+involved. Before making any decisions, the decision makers (according to the
+NumPy governance document - currently that’s the Steering Council) should think
+about whether an opportunity should be advertised to give a wider group of
+people a chance to apply for it.</p>
+</section>
+<section id="compensating-fairly">
+<h3>Compensating fairly<a class="headerlink" href="#compensating-fairly" title="Link to this heading">#</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This section on compensating fairly will be considered <em>Draft</em> even if this
+NEP as a whole is accepted. Once we have applied the approach outlined here
+at least 2-3 times and we are happy with it, will we remove this note and
+consider this section <em>Accepted</em>.</p>
+</div>
+<p>Paying people fairly is a difficult topic, especially when it comes to
+distributed teams. Therefore, we will only offer some guidance here. Final
+decisions will always have to be considered and approved by the group of people
+that bears this responsibility (according to the current NumPy governance
+structure, this would be the NumPy Steering Council).</p>
+<p>Discussions on remote employee compensation tend to be dominated by two
+narratives: “pay local market rates” and “same work – same pay”.</p>
+<p>We consider them both extreme:</p>
+<ul class="simple">
+<li><p>“Same work – same pay” is unfair to people living in locations with a higher
+cost of living. For example, the average rent for a single family apartment
+can differ by a large factor (from a few hundred dollars to thousands of
+dollars per month).</p></li>
+<li><p>“Pay local market rates” bakes in existing inequalities between countries
+and makes fixed-cost items like a development machine or a holiday trip
+abroad relatively harder to afford in locations where market rates are lower.</p></li>
+</ul>
+<p>We seek to find a middle ground between these two extremes.</p>
+<p>Useful points of reference include companies like GitLab and
+Buffer who are transparent about their remuneration policies (<a class="footnote-reference brackets" href="#id11" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id12" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>),
+Google Summer of Code stipends (<a class="footnote-reference brackets" href="#id13" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>), other open source projects that manage
+their budget in a transparent manner (e.g., Babel and Webpack on Open
+Collective (<a class="footnote-reference brackets" href="#id14" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id15" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>)), and standard salary comparison sites.</p>
+<p>Since NumPy is a not-for-profit project, we also looked to the nonprofit sector
+for guidelines on remuneration policies and compensation levels. Our findings
+show that most smaller non-profits tend to pay a median salary/wage. We
+recognize merit in this approach: applying candidates are likely to have a
+genuine interest in open source, rather than to be motivated purely by
+financial incentives.</p>
+<p>Considering all of the above, we will use the following guidelines for
+determining compensation:</p>
+<ol class="arabic simple">
+<li><p>Aim to compensate people appropriately, up to a level that’s expected for
+senior engineers or other professionals as applicable.</p></li>
+<li><p>Establish a compensation cap of $125,000 USD that cannot be exceeded even
+for the residents from the most expensive/competitive locations (<a class="footnote-reference brackets" href="#f-pay" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>).</p></li>
+<li><p>For equivalent work and seniority,  a pay differential between locations
+should never be more than 2x.
+For example, if we pay $110,000 USD to a senior-level developer from New
+York, for equivalent work a senior-level developer from South-East Asia
+should be paid at least $55,000 USD. To compare locations, we will use
+<a class="reference external" href="https://www.numbeo.com/cost-of-living/">Numbeo Cost of Living calculator</a>
+(or its equivalent).</p></li>
+</ol>
+<p>Some other considerations:</p>
+<ul class="simple">
+<li><p>Often, compensated work is offered for a limited amount of hours or fixed
+term. In those cases, consider compensation equivalent to a remuneration
+package that comes with permanent employment (e.g., one month of work should
+be compensated by at most 1/12th of a full-year salary + benefits).</p></li>
+<li><p>When comparing rates, an individual contractor should typically make 20% more
+than someone who is employed since they have to take care of their benefits
+and accounting on their own.</p></li>
+<li><p>Some people may be happy with one-off payments towards a particular
+deliverable (e.g., “triage all open issues for label X for $x,xxx”).
+This should be compensated at a lower rate compared to an individual
+contractor. Or they may motivate lower amounts for another reason (e.g., “I
+want to receive $x,xxx to hire a cleaner or pay for childcare, to free up
+time for work on open source).</p></li>
+<li><p>When funding someone’s time through their employer, that employer may want to
+set the compensation level based on its internal rules (e.g., overhead rates).
+Small deviations from the guidelines in this NEP may be needed in such cases,
+however they should be within reason.</p></li>
+<li><p>It’s entirely possible that another strategy rather than paying people for
+their time on certain tasks may turn out to be more effective. Anything that
+helps the project and community grow and improve is worth considering.</p></li>
+<li><p>Transparency helps. If everyone involved is comfortable sharing their
+compensation levels with the rest of the team (or better make it public),
+it’s least likely to be way off the mark for fairness.</p></li>
+</ul>
+<p>We highly recommend that the individuals involved in decision-making about
+hiring and compensation peruse the content of the References section of this
+NEP. It offers a lot of helpful advice on this topic.</p>
+</section>
+</section>
+<section id="defining-fundable-activities-and-projects">
+<h2>Defining fundable activities and projects<a class="headerlink" href="#defining-fundable-activities-and-projects" title="Link to this heading">#</a></h2>
+<p>We’d like to have a broader set of fundable ideas that we will prioritize with
+input from NumPy team members and the wider community. All ideas will be
+documented on a single wiki page. Anyone may propose an idea. Only members of a
+NumPy team may edit the wiki page.</p>
+<p>Each listed idea must meet the following requirements:</p>
+<ol class="arabic simple">
+<li><p>It must be clearly scoped: its description must explain the importance to
+the project, referencing the NumPy Roadmap if possible, the items to pay for
+or activities and deliverables, and why it should be a funded activity (see
+<a class="reference internal" href="#section-what-to-pay-for"><span class="std std-ref">What to pay for</span></a>).</p></li>
+<li><p>It must contain the following metadata: title, cost, time duration or effort
+estimate, and (if known) names of the team member(s) to execute or coordinate.</p></li>
+<li><p>It must have an assigned priority (low, medium, or high). This discussion
+can originate at a NumPy community meeting or on the mailing list. However,
+it must be finalized on the mailing list allowing everyone to weigh in.</p></li>
+</ol>
+<p>If a proposed idea has been assigned a high priority level, a decision on
+allocating funding for it will be made on the private NumPy Steering Council
+mailing list. <em>Rationale: these will often involve decisions about individuals,
+which is typically hard to do in public. This is the current practice that
+seems to be working well.</em></p>
+<p>Sometimes, it may be practical to make a single funding decision ad-hoc (e.g.,
+“Here’s a great opportunity plus the right person to execute it right now”).
+However, this approach to decision-making should be used rarely.</p>
+</section>
+<section id="strategy-for-spending-saving-funds">
+<h2>Strategy for spending/saving funds<a class="headerlink" href="#strategy-for-spending-saving-funds" title="Link to this heading">#</a></h2>
+<p>There is an expectation from NumPy individual, corporate, and institutional
+donors that the funds will be used for the benefit of the project and the
+community. Therefore, we should spend available funds, thoughtfully,
+strategically, and fairly, as they come in. For emergencies, we should keep a
+$10,000 - $15,000 USD reserve which could cover, for example, a year of CI and
+hosting services, 1-2 months of full-time maintenance work, or contracting a
+consultant for a specific need.</p>
+</section>
+<section id="how-project-funds-get-administered">
+<h2>How project funds get administered<a class="headerlink" href="#how-project-funds-get-administered" title="Link to this heading">#</a></h2>
+<p>We will first summarize how administering of funds works today, and then
+discuss how to make this process more efficient and transparent.</p>
+<p>Currently, the project funds are held by NumFOCUS in a dedicated account.
+NumFOCUS has a small accounting team, which produces an account overview as a
+set of spreadsheets on a monthly basis. These land in a shared drive, typically
+with about a one month delay (e.g., the balance and transactions for February
+are available at the end of March), where a few NumPy team members can access
+them. Expense claims and invoices are submitted through the NumFOCUS website.
+Those then show up in another spreadsheet, where a NumPy team member must
+review and approve each of them before payments are made. Following NumPy
+bylaws, the NumFOCUS finance subcommittee, consisting of five people, meets
+every six months to review all the project related transactions. (In practice,
+there have been so few transactions that we skipped some of these meetings.)</p>
+<p>The existing process is time-consuming and error-prone. More transparency and
+automation are desirable.</p>
+<section id="transparency-about-project-funds-and-in-decision-making">
+<h3>Transparency about project funds and in decision making<a class="headerlink" href="#transparency-about-project-funds-and-in-decision-making" title="Link to this heading">#</a></h3>
+<p><strong>To discuss: do we want full transparency by publishing our accounts,
+transparency to everyone on a NumPy team, or some other level?</strong></p>
+<p>Ralf: I’d personally like it to be fully transparent, like through Open
+Collective, so the whole community can see current balance, income and expenses
+paid out at any moment in time. Moving to Open Collective is nontrivial,
+however we can publish the data elsewhere for now if we’d want to.
+<em>Note: Google Season of Docs this year requires having an Open Collective
+account, so this is likely to happen soon enough.</em></p>
+<p>Stefan/Inessa: at least a summary overview should be fully public, and all
+transactions should be visible to the Steering Council. Full transparency of
+all transactions is probably fine, but not necessary.</p>
+<p><em>The options here may be determined by the accounting system and amount of
+effort required.</em></p>
+</section>
+</section>
+<section id="numpy-funding-history-and-current-status">
+<span id="numpy-funding-history"></span><h2>NumPy funding – history and current status<a class="headerlink" href="#numpy-funding-history-and-current-status" title="Link to this heading">#</a></h2>
+<p>The NumPy project received its first major funding in 2017. For an overview of
+the early history of NumPy (and SciPy), including some institutions sponsoring
+time for their employees or contractors to work on NumPy, see <a class="footnote-reference brackets" href="#id9" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> and <a class="footnote-reference brackets" href="#id10" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. To
+date, NumPy has received four grants:</p>
+<ul class="simple">
+<li><p>Two grants, from the Alfred P. Sloan Foundation and the Gordon and Betty
+Moore Foundation respectively, of about $1.3M combined to the Berkeley
+Institute of Data Science. Work performed during the period 2017-2020;
+PI Stéfan van der Walt.</p></li>
+<li><p>Two grants from the Chan Zuckerberg Foundation to NumFOCUS, for a combined
+amount of $335k. Work performed during the period 2020-2021; PI’s Ralf
+Gommers (first grant) and Melissa Mendonça (second grant).</p></li>
+</ul>
+<p>From 2012 onwards NumPy has been a fiscally sponsored project of NumFOCUS.
+Note that fiscal sponsorship doesn’t mean NumPy gets funding, rather that it
+can receive funds under the umbrella of a nonprofit. See <a class="reference external" href="https://numfocus.org/projects-overview">NumFOCUS Project
+Support</a> for more details.</p>
+<p>Only since 2017 has the NumPy website displayed a “Donate” button, and since
+2019 the NumPy repositories have had the GitHub Sponsors button. Before that,
+it was possible to donate to NumPy on the NumFOCUS website. The sum total of
+donations from individuals to NumPy for 2017-2020 was about $6,100.</p>
+<p>From May 2019 onwards, Tidelift has supported NumPy financially as part of
+its “managed open source” business model. From May 2019 till July 2020 this was
+$1,000/month, and it started steadily growing after that to about $3,000/month
+(as of Feb 2021).</p>
+<p>Finally, there has been other incidental project income, for example, some book
+royalties from Packt Publishing, GSoC mentoring fees from Google, and
+merchandise sales revenue through the NumFOCUS web shop. All of these were
+small (two or three figure) amounts.</p>
+<p>This brings the total amount of project income which did not already have a
+spending target to about $35,000. Most of that is recent, from Tidelift.
+Over the past 1.5 years we spent about $10,000 for work on the new NumPy
+website and Sphinx theme. Those spending decisions were made by the NumPy
+Steering Council and announced on the mailing list.</p>
+<p>That leaves about $25,000 in available funds at the time of writing, and
+that amount is currently growing at a rate of about $3,000/month.</p>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<p>See references.  We assume that other open source projects have also developed
+guidelines on spending project funds. However, we were unable to find any
+examples at the time of writing.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p><em>Alternative spending strategy</em>: not having cash reserves. The rationale
+being that NumPy is important enough that in a real emergency some person or
+entity will likely jump in to help out. This is not a responsible approach to
+financial stewardship of the project though. Hence, we decided against it.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">1</a><span class="fn-bracket">]</span></span>
+<p>Pauli Virtanen et al., “SciPy 1.0: fundamental algorithms for scientific
+computing in Python”, <a class="reference external" href="https://www.nature.com/articles/s41592-019-0686-2">https://www.nature.com/articles/s41592-019-0686-2</a>,
+2020</p>
+</aside>
+<aside class="footnote brackets" id="id10" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">2</a><span class="fn-bracket">]</span></span>
+<p>Charles Harris et al., “Array programming with NumPy”, <a class="reference external" href="https://www.nature.com/articles/s41586-020-2649-2">https://www.nature.com/articles/s41586-020-2649-2</a>, 2020</p>
+</aside>
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://remote.com/blog/remote-compensation">https://remote.com/blog/remote-compensation</a></p>
+</aside>
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">4</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://about.gitlab.com/company/culture/all-remote/compensation/#how-do-you-decide-how-much-to-pay-people">https://about.gitlab.com/company/culture/all-remote/compensation/#how-do-you-decide-how-much-to-pay-people</a></p>
+</aside>
+<aside class="footnote brackets" id="id13" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">5</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://developers.google.com/open-source/gsoc/help/student-stipends">https://developers.google.com/open-source/gsoc/help/student-stipends</a></p>
+</aside>
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">6</a><span class="fn-bracket">]</span></span>
+<p>Jurgen Appelo, “Compensation: what is fair?”, <a class="reference external" href="https://blog.agilityscales.com/compensation-what-is-fair-38a65a822c29">https://blog.agilityscales.com/compensation-what-is-fair-38a65a822c29</a>, 2016</p>
+</aside>
+<aside class="footnote brackets" id="id15" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">7</a><span class="fn-bracket">]</span></span>
+<p>Project Include, “Compensating fairly”, <a class="reference external" href="https://projectinclude.org/compensating_fairly">https://projectinclude.org/compensating_fairly</a></p>
+</aside>
+<aside class="footnote brackets" id="f-pay" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">8</a><span class="fn-bracket">]</span></span>
+<p>This cap is derived from comparing with compensation levels at
+other open source projects (e.g., Babel, Webpack, Drupal - all in
+the $100,000 – $125,000 range) and Partner Institutions.</p>
+</aside>
+</aside>
+<ul class="simple">
+<li><p>Nadia Eghbal, “Roads and Bridges: The Unseen Labor Behind Our Digital
+Infrastructure”, 2016</p></li>
+<li><p>Nadia Eghbal, “Working in Public: The Making and Maintenance of Open
+Source”, 2020</p></li>
+<li><p><a class="github reference external" href="https://github.com/nayafia/lemonade-stand">nayafia/lemonade-stand</a></p></li>
+<li><p>Daniel Oberhaus, <a class="reference external" href="https://www.vice.com/en/article/43zak3/the-internet-was-built-on-the-free-labor-of-open-source-developers-is-that-sustainable">“The Internet Was Built on the Free Labor of Open Source
+Developers. Is That Sustainable?”</a>, 2019</p></li>
+<li><p>David Heinemeier Hansson, <a class="reference external" href="https://dhh.dk/2013/the-perils-of-mixing-open-source-and-money.html">“The perils of mixing open source and money”</a>, 2013</p></li>
+<li><p>Danny Crichton, <a class="reference external" href="https://techcrunch.com/2018/06/23/open-source-sustainability/?guccounter=1">“Open source sustainability”</a>, 2018</p></li>
+<li><p>Nadia Eghbal, “Rebuilding the Cathedral”, <a class="reference external" href="https://www.youtube.com/watch?v=VS6IpvTWwkQ">https://www.youtube.com/watch?v=VS6IpvTWwkQ</a>, 2017</p></li>
+<li><p>Nadia Eghbal, “Where money meets open source”, <a class="reference external" href="https://www.youtube.com/watch?v=bjAinwgvQqc&amp;t=246s">https://www.youtube.com/watch?v=bjAinwgvQqc&amp;t=246s</a>, 2017</p></li>
+<li><p>Eileen Uchitelle, “”The unbearable vulnerability of open source”, <a class="reference external" href="https://www.youtube.com/watch?v=VdwO3LQ56oM">https://www.youtube.com/watch?v=VdwO3LQ56oM</a>, 2017 (the inverted triangle, open source is a funnel)</p></li>
+<li><p>Dries Buytaert, “Balancing Makers and Takers to scale and sustain Open Source”, <a class="reference external" href="https://dri.es/balancing-makers-and-takers-to-scale-and-sustain-open-source">https://dri.es/balancing-makers-and-takers-to-scale-and-sustain-open-source</a>, 2019</p></li>
+<li><p>Safia Abdalla, “Beyond Maintenance”, <a class="reference external" href="https://increment.com/open-source/beyond-maintenance/">https://increment.com/open-source/beyond-maintenance/</a>, 2019</p></li>
+<li><p>Xavier Damman, “Money and Open Source Communities”, <a class="reference external" href="https://blog.opencollective.com/money-and-open-source-communities/">https://blog.opencollective.com/money-and-open-source-communities/</a>, 2016</p></li>
+<li><p>Aseem Sood, “Let’s talk about money”, <a class="reference external" href="https://blog.opencollective.com/lets-talk-about-money/">https://blog.opencollective.com/lets-talk-about-money/</a>, 2017</p></li>
+<li><p>Alanna Irving, “Has your open source community raised money? Here’s how to spend it.”, <a class="reference external" href="https://blog.opencollective.com/has-your-open-source-community-raised-money-heres-how-to-spend-it/">https://blog.opencollective.com/has-your-open-source-community-raised-money-heres-how-to-spend-it/</a>, 2017</p></li>
+<li><p>Alanna Irving, “Funding open source, how Webpack reached $400k+/year”, <a class="reference external" href="https://blog.opencollective.com/funding-open-source-how-webpack-reached-400k-year/">https://blog.opencollective.com/funding-open-source-how-webpack-reached-400k-year/</a>, 2017</p></li>
+<li><p>Alanna Irving, “Babel’s rise to financial sustainability”, <a class="reference external" href="https://blog.opencollective.com/babels-rise-to-financial-sustainability/">https://blog.opencollective.com/babels-rise-to-financial-sustainability/</a>, 2019</p></li>
+<li><p>Devon Zuegel, “The city guide to open source”, <a class="reference external" href="https://www.youtube.com/watch?v=80KTVu6GGSE">https://www.youtube.com/watch?v=80KTVu6GGSE</a>, 2020 + blog: <a class="reference external" href="https://increment.com/open-source/the-city-guide-to-open-source/">https://increment.com/open-source/the-city-guide-to-open-source/</a></p></li>
+</ul>
+<p>GitHub Sponsors:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.blog/2019-05-23-announcing-github-sponsors-a-new-way-to-contribute-to-open-source/">https://github.blog/2019-05-23-announcing-github-sponsors-a-new-way-to-contribute-to-open-source/</a></p></li>
+<li><p><a class="reference external" href="https://github.blog/2020-05-12-github-sponsors-is-out-of-beta-for-sponsored-organizations/">https://github.blog/2020-05-12-github-sponsors-is-out-of-beta-for-sponsored-organizations/</a></p></li>
+<li><p><a class="reference external" href="https://blog.opencollective.com/on-github-sponsors/">https://blog.opencollective.com/on-github-sponsors/</a>, 2019</p></li>
+<li><p><a class="reference external" href="https://blog.opencollective.com/double-the-love/">https://blog.opencollective.com/double-the-love/</a>, 2020</p></li>
+<li><p><a class="reference external" href="https://blog.opencollective.com/github-sponsors-for-companies-open-source-collective-for-people/">https://blog.opencollective.com/github-sponsors-for-companies-open-source-collective-for-people/</a></p></li>
+</ul>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#principles-of-spending-project-funds">Principles of spending project funds</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-to-pay-for">What to pay for</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#whom-to-pay">Whom to pay</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compensating-fairly">Compensating fairly</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-fundable-activities-and-projects">Defining fundable activities and projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#strategy-for-spending-saving-funds">Strategy for spending/saving funds</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-project-funds-get-administered">How project funds get administered</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#transparency-about-project-funds-and-in-decision-making">Transparency about project funds and in decision making</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-funding-history-and-current-status">NumPy funding – history and current status</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1190 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 40 — Legacy datatype implementation in NumPy &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0040-legacy-datatype-impl';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 49 — Data allocation strategies" href="nep-0049.html" />
+    <link rel="prev" title="NEP 38 — Using SIMD optimization instructions for performance" href="nep-0038-SIMD-optimizations.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 16, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 40 — Legacy datatype implementation in NumPy</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-40-legacy-datatype-implementation-in-numpy">
+<span id="nep40"></span><h1>NEP 40 — Legacy datatype implementation in NumPy<a class="headerlink" href="#nep-40-legacy-datatype-implementation-in-numpy" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">title<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Legacy Datatype Implementation in NumPy</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sebastian Berg</p>
+</dd>
+<dt class="field-odd">Status<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Final</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Informational</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2019-07-17</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This NEP is first in a series:</p>
+<ul class="simple">
+<li><p>NEP 40 (this document) explains the shortcomings of NumPy’s dtype implementation.</p></li>
+<li><p><a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a> gives an overview of our proposed replacement.</p></li>
+<li><p><a class="reference internal" href="nep-0042-new-dtypes.html#nep42"><span class="std std-ref">NEP 42</span></a> describes the new design’s datatype-related APIs.</p></li>
+<li><p><a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a> describes the new design’s API for universal functions.</p></li>
+</ul>
+</div>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>As a preparation to further NumPy enhancement proposals 41, 42, and 43. This
+NEP details the current status of NumPy datatypes as of NumPy 1.18.
+It describes some of the technical aspects and concepts that
+motivated the other proposals.
+For more general information most readers should begin by reading <a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a>
+and use this document only as a reference or for additional details.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<p>This section describes some central concepts and provides a brief overview
+of the current implementation of dtypes as well as a discussion.
+In many cases subsections will be split roughly to first describe the
+current implementation and then follow with an “Issues and Discussion” section.</p>
+<section id="parametric-datatypes">
+<span id="parametric-datatype-discussion"></span><h3>Parametric datatypes<a class="headerlink" href="#parametric-datatypes" title="Link to this heading">#</a></h3>
+<p>Some datatypes are inherently <em>parametric</em>. All <code class="docutils literal notranslate"><span class="pre">np.flexible</span></code> scalar
+types are attached to parametric datatypes (string, bytes, and void).
+The class <code class="docutils literal notranslate"><span class="pre">np.flexible</span></code> for scalars is a superclass for the data types of
+variable length (string, bytes, and void).
+This distinction is similarly exposed by the C-Macros
+<code class="docutils literal notranslate"><span class="pre">PyDataType_ISFLEXIBLE</span></code> and <code class="docutils literal notranslate"><span class="pre">PyTypeNum_ISFLEXIBLE</span></code>.
+This flexibility generalizes to the set of values which can be represented
+inside the array.
+For instance, <code class="docutils literal notranslate"><span class="pre">&quot;S8&quot;</span></code> can represent longer strings than <code class="docutils literal notranslate"><span class="pre">&quot;S4&quot;</span></code>.
+The parametric string datatype thus also limits the values inside the array
+to a subset (or subtype) of all values which can be represented by string
+scalars.</p>
+<p>The basic numerical datatypes are not flexible (do not inherit from
+<code class="docutils literal notranslate"><span class="pre">np.flexible</span></code>). <code class="docutils literal notranslate"><span class="pre">float64</span></code>, <code class="docutils literal notranslate"><span class="pre">float32</span></code>, etc. do have a byte order, but the described
+values are unaffected by it, and it is always possible to cast them to the
+native, canonical representation without any loss of information.</p>
+<p>The concept of flexibility can be generalized to parametric datatypes.
+For example the private <code class="docutils literal notranslate"><span class="pre">PyArray_AdaptFlexibleDType</span></code> function also accepts the
+naive datetime dtype as input to find the correct time unit.
+The datetime dtype is thus parametric not in the size of its storage,
+but instead in what the stored value represents.
+Currently <code class="docutils literal notranslate"><span class="pre">np.can_cast(&quot;datetime64[s]&quot;,</span> <span class="pre">&quot;datetime64[ms]&quot;,</span> <span class="pre">casting=&quot;safe&quot;)</span></code>
+returns true, although it is unclear that this is desired or generalizes
+to possible future data types such as physical units.</p>
+<p>Thus we have data types (mainly strings) with the properties that:</p>
+<ol class="arabic simple">
+<li><p>Casting is not always safe (<code class="docutils literal notranslate"><span class="pre">np.can_cast(&quot;S8&quot;,</span> <span class="pre">&quot;S4&quot;)</span></code>)</p></li>
+<li><p>Array coercion should be able to discover the exact dtype, such as for
+<code class="docutils literal notranslate"><span class="pre">np.array([&quot;str1&quot;,</span> <span class="pre">12.34],</span> <span class="pre">dtype=&quot;S&quot;)</span></code> where NumPy discovers the
+resulting dtype as <code class="docutils literal notranslate"><span class="pre">&quot;S5&quot;</span></code>.
+(If the dtype argument is omitted the behaviour is currently ill defined <a class="reference internal" href="#gh-15327" id="id1"><span>[gh-15327]</span></a>.)
+A form similar to <code class="docutils literal notranslate"><span class="pre">dtype=&quot;S&quot;</span></code> is <code class="docutils literal notranslate"><span class="pre">dtype=&quot;datetime64&quot;</span></code> which can
+discover the unit: <code class="docutils literal notranslate"><span class="pre">np.array([&quot;2017-02&quot;],</span> <span class="pre">dtype=&quot;datetime64&quot;)</span></code>.</p></li>
+</ol>
+<p>This notion highlights that some datatypes are more complex than the basic
+numerical ones, which is evident in the complicated output type discovery
+of universal functions.</p>
+</section>
+<section id="value-based-casting">
+<h3>Value based casting<a class="headerlink" href="#value-based-casting" title="Link to this heading">#</a></h3>
+<p>Casting is typically defined between two types:
+A type is considered to cast safely to a second type when the second type
+can represent all values of the first without loss of information.
+NumPy may inspect the actual value to decide
+whether casting is safe or not.</p>
+<p>This is useful for example in expressions such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int8&quot;</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int8&quot;</span><span class="p">)</span>
+<span class="c1"># If the value is larger, the result will change however:</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">+</span> <span class="mi">500</span>
+<span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int16&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this expression, the python value (which originally has no datatype) is
+represented as an <code class="docutils literal notranslate"><span class="pre">int8</span></code> or <code class="docutils literal notranslate"><span class="pre">int16</span></code> (the smallest possible data type).</p>
+<p>NumPy currently does this even for NumPy scalars and zero-dimensional arrays,
+so that replacing <code class="docutils literal notranslate"><span class="pre">5</span></code> with <code class="docutils literal notranslate"><span class="pre">np.int64(5)</span></code> or <code class="docutils literal notranslate"><span class="pre">np.array(5,</span> <span class="pre">dtype=&quot;int64&quot;)</span></code>
+in the above expression will lead to the same results, and thus ignores the
+existing datatype. The same logic also applies to floating-point scalars,
+which are allowed to lose precision.
+The behavior is not used when both inputs are scalars, so that
+<code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">+</span> <span class="pre">np.int8(5)</span></code> returns the default integer size (32 or 64-bit) and not
+an <code class="docutils literal notranslate"><span class="pre">np.int8</span></code>.</p>
+<p>While the behaviour is defined in terms of casting and exposed by
+<code class="docutils literal notranslate"><span class="pre">np.result_type</span></code> it is mainly important for universal functions
+(such as <code class="docutils literal notranslate"><span class="pre">np.add</span></code> in the above examples).
+Universal functions currently rely on safe casting semantics to decide which
+loop should be used, and thus what the output datatype will be.</p>
+<section id="issues-and-discussion">
+<h4>Issues and discussion<a class="headerlink" href="#issues-and-discussion" title="Link to this heading">#</a></h4>
+<p>There appears to be some agreement that the current method is
+not desirable for values that have a datatype,
+but may be useful for pure python integers or floats as in the first
+example.
+However, any change of the datatype system and universal function dispatching
+must initially fully support the current behavior.
+A main difficulty is that for example the value <code class="docutils literal notranslate"><span class="pre">156</span></code> can be represented
+by <code class="docutils literal notranslate"><span class="pre">np.uint8</span></code> and <code class="docutils literal notranslate"><span class="pre">np.int16</span></code>.
+The result depends on the “minimal” representation in the context of the
+conversion (for ufuncs the context may depend on the loop order).</p>
+</section>
+</section>
+<section id="the-object-datatype">
+<h3>The object datatype<a class="headerlink" href="#the-object-datatype" title="Link to this heading">#</a></h3>
+<p>The object datatype currently serves as a generic fallback for any value
+which is not otherwise representable.
+However, due to not having a well-defined type, it has some issues,
+for example when an array is filled with Python sequences:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">object_</span><span class="p">)</span>
+<span class="go">array([1, list([2])], dtype=object)  # a 1d array</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">object_</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">l</span>
+<span class="go">ValueError: assignment to 0-d array  # ???</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="p">[()]</span> <span class="o">=</span> <span class="n">l</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span>
+<span class="go">array(list([1, [2]]), dtype=object)</span>
+</pre></div>
+</div>
+<p>Without a well-defined type, functions such as <code class="docutils literal notranslate"><span class="pre">isnan()</span></code> or <code class="docutils literal notranslate"><span class="pre">conjugate()</span></code>
+do not necessarily work, but can work for a <a class="reference external" href="https://docs.python.org/dev/library/decimal.html#decimal.Decimal" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">decimal.Decimal</span></code></a>.
+To improve this situation it seems desirable to make it easy to create
+<code class="docutils literal notranslate"><span class="pre">object</span></code> dtypes that represent a specific Python datatype and stores its object
+inside the array in the form of pointer to python <code class="docutils literal notranslate"><span class="pre">PyObject</span></code>.
+Unlike most datatypes, Python objects require garbage collection.
+This means that additional methods to handle references and
+visit all objects must be defined.
+In practice, for most use-cases it is sufficient to limit the creation of such
+datatypes so that all functionality related to Python C-level references is
+private to NumPy.</p>
+<p>Creating NumPy datatypes that match builtin Python objects also creates a few problems
+that require more thoughts and discussion.
+These issues do not need to solved right away:</p>
+<ul class="simple">
+<li><p>NumPy currently returns <em>scalars</em> even for array input in some cases, in most
+cases this works seamlessly. However, this is only true because the NumPy
+scalars behave much like NumPy arrays, a feature that general Python objects
+do not have.</p></li>
+<li><p>Seamless integration probably requires that <code class="docutils literal notranslate"><span class="pre">np.array(scalar)</span></code> finds the
+correct DType automatically since some operations (such as indexing) return
+the scalar instead of a 0D array.
+This is problematic if multiple users independently decide to implement
+for example a DType for <code class="docutils literal notranslate"><span class="pre">decimal.Decimal</span></code>.</p></li>
+</ul>
+</section>
+<section id="current-dtype-implementation">
+<h3>Current <code class="docutils literal notranslate"><span class="pre">dtype</span></code> implementation<a class="headerlink" href="#current-dtype-implementation" title="Link to this heading">#</a></h3>
+<p>Currently <code class="docutils literal notranslate"><span class="pre">np.dtype</span></code> is a Python class with its instances being the
+<code class="docutils literal notranslate"><span class="pre">np.dtype(&quot;&gt;float64&quot;)</span></code>, etc. instances.
+To set the actual behaviour of these instances, a prototype instance is stored
+globally and looked up based on the <code class="docutils literal notranslate"><span class="pre">dtype.typenum</span></code>. The singleton is used
+where possible. Where required it is copied and modified, for instance to change
+endianness.</p>
+<p>Parametric datatypes (strings, void, datetime, and timedelta) must store
+additional information such as string lengths, fields, or datetime units –
+new instances of these types are created instead of relying on a singleton.
+All current datatypes within NumPy further support setting a metadata field
+during creation which can be set to an arbitrary dictionary value, but seems
+rarely used in practice (one recent and prominent user is h5py).</p>
+<p>Many datatype-specific functions are defined within a C structure called
+<a class="reference external" href="https://numpy.org/devdocs/reference/c-api/types-and-structures.html#c.PyArray_ArrFuncs" title="(in NumPy v2.3.dev0)"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyArray_ArrFuncs</span></code></a>, which is part of each <code class="docutils literal notranslate"><span class="pre">dtype</span></code> instance and
+has a similarity to Python’s <code class="docutils literal notranslate"><span class="pre">PyNumberMethods</span></code>.
+For user-defined datatypes this structure is exposed to the user, making
+ABI-compatible changes impossible.
+This structure holds important information such as how to copy or cast,
+and provides space for pointers to functions, such as comparing elements,
+converting to bool, or sorting.
+Since some of these functions are vectorized operations, operating on more than
+one element, they fit the model of ufuncs and do not need to be defined on the
+datatype in the future.
+For example the <code class="docutils literal notranslate"><span class="pre">np.clip</span></code> function was previously implemented using
+<code class="docutils literal notranslate"><span class="pre">PyArray_ArrFuncs</span></code> and is now implemented as a ufunc.</p>
+<section id="discussion-and-issues">
+<h4>Discussion and issues<a class="headerlink" href="#discussion-and-issues" title="Link to this heading">#</a></h4>
+<p>A further issue with the current implementation of the functions on the dtype
+is that, unlike methods,
+they are not passed an instance of the dtype when called.
+Instead, in many cases, the array which is being operated on is passed in
+and typically only used to extract the datatype again.
+A future API should likely stop passing in the full array object.
+Since it will be necessary to fall back to the old definitions for
+backward compatibility, the array object may not be available.
+However, passing a “fake” array in which mainly the datatype is defined
+is probably a sufficient workaround
+(see backward compatibility; alignment information may sometimes also be desired).</p>
+<p>Although not extensively used outside of NumPy itself, the currently
+<code class="docutils literal notranslate"><span class="pre">PyArray_Descr</span></code> is a public structure.
+This is especially also true for the <code class="docutils literal notranslate"><span class="pre">PyArray_ArrFuncs</span></code> structure stored in
+the <code class="docutils literal notranslate"><span class="pre">f</span></code> field.
+Due to compatibility they may need to remain supported for a very long time,
+with the possibility of replacing them by functions that dispatch to a newer API.</p>
+<p>However, in the long run access to these structures will probably have to
+be deprecated.</p>
+</section>
+</section>
+<section id="numpy-scalars-and-type-hierarchy">
+<h3>NumPy scalars and type hierarchy<a class="headerlink" href="#numpy-scalars-and-type-hierarchy" title="Link to this heading">#</a></h3>
+<p>As a side note to the above datatype implementation: unlike the datatypes,
+the NumPy scalars currently <strong>do</strong> provide a type hierarchy, consisting of abstract
+types such as <code class="docutils literal notranslate"><span class="pre">np.inexact</span></code> (see figure below).
+In fact, some control flow within NumPy currently uses
+<code class="docutils literal notranslate"><span class="pre">issubclass(a.dtype.type,</span> <span class="pre">np.inexact)</span></code>.</p>
+<figure class="align-default" id="id9">
+<span id="nep-0040-dtype-hierarchy"></span><img alt="_images/nep-0040_dtype-hierarchy.png" src="_images/nep-0040_dtype-hierarchy.png" />
+<figcaption>
+<p><span class="caption-text"><strong>Figure:</strong> Hierarchy of NumPy scalar types reproduced from the reference
+documentation. Some aliases such as <code class="docutils literal notranslate"><span class="pre">np.intp</span></code> are excluded. Datetime
+and timedelta are not shown.</span><a class="headerlink" href="#id9" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>NumPy scalars try to mimic zero-dimensional arrays with a fixed datatype.
+For the numerical (and unicode) datatypes, they are further limited to
+native byte order.</p>
+</section>
+<section id="current-implementation-of-casting">
+<h3>Current implementation of casting<a class="headerlink" href="#current-implementation-of-casting" title="Link to this heading">#</a></h3>
+<p>One of the main features which datatypes need to support is casting between one
+another using <code class="docutils literal notranslate"><span class="pre">arr.astype(new_dtype,</span> <span class="pre">casting=&quot;unsafe&quot;)</span></code>, or during execution
+of ufuncs with different types (such as adding integer and floating point numbers).</p>
+<p>Casting tables determine whether it is possible to cast from one specific type to another.
+However, generic casting rules cannot handle the parametric dtypes such as strings.
+The logic for parametric datatypes is defined mainly in <code class="docutils literal notranslate"><span class="pre">PyArray_CanCastTo</span></code>
+and currently cannot be customized for user defined datatypes.</p>
+<p>The actual casting has two distinct parts:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">copyswap</span></code>/<code class="docutils literal notranslate"><span class="pre">copyswapn</span></code> are defined for each dtype and can handle
+byte-swapping for non-native byte orders as well as unaligned memory.</p></li>
+<li><p>The generic casting code is provided by C functions which know how to
+cast aligned and contiguous memory from one dtype to another
+(both in native byte order).
+These C-level functions can be registered to cast aligned and contiguous memory
+from one dtype to another.
+The function may be provided with both arrays (although the parameter
+is sometimes <code class="docutils literal notranslate"><span class="pre">NULL</span></code> for scalars).
+NumPy will ensure that these functions receive native byte order input.
+The current implementation stores the functions either in a C-array
+on the datatype which is cast, or in a dictionary when casting to a user
+defined datatype.</p></li>
+</ol>
+<p>Generally NumPy will thus perform casting as chain of the three functions
+<code class="docutils literal notranslate"><span class="pre">in_copyswapn</span> <span class="pre">-&gt;</span> <span class="pre">castfunc</span> <span class="pre">-&gt;</span> <span class="pre">out_copyswapn</span></code> using (small) buffers between
+these steps.</p>
+<p>The above multiple functions are wrapped into a single function (with metadata)
+that handles the cast and is used for example during the buffered iteration used
+by ufuncs.
+This is the mechanism that is always used for user defined datatypes.
+For most dtypes defined within NumPy itself, more specialized code is used to
+find a function to do the actual cast
+(defined by the private <code class="docutils literal notranslate"><span class="pre">PyArray_GetDTypeTransferFunction</span></code>).
+This mechanism replaces most of the above mechanism and provides much faster
+casts for example when the inputs are not contiguous in memory.
+However, it cannot be extended by user defined datatypes.</p>
+<p>Related to casting, we currently have a <code class="docutils literal notranslate"><span class="pre">PyArray_EquivTypes</span></code> function which
+indicate that a <em>view</em> is sufficient (and thus no cast is necessary).
+This function is used multiple places and should probably be part of
+a redesigned casting API.</p>
+</section>
+<section id="dtype-handling-in-universal-functions">
+<h3>DType handling in universal functions<a class="headerlink" href="#dtype-handling-in-universal-functions" title="Link to this heading">#</a></h3>
+<p>Universal functions are implemented as instances of the <code class="docutils literal notranslate"><span class="pre">numpy.UFunc</span></code> class
+with an ordered-list of datatype-specific
+(based on the dtype typecode character, not datatype instances) implementations,
+each with a signature and a function pointer.
+This list of implementations can be seen with <code class="docutils literal notranslate"><span class="pre">ufunc.types</span></code> where
+all implementations are listed with their C-style typecode signatures.
+For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">types</span>
+<span class="go">[...,</span>
+<span class="go"> &#39;ll-&gt;l&#39;,</span>
+<span class="go"> ...,</span>
+<span class="go"> &#39;dd-&gt;d&#39;,</span>
+<span class="go"> ...]</span>
+</pre></div>
+</div>
+<p>Each of these signatures is associated with a single inner-loop function defined
+in C, which does the actual calculation, and may be called multiple times.</p>
+<p>The main step in finding the correct inner-loop function is to call a
+<code class="xref c c-type docutils literal notranslate"><span class="pre">PyUFunc_TypeResolutionFunc</span></code> which retrieves the input dtypes from
+the provided input arrays
+and will determine the full type signature (including output dtype) to be executed.</p>
+<p>By default the <code class="docutils literal notranslate"><span class="pre">TypeResolver</span></code> is implemented by searching all of the implementations
+listed in <code class="docutils literal notranslate"><span class="pre">ufunc.types</span></code> in order and stopping if all inputs can be safely
+cast to fit the signature.
+This means that if long (<code class="docutils literal notranslate"><span class="pre">l</span></code>) and double (<code class="docutils literal notranslate"><span class="pre">d</span></code>) arrays are added,
+numpy will find that the <code class="docutils literal notranslate"><span class="pre">'dd-&gt;d'</span></code> definition works
+(long can safely cast to double) and uses that.</p>
+<p>In some cases this is not desirable. For example the <code class="docutils literal notranslate"><span class="pre">np.isnat</span></code> universal
+function has a <code class="docutils literal notranslate"><span class="pre">TypeResolver</span></code> which rejects integer inputs instead of
+allowing them to be cast to float.
+In principle, downstream projects can currently use their own non-default
+<code class="docutils literal notranslate"><span class="pre">TypeResolver</span></code>, since the corresponding C-structure necessary to do this
+is public.
+The only project known to do this is Astropy, which is willing to switch to
+a new API if NumPy were to remove the possibility to replace the TypeResolver.</p>
+<p>For user defined datatypes, the dispatching logic is similar,
+although separately implemented and limited (see discussion below).</p>
+<section id="id2">
+<h4>Issues and discussion<a class="headerlink" href="#id2" title="Link to this heading">#</a></h4>
+<p>It is currently only possible for user defined functions to be found/resolved
+if any of the inputs (or the outputs) has the user datatype, since it uses the
+<cite>OO-&gt;O</cite> signature.
+For example, given that a ufunc loop to implement <code class="docutils literal notranslate"><span class="pre">fraction_divide(int,</span> <span class="pre">int)</span>
+<span class="pre">-&gt;</span> <span class="pre">Fraction</span></code> has been implemented,
+the call <code class="docutils literal notranslate"><span class="pre">fraction_divide(4,</span> <span class="pre">5)</span></code> (with no specific output dtype) will fail
+because the loop that
+includes the user datatype <code class="docutils literal notranslate"><span class="pre">Fraction</span></code> (as output) can only be found if any of
+the inputs is already a <code class="docutils literal notranslate"><span class="pre">Fraction</span></code>.
+<code class="docutils literal notranslate"><span class="pre">fraction_divide(4,</span> <span class="pre">5,</span> <span class="pre">dtype=Fraction)</span></code> can be made to work, but is inconvenient.</p>
+<p>Typically, dispatching is done by finding the first loop that matches. A match
+is defined as: all inputs (and possibly outputs) can
+be cast safely to the signature typechars (see also the current implementation
+section).
+However, in some cases safe casting is problematic and thus explicitly not
+allowed.
+For example the <code class="docutils literal notranslate"><span class="pre">np.isnat</span></code> function is currently only defined for
+datetime and timedelta,
+even though integers are defined to be safely castable to timedelta.
+If this was not the case, calling
+<code class="docutils literal notranslate"><span class="pre">np.isnat(np.array(&quot;NaT&quot;,</span> <span class="pre">&quot;timedelta64&quot;).astype(&quot;int64&quot;))</span></code> would currently
+return true, although the integer input array has no notion of “not a time”.
+If a universal function, such as most functions in <code class="docutils literal notranslate"><span class="pre">scipy.special</span></code>, is only
+defined for <code class="docutils literal notranslate"><span class="pre">float32</span></code> and <code class="docutils literal notranslate"><span class="pre">float64</span></code> it will currently automatically
+cast a <code class="docutils literal notranslate"><span class="pre">float16</span></code> silently to <code class="docutils literal notranslate"><span class="pre">float32</span></code> (similarly for any integer input).
+This ensures successful execution, but may lead to a change in the output dtype
+when support for new data types is added to a ufunc.
+When a <code class="docutils literal notranslate"><span class="pre">float16</span></code> loop is added, the output datatype will currently change
+from <code class="docutils literal notranslate"><span class="pre">float32</span></code> to <code class="docutils literal notranslate"><span class="pre">float16</span></code> without a warning.</p>
+<p>In general the order in which loops are registered is important.
+However, this is only reliable if all loops are added when the ufunc is first defined.
+Additional loops added when a new user datatypes is imported
+must not be sensitive to the order in which imports occur.</p>
+<p>There are two main approaches to better define the type resolution for user
+defined types:</p>
+<ol class="arabic simple">
+<li><p>Allow for user dtypes to directly influence the loop selection.
+For example they may provide a function which return/select a loop
+when there is no exact matching loop available.</p></li>
+<li><p>Define a total ordering of all implementations/loops, probably based on
+“safe casting” semantics, or semantics similar to that.</p></li>
+</ol>
+<p>While option 2 may be less complex to reason about it remains to be seen
+whether it is sufficient for all (or most) use cases.</p>
+</section>
+</section>
+<section id="adjustment-of-parametric-output-dtypes-in-ufuncs">
+<h3>Adjustment of parametric output DTypes in UFuncs<a class="headerlink" href="#adjustment-of-parametric-output-dtypes-in-ufuncs" title="Link to this heading">#</a></h3>
+<p>A second step necessary for parametric dtypes is currently performed within
+the <code class="docutils literal notranslate"><span class="pre">TypeResolver</span></code>:
+the datetime and timedelta datatypes have to decide on the correct parameter
+for the operation and output array.
+This step also needs to double check that all casts can be performed safely,
+which by default means that they are “same kind” casts.</p>
+<section id="id3">
+<h4>Issues and discussion<a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<p>Fixing the correct output dtype is currently part of the type resolution.
+However, it is a distinct step and should probably be handled as such after
+the actual type/loop resolution has occurred.</p>
+<p>As such this step may move from the dispatching step (described above) to
+the implementation-specific code described below.</p>
+</section>
+</section>
+<section id="dtype-specific-implementation-of-the-ufunc">
+<h3>DType-specific implementation of the UFunc<a class="headerlink" href="#dtype-specific-implementation-of-the-ufunc" title="Link to this heading">#</a></h3>
+<p>Once the correct implementation/loop is found, UFuncs currently call
+a single <em>inner-loop function</em> which is written in C.
+This may be called multiple times to do the full calculation and it has
+little or no information about the current context. It also has a void
+return value.</p>
+<section id="id4">
+<h4>Issues and discussion<a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
+<p>Parametric datatypes may require passing
+additional information to the inner-loop function to decide how to interpret
+the data.
+This is the reason why currently no universal functions for <code class="docutils literal notranslate"><span class="pre">string</span></code> dtypes
+exist (although technically possible within NumPy itself).
+Note that it is currently possible to pass in the input array objects
+(which in turn hold the datatypes when no casting is necessary).
+However, the full array information should not be required and currently the
+arrays are passed in before any casting occurs.
+The feature is unused within NumPy and no known user exists.</p>
+<p>Another issue is the error reporting from within the inner-loop function.
+There exist currently two ways to do this:</p>
+<ol class="arabic simple">
+<li><p>by setting a Python exception</p></li>
+<li><p>using the CPU floating point error flags.</p></li>
+</ol>
+<p>Both of these are checked before returning to the user.
+However, many integer functions currently can set neither of these errors,
+so that checking the floating point error flags is unnecessary overhead.
+On the other hand, there is no way to stop the iteration or pass out error
+information which does not use the floating point flags or requires to hold
+the Python global interpreter lock (GIL).</p>
+<p>It seems necessary to provide more control to authors of inner loop functions.
+This means allowing users to pass in and out information from the inner-loop
+function more easily, while <em>not</em> providing the input array objects.
+Most likely this will involve:</p>
+<ul class="simple">
+<li><p>Allowing the execution of additional code before the first and after
+the last inner-loop call.</p></li>
+<li><p>Returning an integer value from the inner-loop to allow stopping the
+iteration early and possibly propagate error information.</p></li>
+<li><p>Possibly, to allow specialized inner-loop selections. For example currently
+<code class="docutils literal notranslate"><span class="pre">matmul</span></code> and many reductions will execute optimized code for certain inputs.
+It may make sense to allow selecting such optimized loops beforehand.
+Allowing this may also help to bring casting (which uses this heavily) and
+ufunc implementations closer.</p></li>
+</ul>
+<p>The issues surrounding the inner-loop functions have been discussed in some
+detail in the github issue <a class="reference external" href="https://github.com/numpy/numpy/issues/12518">gh-12518</a> .</p>
+<p>Reductions use an “identity” value.
+This is currently defined once per ufunc, regardless of the ufunc dtype signature.
+For example  <code class="docutils literal notranslate"><span class="pre">0</span></code> is used for <code class="docutils literal notranslate"><span class="pre">sum</span></code>, or <code class="docutils literal notranslate"><span class="pre">math.inf</span></code> for <code class="docutils literal notranslate"><span class="pre">min</span></code>.
+This works well for numerical datatypes, but is not always appropriate for other dtypes.
+In general it should be possible to provide a dtype-specific identity to the
+ufunc reduction.</p>
+</section>
+</section>
+<section id="datatype-discovery-during-array-coercion">
+<h3>Datatype discovery during array coercion<a class="headerlink" href="#datatype-discovery-during-array-coercion" title="Link to this heading">#</a></h3>
+<p>When calling <code class="docutils literal notranslate"><span class="pre">np.array(...)</span></code> to coerce a general Python object to a NumPy array,
+all objects need to be inspected to find the correct dtype.
+The input to <code class="docutils literal notranslate"><span class="pre">np.array()</span></code> are potentially nested Python sequences which hold
+the final elements as generic Python objects.
+NumPy has to unpack all the nested sequences and then inspect the elements.
+The final datatype is found by iterating over all elements which will end up
+in the array and:</p>
+<ol class="arabic simple">
+<li><p>discovering the dtype of the single element:</p>
+<ul class="simple">
+<li><p>from array (or array like) or NumPy scalar using <code class="docutils literal notranslate"><span class="pre">element.dtype</span></code></p></li>
+<li><p>using <code class="docutils literal notranslate"><span class="pre">isinstance(...,</span> <span class="pre">float)</span></code> for known Python types
+(note that these rules mean that subclasses are <em>currently</em> valid).</p></li>
+<li><p>special rule for void datatypes to coerce tuples.</p></li>
+</ul>
+</li>
+<li><p>Promoting the current dtype with the next elements dtype using
+<code class="docutils literal notranslate"><span class="pre">np.promote_types</span></code>.</p></li>
+<li><p>If strings are found, the whole process is restarted (see also <a class="reference internal" href="#gh-15327" id="id5"><span>[gh-15327]</span></a>),
+in a similar manner as if <code class="docutils literal notranslate"><span class="pre">dtype=&quot;S&quot;</span></code> was given (see below).</p></li>
+</ol>
+<p>If <code class="docutils literal notranslate"><span class="pre">dtype=...</span></code> is given, this dtype is used unmodified, unless
+it is an unspecific <em>parametric dtype instance</em> which means “S0”, “V0”, “U0”,
+“datetime64”, and “timdelta64”.
+These are thus flexible datatypes without length 0 – considered to be unsized –
+and datetimes or timedelta without a unit attached (“generic unit”).</p>
+<p>In future DType class hierarchy, these may be represented by the class rather
+than a special instance, since these special instances should not normally be
+attached to an array.</p>
+<p>If such a <em>parametric dtype instance</em> is provided for example using <code class="docutils literal notranslate"><span class="pre">dtype=&quot;S&quot;</span></code>
+<code class="docutils literal notranslate"><span class="pre">PyArray_AdaptFlexibleDType</span></code> is called and effectively inspects all values
+using DType specific logic.
+That is:</p>
+<ul class="simple">
+<li><p>Strings will use <code class="docutils literal notranslate"><span class="pre">str(element)</span></code> to find the length of most elements</p></li>
+<li><p>Datetime64 is capable of coercing from strings and guessing the correct unit.</p></li>
+</ul>
+<section id="id6">
+<h4>Discussion and issues<a class="headerlink" href="#id6" title="Link to this heading">#</a></h4>
+<p>It seems probable that during normal discovery, the <code class="docutils literal notranslate"><span class="pre">isinstance</span></code> should rather
+be strict <code class="docutils literal notranslate"><span class="pre">type(element)</span> <span class="pre">is</span> <span class="pre">desired_type</span></code> checks.
+Further, the current <code class="docutils literal notranslate"><span class="pre">AdaptFlexibleDType</span></code> logic should be made available to
+user DTypes and not be a secondary step, but instead replace, or be part of,
+the normal discovery.</p>
+</section>
+</section>
+</section>
+<section id="related-issues">
+<h2>Related issues<a class="headerlink" href="#related-issues" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">np.save</span></code> currently translates all user-defined dtypes to void dtypes.
+This means they cannot be stored using the <code class="docutils literal notranslate"><span class="pre">npy</span></code> format.
+This is not an issue for the python pickle protocol, although it may require
+some thought if we wish to ensure that such files can be loaded securely
+without the possibility of executing malicious code
+(i.e. without the <code class="docutils literal notranslate"><span class="pre">allow_pickle=True</span></code> keyword argument).</p>
+<p>The additional existence of masked arrays and especially masked datatypes
+within Pandas has interesting implications for interoperability.
+Since mask information is often stored separately, its handling requires
+support by the container (array) object.
+NumPy itself does not provide such support, and is not expected to add it
+in the foreseeable future.
+However, if such additions to the datatypes within NumPy would improve
+interoperability they could be considered even if
+they are not used by NumPy itself.</p>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Julia types are an interesting blueprint for a type hierarchy, and define
+abstract and concrete types <a class="reference internal" href="#julia-types" id="id7"><span>[julia-types]</span></a>.</p></li>
+<li><p>In Julia promotion can occur based on abstract types. If a promoter is
+defined, it will cast the inputs and then Julia can then retry to find
+an implementation with the new values <a class="reference internal" href="#julia-promotion" id="id8"><span>[julia-promotion]</span></a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xnd-project</span></code> (<a class="github reference external" href="https://github.com/xnd-project">xnd-project</a>) with ndtypes and gumath</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">xnd-project</span></code> is similar to NumPy and defines data types as well
+as the possibility to extend them. A major difference is that it does
+not use promotion/casting within the ufuncs, but instead requires explicit
+definition of <code class="docutils literal notranslate"><span class="pre">int32</span> <span class="pre">+</span> <span class="pre">float64</span> <span class="pre">-&gt;</span> <span class="pre">float64</span></code> loops.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<p>There have been many discussions about the current state and what a future
+datatype system may look like.
+The full list of these discussion is long and some are lost to time,
+the following provides a subset for more recent ones:</p>
+<ul>
+<li><p>Draft NEP by Stephan Hoyer after a developer meeting (was updated on the next developer meeting) <a class="reference external" href="https://hackmd.io/6YmDt_PgSVORRNRxHyPaNQ">https://hackmd.io/6YmDt_PgSVORRNRxHyPaNQ</a></p></li>
+<li><p>List of related documents gathered previously here
+<a class="reference external" href="https://hackmd.io/UVOtgj1wRZSsoNQCjkhq1g">https://hackmd.io/UVOtgj1wRZSsoNQCjkhq1g</a> (TODO: Reduce to the most important
+ones):</p>
+<ul>
+<li><p><a class="github reference external" href="https://github.com/numpy/numpy/pull/12630">numpy/numpy#12630</a>
+Matti Picus draft NEP, discusses the technical side of subclassing  more from
+the side of <code class="docutils literal notranslate"><span class="pre">ArrFunctions</span></code></p></li>
+<li><p><a class="reference external" href="https://hackmd.io/ok21UoAQQmOtSVk6keaJhw">https://hackmd.io/ok21UoAQQmOtSVk6keaJhw</a> and <a class="reference external" href="https://hackmd.io/s/ryTFaOPHE">https://hackmd.io/s/ryTFaOPHE</a>
+(2019-04-30) Proposals for subclassing implementation approach.</p></li>
+<li><p>Discussion about the calling convention of ufuncs and need for more
+powerful UFuncs: <a class="github reference external" href="https://github.com/numpy/numpy/issues/12518">numpy/numpy#12518</a></p></li>
+<li><p>2018-11-30 developer meeting notes:
+<a class="github reference external" href="https://github.com/BIDS-numpy/docs/blob/master/meetings/2018-11-30-dev-meeting.md">BIDS-numpy/docs</a>
+and subsequent draft for an NEP: <a class="reference external" href="https://hackmd.io/6YmDt_PgSVORRNRxHyPaNQ">https://hackmd.io/6YmDt_PgSVORRNRxHyPaNQ</a></p>
+<p>BIDS Meeting on November 30, 2018 and document by Stephan Hoyer about
+what numpy should provide and thoughts of how to get there. Meeting with
+Eric Wieser, Matti Picus, Charles Harris, Tyler Reddy, Stéfan van der
+Walt, and Travis Oliphant.</p>
+</li>
+<li><p>SciPy 2018 brainstorming session with summaries of use cases:
+<a class="github reference external" href="https://github.com/numpy/numpy/wiki/Dtype-Brainstorming">numpy/numpy</a></p>
+<p>Also lists some requirements and some ideas on implementations</p>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div role="list" class="citation-list">
+<div class="citation" id="gh-15327" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>gh-15327<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p><a class="github reference external" href="https://github.com/numpy/numpy/issues/12518">numpy/numpy#12518</a></p>
+</div>
+<div class="citation" id="julia-types" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">julia-types</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.julialang.org/en/v1/manual/types/index.html#Abstract-Types-1">https://docs.julialang.org/en/v1/manual/types/index.html#Abstract-Types-1</a></p>
+</div>
+<div class="citation" id="julia-promotion" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">julia-promotion</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://docs.julialang.org/en/v1/manual/conversion-and-promotion/">https://docs.julialang.org/en/v1/manual/conversion-and-promotion/</a></p>
+</div>
+</div>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parametric-datatypes">Parametric datatypes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#value-based-casting">Value based casting</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#issues-and-discussion">Issues and discussion</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-object-datatype">The object datatype</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#current-dtype-implementation">Current <code class="docutils literal notranslate"><span class="pre">dtype</span></code> implementation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion-and-issues">Discussion and issues</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-scalars-and-type-hierarchy">NumPy scalars and type hierarchy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#current-implementation-of-casting">Current implementation of casting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dtype-handling-in-universal-functions">DType handling in universal functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Issues and discussion</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adjustment-of-parametric-output-dtypes-in-ufuncs">Adjustment of parametric output DTypes in UFuncs</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Issues and discussion</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dtype-specific-implementation-of-the-ufunc">DType-specific implementation of the UFunc</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Issues and discussion</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#datatype-discovery-during-array-coercion">Datatype discovery during array coercion</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Discussion and issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-issues">Related issues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

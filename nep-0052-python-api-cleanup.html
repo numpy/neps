@@ -1,0 +1,915 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 52 — Python API cleanup for NumPy 2.0 &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0052-python-api-cleanup';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 55 — Add a UTF-8 variable-width string DType to NumPy" href="nep-0055-string_dtype.html" />
+    <link rel="prev" title="NEP 50 — Promotion rules for Python scalars" href="nep-0050-scalar-promotion.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 16, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 52 — Python API cleanup for NumPy 2.0</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-52-python-api-cleanup-for-numpy-2-0">
+<span id="nep52"></span><h1>NEP 52 — Python API cleanup for NumPy 2.0<a class="headerlink" href="#nep-52-python-api-cleanup-for-numpy-2-0" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ralf Gommers &lt;<a class="reference external" href="mailto:ralf&#46;gommers&#37;&#52;&#48;gmail&#46;com">ralf<span>&#46;</span>gommers<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Stéfan van der Walt &lt;<a class="reference external" href="mailto:stefanv&#37;&#52;&#48;berkeley&#46;edu">stefanv<span>&#64;</span>berkeley<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nathan Goldbaum &lt;<a class="reference external" href="mailto:ngoldbaum&#37;&#52;&#48;quansight&#46;com">ngoldbaum<span>&#64;</span>quansight<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mateusz Sokół &lt;<a class="reference external" href="mailto:msokol&#37;&#52;&#48;quansight&#46;com">msokol<span>&#64;</span>quansight<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-odd">Status<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Final</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Standards Track</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2023-03-28</p>
+</dd>
+<dt class="field-even">Resolution<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/QLMPFTWA67DXE3JCUQT2RIRLQ44INS4F/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/QLMPFTWA67DXE3JCUQT2RIRLQ44INS4F/</a></p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>We propose to clean up NumPy’s Python API for the NumPy 2.0 release.
+This includes a more clearly defined split between what is public and what is
+private, and reducing the size of the main namespace by removing aliases
+and functions that have better alternatives. Furthermore, each function is meant
+to be accessible from only one place, so all duplicates also need to be dropped.</p>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>NumPy has a large API surface that evolved organically over many years:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">objects_in_api</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">np</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">objects_in_api</span><span class="p">)</span>
+<span class="go">562</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modules</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">objects_in_api</span> <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">(</span><span class="nb">eval</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;np.</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modules</span>
+<span class="go">[&#39;char&#39;, &#39;compat&#39;, &#39;ctypeslib&#39;, &#39;emath&#39;, &#39;fft&#39;, &#39;lib&#39;, &#39;linalg&#39;, &#39;ma&#39;, &#39;math&#39;, &#39;polynomial&#39;, &#39;random&#39;, &#39;rec&#39;, &#39;testing&#39;, &#39;version&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+<span class="go">14</span>
+</pre></div>
+</div>
+<p>The above doesn’t even include items that are public but have
+been hidden from <code class="docutils literal notranslate"><span class="pre">__dir__</span></code>.
+A particularly problematic example of that is <code class="docutils literal notranslate"><span class="pre">np.core</span></code>,
+which is technically private but heavily used in practice.
+For a full overview of what’s considered public, private or a bit in between, see
+<a class="github reference external" href="https://github.com/numpy/numpy/blob/main/numpy/tests/test_public_api.py">numpy/numpy</a>.</p>
+<p>The size of the API and the lacking definition of its boundaries
+incur significant costs:</p>
+<ul>
+<li><p><strong>Users find it hard to disambiguate between similarly named
+functions.</strong></p>
+<p>Looking for functions with tab completion in IPython, a notebook, or an IDE
+is a challenge. E.g., type <code class="docutils literal notranslate"><span class="pre">np.&lt;TAB&gt;</span></code> and look at the first six items
+offered: two ufuncs (<code class="docutils literal notranslate"><span class="pre">abs</span></code>, <code class="docutils literal notranslate"><span class="pre">add</span></code>), one alias (<code class="docutils literal notranslate"><span class="pre">absolute</span></code>), and three
+functions that are not intended for end-users (<code class="docutils literal notranslate"><span class="pre">add_docstring</span></code>,
+<code class="docutils literal notranslate"><span class="pre">add_newdoc</span></code>, <code class="docutils literal notranslate"><span class="pre">add_newdoc_ufunc</span></code>). As a result, the learning curve for
+NumPy is steeper than it has to be.</p>
+</li>
+<li><p><strong>Libraries that mimic the NumPy API face significant implementation barriers.</strong></p>
+<p>For maintainers of NumPy API-compatible array libraries (Dask, CuPy, JAX,
+PyTorch, TensorFlow, cuNumeric, etc.) and compilers/transpilers (Numba,
+Pythran, Cython, etc.) there is an implementation cost to each object in the
+namespace. In practice, no other library has full support for the entire
+NumPy API, partly because it is so hard to know what to include when faced
+with a slew of aliases and legacy objects.</p>
+</li>
+<li><p><strong>Teaching NumPy is more complicated than it needs to be.</strong></p>
+<p>Similarly, a larger API is confusing to learners, who not only have to <em>find</em>
+functions but have to choose <em>which</em> functions to use.</p>
+</li>
+<li><p><strong>Developers are hesitant to grow the API surface.</strong></p>
+<p>This happens even when the changes are warranted, because they are aware of
+the above concerns.</p>
+</li>
+</ul>
+<p>The scope of this NEP includes:</p>
+<ul class="simple">
+<li><p>Deprecating or removing functionality that is too niche for NumPy, not
+well-designed, superseded by better alternatives, an unnecessary alias,
+or otherwise a candidate for removal.</p></li>
+<li><p>Clearly separating public from private NumPy API by use of underscores.</p></li>
+<li><p>Restructuring the NumPy namespaces to be easier to understand and navigate.</p></li>
+</ul>
+<p>Out of scope for this NEP are:</p>
+<ul class="simple">
+<li><p>Introducing new functionality or performance enhancements.</p></li>
+</ul>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>A key principle of this API refactor is to ensure that, when code has been
+adapted to the changes and is 2.0-compatible, that code then <em>also</em> works with
+NumPy <code class="docutils literal notranslate"><span class="pre">1.2x.x</span></code>. This keeps the burden on users and downstream library
+maintainers low by not having to carry duplicate code which switches on the
+NumPy major version number.</p>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>As mentioned above, while the new (or cleaned up, NumPy 2.0) API should be
+backward compatible, there is no guarantee of forward compatibility from 1.25.X
+to 2.0. Code will have to be updated to account for deprecated, moved, or
+removed functions/classes, as well as for more strictly enforced private APIs.</p>
+<p>In order to make it easier to adopt the changes in this NEP, we will:</p>
+<ol class="arabic simple">
+<li><p>Provide a transition guide that lists each API change and its replacement.</p></li>
+<li><p>Explicitly flag all expired attributes with a meaningful <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code>
+that points out to the new place or recommends an alternative.</p></li>
+<li><p>Provide a script to automate the migration wherever possible. This will be
+similar to <code class="docutils literal notranslate"><span class="pre">tools/replace_old_macros.sed</span></code> (which adapts code for a
+previous C API naming scheme change). This will be <code class="docutils literal notranslate"><span class="pre">sed</span></code> (or equivalent)
+based rather than attempting AST analysis, so it won’t cover everything.</p></li>
+</ol>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<section id="cleaning-up-the-main-namespace">
+<h3>Cleaning up the main namespace<a class="headerlink" href="#cleaning-up-the-main-namespace" title="Link to this heading">#</a></h3>
+<p>We expect to reduce the main namespace by a large number of entries, on the
+order of 100. Here is a representative set of examples:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">np.inf</span></code> and <code class="docutils literal notranslate"><span class="pre">np.nan</span></code> have 8 aliases between them, of which most can be removed.</p></li>
+<li><p>A collection of random and undocumented functions (e.g., <code class="docutils literal notranslate"><span class="pre">byte_bounds</span></code>, <code class="docutils literal notranslate"><span class="pre">disp</span></code>,
+<code class="docutils literal notranslate"><span class="pre">safe_eval</span></code>, <code class="docutils literal notranslate"><span class="pre">who</span></code>) listed in
+<a class="reference external" href="https://github.com/numpy/numpy/issues/12385">gh-12385</a>
+can be deprecated and removed.</p></li>
+<li><p>All <code class="docutils literal notranslate"><span class="pre">*sctype</span></code> functions can be deprecated and removed, they (see
+<a class="reference external" href="https://github.com/numpy/numpy/issues/17325">gh-17325</a>,
+<a class="reference external" href="https://github.com/numpy/numpy/issues/12334">gh-12334</a>,
+and other issues for <code class="docutils literal notranslate"><span class="pre">maximum_sctype</span></code> and related functions).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">np.compat</span></code> namespace, used during the Python 2 to 3 transition, will be removed.</p></li>
+<li><p>Functions that are narrow in scope, with very few public use-cases,
+will be removed. These will have to be identified manually and by issue triage.</p></li>
+</ul>
+<p>New namespaces are introduced for warnings/exceptions (<code class="docutils literal notranslate"><span class="pre">np.exceptions</span></code>) and
+for dtype-related functionality (<code class="docutils literal notranslate"><span class="pre">np.dtypes</span></code>). NumPy 2.0 is a good opportunity
+to populate these submodules from the main namespace.</p>
+<p>Functionality that is widely used but has a preferred alternative may either be
+deprecated (with the deprecation message pointing out what to use instead) or
+be hidden by not including it in <code class="docutils literal notranslate"><span class="pre">__dir__</span></code>. In case of hiding, a <code class="docutils literal notranslate"><span class="pre">..</span>
+<span class="pre">legacy::</span></code> directory may be used to mark such functionality in the
+documentation.</p>
+<p>A test will be added to ensure limited future growth of all namespaces; i.e.,
+every new entry will need to be explicitly added to an allow-list.</p>
+</section>
+<section id="cleaning-up-the-submodule-structure">
+<h3>Cleaning up the submodule structure<a class="headerlink" href="#cleaning-up-the-submodule-structure" title="Link to this heading">#</a></h3>
+<p>We will clean up the NumPy submodule structure, so it is easier to navigate.
+When this was discussed before (see
+<a class="reference external" href="https://github.com/numpy/numpy/pull/18447">MAINT: Hide internals of np.lib to only show submodules</a>)
+there was already rough consensus on that - however it was hard to pull off in
+a minor release.</p>
+<p>A basic principle we will adhere to is “one function, one location”. Functions
+that are exposed in more than one namespace (e.g., many functions are present
+in <code class="docutils literal notranslate"><span class="pre">numpy</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy.lib</span></code>) need to find a single home.</p>
+<p>We will reorganize the API reference guide along main and submodule namespaces,
+and only within the main namespace use the current subdivision along
+functionality groupings. Also by “mainstream” and special-purpose namespaces:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Regular/recommended user-facing namespaces for general use. Present these</span>
+<span class="c1"># as the primary set of namespaces to the users.</span>
+<span class="n">numpy</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">exceptions</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">fft</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">polynomial</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">random</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">testing</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">typing</span>
+
+<span class="c1"># Special-purpose namespaces. Keep these, but document them in a separate</span>
+<span class="c1"># grouping in the reference guide and explain their purpose.</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">array_api</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">ctypeslib</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">emath</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">f2py</span>  <span class="c1"># only a couple of public functions, like `compile` and `get_include`</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">stride_tricks</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">npyio</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">rec</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">dtypes</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">array_utils</span>
+
+<span class="c1"># Legacy (prefer not to use, there are better alternatives and/or this code</span>
+<span class="c1"># is deprecated or isn&#39;t reliable). This will be a third grouping in the</span>
+<span class="c1"># reference guide; it&#39;s still there, but de-emphasized and the problems</span>
+<span class="c1"># with it or better alternatives are explained in the docs.</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">char</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">distutils</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">ma</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">matlib</span>
+
+<span class="c1"># To remove</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">compat</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">core</span>  <span class="c1"># rename to _core</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">doc</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">math</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">version</span>  <span class="c1"># rename to _version</span>
+<span class="n">numpy</span><span class="o">.</span><span class="n">matrixlib</span>
+
+<span class="c1"># To clean out or somehow deal with: everything in `numpy.lib`</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>TBD: will we preserve <code class="docutils literal notranslate"><span class="pre">np.lib</span></code> or not? It only has a couple of unique
+functions/objects, like <code class="docutils literal notranslate"><span class="pre">Arrayterator</span></code> (a candidate for removal), <code class="docutils literal notranslate"><span class="pre">NumPyVersion</span></code>,
+and the <code class="docutils literal notranslate"><span class="pre">stride_tricks</span></code>, <code class="docutils literal notranslate"><span class="pre">mixins</span></code> and <code class="docutils literal notranslate"><span class="pre">format</span></code> subsubmodules.
+<code class="docutils literal notranslate"><span class="pre">numpy.lib</span></code> itself is not a coherent namespace, and does not even have a
+reference guide page.</p>
+</div>
+<p>We will make all submodules available lazily, so that users don’t have to type
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">numpy.xxx</span></code> but can use <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">numpy</span> <span class="pre">as</span> <span class="pre">np;</span> <span class="pre">np.xxx.*</span></code>, while at the
+same time not negatively impacting the overhead of <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">numpy</span></code>. This has
+been very helpful for teaching scikit-image and SciPy, and it resolves a
+potential issue for Spyder users because Spyder already makes all submodules
+available - so code using the above import pattern then works in Spyder but not
+outside it.</p>
+</section>
+<section id="reducing-the-number-of-ways-to-select-dtypes">
+<h3>Reducing the number of ways to select dtypes<a class="headerlink" href="#reducing-the-number-of-ways-to-select-dtypes" title="Link to this heading">#</a></h3>
+<p>The many dtype classes, instances, aliases and ways to select them are one of
+the larger usability problems in the NumPy API. E.g.:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># np.intp is different, but compares equal too</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">int64</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int_</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;i8&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sctypeDict</span><span class="p">[</span><span class="s1">&#39;i8&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">float64</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">double</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float_</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;f8&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">sctypeDict</span><span class="p">[</span><span class="s1">&#39;f8&#39;</span><span class="p">]</span>
+<span class="go">True</span>
+<span class="go">### Really?</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">clongdouble</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">clongfloat</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">longcomplex</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex256</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>These aliases can go: <a class="reference external" href="https://numpy.org/devdocs/reference/arrays.scalars.html#other-aliases">https://numpy.org/devdocs/reference/arrays.scalars.html#other-aliases</a></p>
+<p>All one-character type code strings and related routines like <code class="docutils literal notranslate"><span class="pre">mintypecode</span></code>
+will be marked as legacy.</p>
+<p>To discuss:</p>
+<ul class="simple">
+<li><p>move <em>all</em> dtype-related classes to <code class="docutils literal notranslate"><span class="pre">np.dtypes</span></code>?</p></li>
+<li><p>canonical way to compare/select dtypes: <code class="docutils literal notranslate"><span class="pre">np.isdtype</span></code> (new, xref array API
+NEP), leaving <code class="docutils literal notranslate"><span class="pre">np.issubdtype</span></code> for the more niche use of numpy’s dtype class
+hierarchy, and hide most other stuff.</p></li>
+<li><p>possibly remove <code class="docutils literal notranslate"><span class="pre">float96</span></code>/<code class="docutils literal notranslate"><span class="pre">float128</span></code>? they’re aliases that may not exist,
+and are too easy to shoot yourself in the foot with.</p></li>
+</ul>
+</section>
+<section id="cleaning-up-the-niche-methods-on-numpy-ndarray">
+<h3>Cleaning up the niche methods on <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code><a class="headerlink" href="#cleaning-up-the-niche-methods-on-numpy-ndarray" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> object has a lot of attributes and  methods, some of which are
+too niche to be that prominent, all that does is distract the average user.
+E.g.:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.itemset</span></code> (already discouraged)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.newbyteorder</span></code> (too niche)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.ptp</span></code> (niche, use <code class="docutils literal notranslate"><span class="pre">np.ptp</span></code> function instead)</p></li>
+</ul>
+</section>
+</section>
+<section id="api-changes-considered-and-rejected">
+<h2>API changes considered and rejected<a class="headerlink" href="#api-changes-considered-and-rejected" title="Link to this heading">#</a></h2>
+<p>For some functions and submodules it turned out that removing them would cause
+too much disruption or would require an amount of work disproportional to the
+actual gain. We arrived at this conclusion for such items:</p>
+<ul class="simple">
+<li><p>Removing business day functions: <code class="docutils literal notranslate"><span class="pre">np.busday_count</span></code>, <code class="docutils literal notranslate"><span class="pre">np.busday_offset</span></code>, <code class="docutils literal notranslate"><span class="pre">np.busdaycalendar</span></code>.</p></li>
+<li><p>Removing <code class="docutils literal notranslate"><span class="pre">np.nan*</span></code> functions and introducing new <code class="docutils literal notranslate"><span class="pre">nan_mode</span></code> argument to the related base functions.</p></li>
+<li><p>Hiding histogram functions in the <code class="docutils literal notranslate"><span class="pre">np.histograms</span></code> submodule.</p></li>
+<li><p>Hiding <code class="docutils literal notranslate"><span class="pre">c_</span></code>, <code class="docutils literal notranslate"><span class="pre">r_</span></code> and <code class="docutils literal notranslate"><span class="pre">s_</span></code> in the <code class="docutils literal notranslate"><span class="pre">np.lib.index_tricks</span></code> submodule.</p></li>
+<li><p>Functions that looked niche but are present in the Array API (for example <code class="docutils literal notranslate"><span class="pre">np.can_cast</span></code>).</p></li>
+<li><p>Removing <code class="docutils literal notranslate"><span class="pre">.repeat</span></code> and <code class="docutils literal notranslate"><span class="pre">.ctypes</span></code> from <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> object.</p></li>
+</ul>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<p>A clear split between public and private API was recently established
+as part of SciPy 1.8.0 (2021), see
+<a class="reference external" href="https://github.com/scipy/scipy/issues/14360">tracking issue scipy#14360</a>.
+The results were beneficial, and the impact on users relatively modest.</p>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>The implementation has been split over many different PRs, each touching on
+a single API or a set of related APIs. Here’s a sample of the most impactful PRs:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/24634">gh-24634: Rename numpy/core to numpy/_core</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/24357">gh-24357: Cleaning numpy/__init__.py and main namespace - Part 2</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/24376">gh-24376: Cleaning numpy/__init__.py and main namespace - Part 3</a></p></li>
+</ul>
+<p>The complete list of cleanup work done in the 2.0 release can be found by searching a dedicated label:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/labels/Numpy%202.0%20API%20Changes">Numpy 2.0 API Changes:</a></p></li>
+</ul>
+<p>Some PRs has already been merged and shipped with the <cite>1.25.0</cite> release.
+For example, deprecating non-preferred aliases:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/23302">gh-23302: deprecate np.round_; add round/min/max to the docs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/23314">gh-23314: deprecate product/cumproduct/sometrue/alltrue</a></p></li>
+</ul>
+<p>Hiding or removing objects that are accidentally made public or not even NumPy objects at all:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/21403">gh-21403: remove some names from main numpy namespace</a></p></li>
+</ul>
+<p>Creation of new namespaces to make it easier to navigate the module structure:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/22644">gh-22644: Add new np.exceptions namespace for errors and warnings</a></p></li>
+</ul>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/23999">gh-23999: Tracking issue for the NEP 52</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/24306">gh-24306: Overhaul of the main namespace</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/24507">gh-24507: Overhaul of the np.lib namespace</a></p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cleaning-up-the-main-namespace">Cleaning up the main namespace</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cleaning-up-the-submodule-structure">Cleaning up the submodule structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reducing-the-number-of-ways-to-select-dtypes">Reducing the number of ways to select dtypes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cleaning-up-the-niche-methods-on-numpy-ndarray">Cleaning up the niche methods on <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-changes-considered-and-rejected">API changes considered and rejected</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1757 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 55 — Add a UTF-8 variable-width string DType to NumPy &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0055-string_dtype';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 56 — Array API standard support in NumPy’s main namespace" href="nep-0056-array-api-main-namespace.html" />
+    <link rel="prev" title="NEP 52 — Python API cleanup for NumPy 2.0" href="nep-0052-python-api-cleanup.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 16, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-55-add-a-utf-8-variable-width-string-dtype-to-numpy">
+<span id="nep55"></span><h1>NEP 55 — Add a UTF-8 variable-width string DType to NumPy<a class="headerlink" href="#nep-55-add-a-utf-8-variable-width-string-dtype-to-numpy" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nathan Goldbaum &lt;<a class="reference external" href="mailto:ngoldbaum&#37;&#52;&#48;quansight&#46;com">ngoldbaum<span>&#64;</span>quansight<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Warren Weckesser</p>
+</dd>
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Marten van Kerkwijk</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2023-06-29</p>
+</dd>
+<dt class="field-odd">Updated<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2024-01-18</p>
+</dd>
+<dt class="field-even">Resolution<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/Y5CIKBZKMIOWSRYLJ64WV6DKM37QR76B/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/Y5CIKBZKMIOWSRYLJ64WV6DKM37QR76B/</a></p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>We propose adding a new string data type to NumPy where each item in the array
+is an arbitrary length UTF-8 encoded string. This will enable performance,
+memory usage, and usability improvements for NumPy users, including:</p>
+<ul class="simple">
+<li><p>Memory savings for workflows that currently use fixed-width strings and store
+primarily ASCII data or a mix of short and long strings in a single NumPy
+array.</p></li>
+<li><p>Downstream libraries and users will be able to move away from object arrays
+currently used as a substitute for variable-length string arrays, unlocking
+performance improvements by avoiding passes over the data outside of NumPy and
+allowing use of fast GIL-releasing C casts and string ufuncs for string
+operations.</p></li>
+<li><p>A more intuitive user-facing API for working with arrays of Python strings,
+without a need to think about the in-memory array representation.</p></li>
+</ul>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>First, we will describe how the current state of support for string or
+string-like data in NumPy arose. Next, we will summarize the last major previous
+discussion about this topic. Finally, we will describe the scope of the proposed
+changes to NumPy as well as changes that are explicitly out of scope of this
+proposal.</p>
+<section id="history-of-string-support-in-numpy">
+<h3>History of string support in Numpy<a class="headerlink" href="#history-of-string-support-in-numpy" title="Link to this heading">#</a></h3>
+<p>Support in NumPy for textual data evolved organically in response to early user
+needs and then changes in the Python ecosystem.</p>
+<p>Support for strings was added to NumPy to support users of the NumArray
+<code class="docutils literal notranslate"><span class="pre">chararray</span></code> type. Remnants of this are still visible in the NumPy API:
+string-related functionality lives in <code class="docutils literal notranslate"><span class="pre">np.char</span></code>, to support the
+<code class="docutils literal notranslate"><span class="pre">np.char.chararray</span></code> class. This class is not formally deprecated, but has a
+had comment in the module docstring suggesting to use string dtypes instead
+since NumPy 1.4.</p>
+<p>NumPy’s <code class="docutils literal notranslate"><span class="pre">bytes_</span></code> DType was originally used to represent the Python 2 <code class="docutils literal notranslate"><span class="pre">str</span></code>
+type before Python 3 support was added to NumPy. The bytes DType makes the most
+sense when it is used to represent Python 2 strings or other null-terminated
+byte sequences. However, ignoring trailing nulls means the <code class="docutils literal notranslate"><span class="pre">bytes_</span></code> DType is
+only suitable for fixed-width bytestreams that do not contain trailing nulls, so
+it is a possibly problematic match for generic bytestreams where trailing nulls
+need to round-trip through a NumPy string.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">unicode</span></code> DType was added to support the Python 2 <code class="docutils literal notranslate"><span class="pre">unicode</span></code> type. It
+stores data in 32-bit UCS-4 codepoints (e.g. a UTF-32 encoding), which makes for
+a straightforward implementation, but is inefficient for storing text that can
+be represented well using a one-byte ASCII or Latin-1 encoding. This was not a
+problem in Python 2, where ASCII or mostly-ASCII text could use the <code class="docutils literal notranslate"><span class="pre">str</span></code>
+DType.</p>
+<p>With the arrival of Python 3 support in NumPy, the string DTypes were largely
+left alone due to backward compatibility concerns, although the unicode DType
+became the default DType for <code class="docutils literal notranslate"><span class="pre">str</span></code> data and the old <code class="docutils literal notranslate"><span class="pre">string</span></code> DType was
+renamed the <code class="docutils literal notranslate"><span class="pre">bytes_</span></code> DType. This change left NumPy with the sub-optimal
+situation of shipping a data type originally intended for null-terminated
+bytestrings as the data type for <em>all</em> python <code class="docutils literal notranslate"><span class="pre">bytes</span></code> data, and a default
+string type with an in-memory representation that consumes four times as much
+memory than what is needed for data that can be represented well by a one-byte
+ASCII or Latin-1 encoding.</p>
+</section>
+<section id="problems-with-fixed-width-strings">
+<h3>Problems with fixed-width strings<a class="headerlink" href="#problems-with-fixed-width-strings" title="Link to this heading">#</a></h3>
+<p>Both existing string DTypes represent fixed-width sequences, allowing storage of
+the string data in the array buffer. This avoids adding out-of-band storage to
+NumPy, however, it makes for an awkward user interface for many use cases. In
+particular, the maximum string size must be inferred by NumPy or estimated by
+the user before loading the data into a NumPy array or selecting an output DType
+for string operations. In the worst case, this requires an expensive pass over
+the full dataset to calculate the maximum length of an array element. It also
+wastes memory when array elements have varying lengths. Pathological cases where
+an array stores many short strings and a few very long strings are particularly
+bad for wasting memory.</p>
+<p>Downstream usage of string data in NumPy arrays has proven out the need for a
+variable-width string data type. In practice, many downstream libraries avoid
+using fixed-width strings due to usability issues and instead employ <code class="docutils literal notranslate"><span class="pre">object</span></code>
+arrays for storing strings. In particular, Pandas has explicitly deprecated
+support for NumPy fixed-width strings, coerces NumPy fixed-width string arrays
+to either <code class="docutils literal notranslate"><span class="pre">object</span></code> string arrays or <code class="docutils literal notranslate"><span class="pre">PyArrow</span></code>-backed string arrays, and in
+the future will switch to only supporting string data via <code class="docutils literal notranslate"><span class="pre">PyArrow</span></code>, which has
+native support for UTF-8 encoded variable-width string arrays <a class="footnote-reference brackets" href="#id14" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+</section>
+</section>
+<section id="previous-discussions">
+<h2>Previous discussions<a class="headerlink" href="#previous-discussions" title="Link to this heading">#</a></h2>
+<p>The project last publicly discussed this topic in depth in 2017, when Julian
+Taylor proposed a fixed-width text data type parameterized by an encoding
+<a class="footnote-reference brackets" href="#id15" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. This started a wide-ranging discussion about pain points for working with
+string data in NumPy and possible ways forward.</p>
+<p>The discussion highlighted two use-cases that the current support for strings
+does a poor job of handling <a class="footnote-reference brackets" href="#id16" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id17" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id18" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>:</p>
+<ul class="simple">
+<li><p>Loading or memory-mapping scientific datasets with unknown encoding,</p></li>
+<li><p>Working with “a NumPy array of python strings” in a manner that allows
+transparent conversion between NumPy arrays and Python strings, including
+support for missing strings. The <code class="docutils literal notranslate"><span class="pre">object</span></code> DType partially satisfies this
+need, albeit with a cost of slow performance and no type checking.</p></li>
+</ul>
+<p>As a result of this discussion, improving support for string data was added to
+the NumPy project roadmap <a class="footnote-reference brackets" href="#id19" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>, with an explicit call-out to add a DType better
+suited to memory-mapping bytes with any or no encoding, and a variable-width
+string DType that supports missing data to replace usages of object string
+arrays.</p>
+</section>
+<section id="proposed-work">
+<h2>Proposed work<a class="headerlink" href="#proposed-work" title="Link to this heading">#</a></h2>
+<p>This NEP proposes adding <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>, a DType that stores variable-width
+heap-allocated strings in Numpy arrays, to replace downstream usages of the
+<code class="docutils literal notranslate"><span class="pre">object</span></code> DType for string data. This work will heavily leverage recent
+improvements in NumPy to improve support for user-defined DTypes, so we will
+also necessarily be working on the data type internals in NumPy. In particular,
+we propose to:</p>
+<ul class="simple">
+<li><p>Add a new variable-length string DType to NumPy, targeting NumPy 2.0.</p></li>
+<li><p>Work out issues related to adding a DType implemented using the experimental
+DType API to NumPy itself.</p></li>
+<li><p>Support for a user-provided missing data sentinel.</p></li>
+<li><p>Exposing string ufuncs in a new <code class="docutils literal notranslate"><span class="pre">np.strings</span></code> namespace for functions and
+types related to string support, enabling a migration path for a future
+deprecation of <code class="docutils literal notranslate"><span class="pre">np.char</span></code>.</p></li>
+</ul>
+<p>The following is out of scope for this work:</p>
+<ul class="simple">
+<li><p>Changing DType inference for string data.</p></li>
+<li><p>Adding a DType for memory-mapping text in unknown encodings or a DType that
+attempts to fix issues with the <code class="docutils literal notranslate"><span class="pre">bytes_</span></code> DType.</p></li>
+<li><p>Fully agreeing on the semantics of a missing data sentinels or adding a
+missing data sentinel to NumPy itself.</p></li>
+<li><p>Implement SIMD optimizations for string operations.</p></li>
+<li><p>An update to the <code class="docutils literal notranslate"><span class="pre">npy</span></code> and <code class="docutils literal notranslate"><span class="pre">npz</span></code> file formats to allow storage of
+arbitrary-length sidecar data.</p></li>
+</ul>
+<p>While we’re explicitly ruling out implementing these items as part of this work,
+adding a new string DType helps set up future work that does implement some of
+these items.</p>
+<p>If implemented this NEP will make it easier to add a new fixed-width text DType
+in the future by moving string operations into a long-term supported namespace
+and improving the internal infrastructure in NumPy for handling strings. We are
+also proposing a memory layout that should be amenable to SIMD optimization in
+some cases, increasing the payoff for writing string operations as
+SIMD-optimized ufuncs in the future.</p>
+<p>While we are not proposing adding a missing data sentinel to NumPy, we are
+proposing adding support for an optional, user-provided missing data sentinel,
+so this does move NumPy a little closer to officially supporting missing
+data. We are attempting to avoid resolving the disagreement described in
+<a class="reference internal" href="nep-0026-missing-data-summary.html#nep26"><span class="std std-ref">NEP 26</span></a> and this proposal does not require or preclude adding a
+missing data sentinel or bitflag-based missing data support to <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> in
+the future.</p>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>The DType is intended as a drop-in replacement for object string arrays. This
+means that we intend to support as many downstream usages of object string
+arrays as possible, including all supported NumPy functionality. Pandas is the
+obvious first user, and substantial work has already occurred to add support in
+a fork of Pandas. <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> also uses object string arrays and will be
+able to migrate to a DType with guarantees that the arrays contains only
+strings. Both h5py <a class="footnote-reference brackets" href="#id20" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a> and PyTables <a class="footnote-reference brackets" href="#id21" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a> will be able to add first-class
+support for variable-width UTF-8 encoded string datasets in HDF5. String data
+are heavily used in machine-learning workflows and downstream machine learning
+libraries will be able to leverage this new DType.</p>
+<p>Users who wish to load string data into NumPy and leverage NumPy features like
+fancy advanced indexing will have a natural choice that offers substantial
+memory savings over fixed-width unicode strings and better validation guarantees
+and overall integration with NumPy than object string arrays. Moving to a
+first-class string DType also removes the need to acquire the GIL during string
+operations, unlocking future optimizations that are impossible with object
+string arrays.</p>
+<section id="performance">
+<h3>Performance<a class="headerlink" href="#performance" title="Link to this heading">#</a></h3>
+<p>Here we briefly describe preliminary performance measurements of the prototype
+version of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> we have implemented outside of NumPy using the
+experimental DType API. All benchmarks in this section were performed on a Dell
+XPS 13 9380 running Ubuntu 22.04 and Python 3.11.3 compiled using pyenv. NumPy,
+Pandas, and the <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> prototype were all compiled with meson release
+builds.</p>
+<p>Currently, the <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> prototype has comparable performance with object
+arrays and fixed-width string arrays. One exception is array creation from
+python strings, performance is somewhat slower than object arrays and comparable
+to fixed-width unicode arrays:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>In [1]: from stringdtype import StringDType
+
+In [2]: import numpy as np
+
+In [3]: data = [str(i) * 10 for i in range(100_000)]
+
+In [4]: %timeit arr_object = np.array(data, dtype=object)
+3.15 ms ± 74.4 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+In [5]: %timeit arr_stringdtype = np.array(data, dtype=StringDType())
+8.8 ms ± 12.7 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+In [6]: %timeit arr_strdtype = np.array(data, dtype=str)
+11.6 ms ± 57.8 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+</pre></div>
+</div>
+<p>In this example, object DTypes are substantially faster because the objects in
+the <code class="docutils literal notranslate"><span class="pre">data</span></code> list can be directly interned in the array, while <code class="docutils literal notranslate"><span class="pre">StrDType</span></code> and
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code> need to copy the string data and <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> needs to
+convert the data to UTF-8 and perform additional heap allocations outside the
+array buffer. In the future, if Python moves to a UTF-8 internal representation
+for strings, the string loading performance of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> should improve.</p>
+<p>String operations have similar performance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>In [7]: %timeit np.array([s.capitalize() for s in data], dtype=object)
+31.6 ms ± 728 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
+In [8]: %timeit np.char.capitalize(arr_stringdtype)
+41.5 ms ± 84.1 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+
+In [9]: %timeit np.char.capitalize(arr_strdtype)
+47.6 ms ± 386 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+</pre></div>
+</div>
+<p>The poor performance here is a reflection of the slow iterator-based
+implementation of operations in <code class="docutils literal notranslate"><span class="pre">np.char</span></code>. When we finish rewriting these
+operations as ufuncs, we will unlock substantial performance
+improvements. Using the example of the <code class="docutils literal notranslate"><span class="pre">add</span></code> ufunc, which we have implemented
+for the <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> prototype:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>In [10]: %timeit arr_object + arr_object
+10.1 ms ± 400 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+In [11]: %timeit arr_stringdtype + arr_stringdtype
+3.64 ms ± 258 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+
+In [12]: %timeit np.char.add(arr_strdtype, arr_strdtype)
+17.7 ms ± 245 µs per loop (mean ± std. dev. of 7 runs, 100 loops each)
+</pre></div>
+</div>
+<p>As described below, we have already updated a fork of Pandas to use a prototype
+version of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>. This demonstrates the performance improvements
+available when data are already loaded into a NumPy array and are passed to a
+third-party library. Currently Pandas attempts to coerce all <code class="docutils literal notranslate"><span class="pre">str</span></code> data to
+<code class="docutils literal notranslate"><span class="pre">object</span></code> DType by default, and has to check and sanitize existing <code class="docutils literal notranslate"><span class="pre">object</span></code>
+arrays that are passed in. This requires a copy or pass over the data made
+unnecessary by first-class support for variable-width strings in both NumPy and
+Pandas:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>In [13]: import pandas as pd
+
+In [14]: %timeit pd.Series(arr_stringdtype)
+18.8 µs ± 164 ns per loop (mean ± std. dev. of 7 runs, 100,000 loops each)
+</pre></div>
+</div>
+<p>If we force Pandas to use object string arrays, which was the default until very
+recently, we see the substantial performance penalty of a pass over the data
+outside of NumPy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>In [15]: %timeit pd.Series(arr_object, dtype=&#39;string[python]&#39;)
+907 µs ± 67 µs per loop (mean ± std. dev. of 7 runs, 1,000 loops each
+</pre></div>
+</div>
+<p>Pandas switched to PyArrow-backed string arrays by default specifically to avoid
+this and other performance costs associated with object string arrays.</p>
+</section>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>We are not proposing a change to DType inference for python strings and do not
+expect to see any impacts on existing usages of NumPy.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<p>Here we provide a detailed description of the version of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> we
+would like to include in NumPy. This is mostly identical to the prototype, but
+has a few differences that are impossible to implement in a DType that lives
+outside of NumPy.</p>
+<p>First, we describe the Python API for instantiating <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>
+instances. Next, we will describe the missing data handling support and support
+for strict string type checking for array elements. We next discuss the cast and
+ufunc implementations we will define and discuss our plan for a new
+<code class="docutils literal notranslate"><span class="pre">np.strings</span></code> namespace to directly expose string ufuncs in the Python
+API. Finally, we provide an overview of the C API we would like to expose and
+the details of the memory layout and heap allocation strategy we have chosen for
+the initial implementation.</p>
+<section id="python-api-for-stringdtype">
+<h3>Python API for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code><a class="headerlink" href="#python-api-for-stringdtype" title="Link to this heading">#</a></h3>
+<p>The new DType will be accessible via the <code class="docutils literal notranslate"><span class="pre">np.dtypes</span></code> namespace:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.dtypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringDType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">StringDType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span>
+<span class="go">numpy.dtypes.StringDType()</span>
+</pre></div>
+</div>
+<p>In addition, we propose reserving the character <code class="docutils literal notranslate"><span class="pre">&quot;T&quot;</span></code> (short for text) for
+usage with <code class="docutils literal notranslate"><span class="pre">np.dtype</span></code>, so the above would be identical to:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+<span class="go">numpy.dtypes.StringDType()</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">StringDType</span></code> can be used out of the box to represent strings of arbitrary
+length in a NumPy array:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;this is a very long string&quot;</span><span class="p">,</span> <span class="s2">&quot;short string&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">StringDType</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
+<span class="go">array([&#39;this is a very long string&#39;, &#39;short string&#39;], dtype=StringDType())</span>
+</pre></div>
+</div>
+<p>Note that unlike fixed-width strings, <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> is not parameterized by
+the maximum length of an array element, arbitrarily long or short strings can
+live in the same array without needing to reserve storage for padding bytes in
+the short strings.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> class will be a synonym for the default <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>
+instance when the class is passed as a <code class="docutils literal notranslate"><span class="pre">dtype</span></code> argument in the NumPy Python
+API. We have already converted most of the API surface to work like this, but
+there are still a few spots that have not yet been converted and it’s likely
+third-party code has not been converted, so we will not emphasize this in the
+docs. Emphasizing that <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> is a class and <code class="docutils literal notranslate"><span class="pre">StringDType()</span></code> is an
+instance is a more forward-looking API that the rest of the NumPy DType API can
+move towards now that DType classes are importable from the <code class="docutils literal notranslate"><span class="pre">np.dtypes</span></code>
+namespace, so we will include an explicit instantiation of a <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>
+object in the documentation even if it is not strictly necessary.</p>
+<p>We propose associating the python <code class="docutils literal notranslate"><span class="pre">str</span></code> builtin as the DType’s scalar type:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">StringDType</span><span class="o">.</span><span class="n">type</span>
+<span class="go">&lt;class &#39;str&#39;&gt;</span>
+</pre></div>
+</div>
+<p>While this does create an API wart in that the mapping from builtin DType
+classes to scalars in NumPy will no longer be one-to-one (the <code class="docutils literal notranslate"><span class="pre">unicode</span></code>
+DType’s scalar type is <code class="docutils literal notranslate"><span class="pre">str</span></code>), this avoids needing to define, optimize, or
+maintain a <code class="docutils literal notranslate"><span class="pre">str</span></code> subclass for this purpose or other hacks to maintain this
+one-to-one mapping. To maintain backward compatibility, the DType detected for a
+list of python strings will remain a fixed-width unicode string.</p>
+<p>As described below, <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> supports two parameters that can adjust the
+runtime behavior of the DType. We will not attempt to support parameters for the
+dtype via a character code. If users need an instance of the DType that does not
+use the default parameters, they will need to instantiate an instance of the
+DType using the DType class.</p>
+<p>We will also extend the <code class="docutils literal notranslate"><span class="pre">NPY_TYPES</span></code> enum in the C API with an <code class="docutils literal notranslate"><span class="pre">NPY_VSTRING</span></code>
+entry (there is already an <code class="docutils literal notranslate"><span class="pre">NPY_STRING</span></code> entry). This should not interfere with
+legacy user-defined DTypes since the integer type numbers for these data types
+begin at 256. In principle there is still room for hundreds more builtin
+DTypes in the integer range available in the <code class="docutils literal notranslate"><span class="pre">NPY_TYPES</span></code> enum.</p>
+<p>In principle we do not need to reserve a character code and there is a desire to
+move away from character codes. However, a substantial amount of downstream code
+relies on checking DType character codes to discriminate between builtin NumPy
+DTypes, and we think it would harm adoption to require users to refactor their
+DType-handling code if they want to use <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>.</p>
+<p>We also hope that in the future we might be able to add a new fixed-width text
+version of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> that can re-use the <code class="docutils literal notranslate"><span class="pre">&quot;T&quot;</span></code> character code with
+length or encoding modifiers. This will allow a migration to a more flexible
+text dtype for use with structured arrays and other use-cases with a fixed-width
+string is a better fit than a variable-width string.</p>
+</section>
+<section id="missing-data-support">
+<h3>Missing Data Support<a class="headerlink" href="#missing-data-support" title="Link to this heading">#</a></h3>
+<p>Missing data can be represented using a sentinel:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">StringDType</span><span class="p">(</span><span class="n">na_object</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="n">nan</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span>
+<span class="go">array([&#39;hello&#39;, nan, &#39;world&#39;], dtype=StringDType(na_object=nan))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">nan</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="go">array([False,  True, False])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+<span class="go">array([&#39;&#39;, &#39;&#39;, &#39;&#39;])</span>
+</pre></div>
+</div>
+<p>We only propose supporting user-provided sentinels. By default, empty arrays
+will be populated with empty strings:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">StringDType</span><span class="p">())</span>
+<span class="go">array([&#39;&#39;, &#39;&#39;, &#39;&#39;], dtype=StringDType())</span>
+</pre></div>
+</div>
+<p>By only supporting user-provided missing data sentinels, we avoid resolving
+exactly how NumPy itself should support missing data and the correct semantics
+of the missing data object, leaving that up to users to decide. However, we <em>do</em>
+detect whether the user is providing a NaN-like missing data value, a string
+missing data value, or neither. We explain how we handle these cases below.</p>
+<p>A cautious reader may be worried about the complexity of needing to handle three
+different categories of missing data sentinel. The complexity here is reflective
+of the flexibility of object arrays and the downstream usage patterns we’ve
+found. Some users want comparisons with the sentinel to error, so they use
+<code class="docutils literal notranslate"><span class="pre">None</span></code>. Others want comparisons to succeed and have some kind of meaningful
+ordering, so they use some arbitrary, hopefully unique string. Other users want
+to use something that acts like NaN in comparisons and arithmetic or is
+literally NaN so that NumPy operations that specifically look for exactly NaN
+work and there isn’t a need to rewrite missing data handling outside of
+NumPy. We believe it is possible to support all this, but it requires a bit of
+hopefully manageable complexity.</p>
+<section id="nan-like-sentinels">
+<h4>NaN-like Sentinels<a class="headerlink" href="#nan-like-sentinels" title="Link to this heading">#</a></h4>
+<p>A NaN-like sentinel returns itself as the result of arithmetic operations. This
+includes the python <code class="docutils literal notranslate"><span class="pre">nan</span></code> float and the Pandas missing data sentinel
+<code class="docutils literal notranslate"><span class="pre">pd.NA</span></code>. We choose to make NaN-like sentinels inherit these behaviors in
+operations, so the result of addition is the sentinel:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">StringDType</span><span class="p">(</span><span class="n">na_object</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">+</span> <span class="n">arr</span>
+<span class="go">array([&#39;hellohello&#39;, nan, &#39;worldworld&#39;], dtype=StringDType(na_object=nan))</span>
+</pre></div>
+</div>
+<p>We also chose to make a NaN-like sentinel sort to the end of the array,
+following the behavior of sorting an array containing <code class="docutils literal notranslate"><span class="pre">nan</span></code>.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="go">array([&#39;hello&#39;, &#39;world&#39;, nan], dtype=StringDType(na_object=nan))</span>
+</pre></div>
+</div>
+</section>
+<section id="string-sentinels">
+<h4>String Sentinels<a class="headerlink" href="#string-sentinels" title="Link to this heading">#</a></h4>
+<p>A string missing data value is an instance of <code class="docutils literal notranslate"><span class="pre">str</span></code> or subtype of <code class="docutils literal notranslate"><span class="pre">str</span></code>.</p>
+<p>Operations will use the sentinel value directly for missing entries. This is the
+primary usage of this pattern we’ve found in downstream code, where a missing
+data sentinel like <code class="docutils literal notranslate"><span class="pre">&quot;__nan__&quot;</span></code> is passed to a low-level sorting or
+partitioning algorithm.</p>
+</section>
+<section id="other-sentinels">
+<h4>Other Sentinels<a class="headerlink" href="#other-sentinels" title="Link to this heading">#</a></h4>
+<p>Any other python object will raise errors in operations or comparisons, just as
+<code class="docutils literal notranslate"><span class="pre">None</span></code> does as a missing data sentinel for object arrays currently:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dt</span> <span class="o">=</span> <span class="n">StringDType</span><span class="p">(</span><span class="n">na_object</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dt</span><span class="p">))</span>
+<span class="go">ValueError: Cannot compare null that is not a string or NaN-like value</span>
+</pre></div>
+</div>
+<p>Since comparisons need to raise an error, and the NumPy comparison API has no
+way to signal value-based errors during a sort without holding the GIL, sorting
+arrays that use arbitrary missing data sentinels will hold the GIL. We may also
+attempt to relax this restriction by refactoring NumPy’s comparison and sorting
+implementation to allow value-based error propagation during a sort operation.</p>
+</section>
+<section id="implications-for-dtype-inference">
+<h4>Implications for DType Inference<a class="headerlink" href="#implications-for-dtype-inference" title="Link to this heading">#</a></h4>
+<p>If, in the future, we decide to break backward compatibility to make
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code> the default DType for <code class="docutils literal notranslate"><span class="pre">str</span></code> data, the support for arbitrary
+objects as missing data sentinels may seem to pose a problem for implementing
+DType inference. However, given that initial support for this DType will require
+using the DType directly and will not be able to rely on NumPy to infer the
+DType, we do not think this will be a major problem for downstream users of the
+missing data feature. To use <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>, they will need to update
+their code to explicitly specify a DType when an array is created, so if NumPy
+changes DType inference in the future, their code will not change behavior and
+there will never be a need for missing data sentinels to participate in DType
+inference.</p>
+</section>
+</section>
+<section id="coercing-non-strings">
+<h3>Coercing non-strings<a class="headerlink" href="#coercing-non-strings" title="Link to this heading">#</a></h3>
+<p>By default, non-string data are coerced to strings:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="nb">object</span><span class="p">(),</span> <span class="mf">3.4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">StringDType</span><span class="p">())</span>
+<span class="go">array([&#39;1&#39;, &#39;&lt;object object at 0x7faa2497dde0&gt;&#39;, &#39;3.4&#39;], dtype=StringDType())</span>
+</pre></div>
+</div>
+<p>If this behavior is not desired, an instance of the DType can be created that
+disables string coercion:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="nb">object</span><span class="p">(),</span> <span class="mf">3.4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">StringDType</span><span class="p">(</span><span class="n">coerce</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+<span class="gr">ValueError</span>: <span class="n">StringDType only allows string data when string coercion</span>
+<span class="x">is disabled</span>
+</pre></div>
+</div>
+<p>This allows strict data validation in the same pass over the data NumPy uses to
+create the array without a need for downstream libraries to implement their own
+string validation in a separate, expensive, pass over the input array-like. We
+have chosen not to make this the default behavior to follow NumPy fixed-width
+strings, which coerce non-strings.</p>
+</section>
+<section id="casts-ufunc-support-and-string-manipulation-functions">
+<h3>Casts, ufunc support, and string manipulation functions<a class="headerlink" href="#casts-ufunc-support-and-string-manipulation-functions" title="Link to this heading">#</a></h3>
+<p>A full set of round-trip casts to the builtin NumPy DTypes will be available. In
+addition, we will add implementations for the comparison operators as well as an
+<code class="docutils literal notranslate"><span class="pre">add</span></code> loop that accepts two string arrays, <code class="docutils literal notranslate"><span class="pre">multiply</span></code> loops that accept
+string and integer arrays, an <code class="docutils literal notranslate"><span class="pre">isnan</span></code> loop, and implementations for the
+<code class="docutils literal notranslate"><span class="pre">str_len</span></code>, <code class="docutils literal notranslate"><span class="pre">isalpha</span></code>, <code class="docutils literal notranslate"><span class="pre">isdecimal</span></code>, <code class="docutils literal notranslate"><span class="pre">isdigit</span></code>, <code class="docutils literal notranslate"><span class="pre">isnumeric</span></code>,
+<code class="docutils literal notranslate"><span class="pre">isspace</span></code>, <code class="docutils literal notranslate"><span class="pre">find</span></code>, <code class="docutils literal notranslate"><span class="pre">rfind</span></code>, <code class="docutils literal notranslate"><span class="pre">count</span></code>, <code class="docutils literal notranslate"><span class="pre">strip</span></code>, <code class="docutils literal notranslate"><span class="pre">lstrip</span></code>, <code class="docutils literal notranslate"><span class="pre">rstrip</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">replace</span></code> string ufuncs that will be newly available in NumPy 2.0.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">isnan</span></code> ufunc will return <code class="docutils literal notranslate"><span class="pre">True</span></code> for entries that are NaN-like sentinels
+and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise. Comparisons will sort data in order of unicode code
+point, as is currently implemented for the fixed-width unicode DType. In the
+future NumPy or a downstream library may add locale-aware sorting, case folding,
+and normalization for NumPy unicode strings arrays, but we are not proposing
+adding these features at this time.</p>
+<p>Two <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> instances are considered equal if they are created with the
+same <code class="docutils literal notranslate"><span class="pre">na_object</span></code> and <code class="docutils literal notranslate"><span class="pre">coerce</span></code> parameter. For ufuncs that accept more than
+one string argument we also introduce the concept of “compatible”
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code> instances. We allow distinct DType instances to be used in ufunc
+operations together if have the same <code class="docutils literal notranslate"><span class="pre">na_object</span></code> or if only one
+or the other DType has an <code class="docutils literal notranslate"><span class="pre">na_object</span></code> explicitly set. We do not consider
+string coercion for determining whether instances are compatible, although if
+the result of the operation is a string, the result will inherit the stricter
+string coercion setting of the original operands.</p>
+<p>This notion of “compatible” instances will be enforced in the
+<code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function of binary ufuncs. This choice makes it easier
+to work with non-default <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> instances, because python strings are
+coerced to the default <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> instance, so the following idiomatic
+expression is allowed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">StringDType</span><span class="p">(</span><span class="n">na_object</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">+</span> <span class="s2">&quot;!&quot;</span>
+<span class="go">array([&#39;hello!&#39;, &#39;world!&#39;], dtype=StringDType(na_object=None))</span>
+</pre></div>
+</div>
+<p>If we only considered equality of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> instances, this would
+be an error, making for an awkward user experience. If the operands have
+distinct <code class="docutils literal notranslate"><span class="pre">na_object</span></code> settings, NumPy will raise an error because the choice
+for the result DType is ambiguous:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="s2">&quot;!&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">StringDType</span><span class="p">(</span><span class="n">na_object</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+<span class="go">TypeError: Cannot find common instance for incompatible dtype instances</span>
+</pre></div>
+</div>
+</section>
+<section id="np-strings-namespace">
+<h3><code class="docutils literal notranslate"><span class="pre">np.strings</span></code> namespace<a class="headerlink" href="#np-strings-namespace" title="Link to this heading">#</a></h3>
+<p>String operations will be available in a <code class="docutils literal notranslate"><span class="pre">np.strings</span></code> namespace that will
+be populated with string ufuncs:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">strings</span><span class="o">.</span><span class="n">upper</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;world&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">StringDType</span><span class="p">())</span>
+<span class="go">array([&#39;HELLO&#39;, &#39;WORLD&#39;], dtype=StringDType())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">strings</span><span class="o">.</span><span class="n">upper</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ufunc</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>We feel <code class="docutils literal notranslate"><span class="pre">np.strings</span></code> is a more intuitive name than <code class="docutils literal notranslate"><span class="pre">np.char</span></code>, and eventually
+will replace <code class="docutils literal notranslate"><span class="pre">np.char</span></code> once the minimum NumPy version supported by downstream
+libraries per <a class="reference external" href="https://scientific-python.org/specs/spec-0000/">SPEC-0</a> is new
+enough that they can safely switch to <code class="docutils literal notranslate"><span class="pre">np.strings</span></code> without needing any logic
+conditional on the NumPy version.</p>
+</section>
+<section id="serialization">
+<h3>Serialization<a class="headerlink" href="#serialization" title="Link to this heading">#</a></h3>
+<p>Since string data are stored outside the array buffer, serialization to the
+<code class="docutils literal notranslate"><span class="pre">npy</span></code> format would requires a format revision to support storing
+variable-width sidecare data. Rather than doing this as part of this effort, we
+do not plan on supporting serialization to the <code class="docutils literal notranslate"><span class="pre">npy</span></code> or <code class="docutils literal notranslate"><span class="pre">npz</span></code> format without
+specifying <code class="docutils literal notranslate"><span class="pre">allow_pickle=True</span></code>.</p>
+<p>This is a continuation of the current situation with object string arrays,
+which can only be saved to an <code class="docutils literal notranslate"><span class="pre">npy</span></code> file using the <code class="docutils literal notranslate"><span class="pre">allow_pickle=True</span></code>
+option.</p>
+<p>In the future we may decide to add support for this, but care should be taken to
+not break parsers outside of NumPy that may not be maintained.</p>
+</section>
+<section id="c-api-for-stringdtype">
+<h3>C API for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code><a class="headerlink" href="#c-api-for-stringdtype" title="Link to this heading">#</a></h3>
+<p>The goal of the C API is to hide details of how string data are stored on the
+heap from the user and provide a thread-safe interface for reading and writing
+strings stored in <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> arrays. To accomplish this, we have decided to
+split strings into two different <em>packed</em> and <em>unpacked</em> representations. A
+packed string lives directly in the array buffer and may contain either the
+string data for a sufficiently short string or metadata for a heap allocation
+where the characters of the string are stored. An unpacked string exposes the
+size of the string in bytes and a <code class="docutils literal notranslate"><span class="pre">char</span> <span class="pre">*</span></code> pointer to the string data.</p>
+<p>To access the unpacked string data for a string stored in a numpy array, a user
+must call a function to load the packed string into an unpacked string or call
+another function to pack an unpacked string into an array. These operations
+require both a pointer to an array entry and a reference to an allocator
+struct. The allocator manages the bookkeeping needed to store the string data on
+the heap. Centralizing this bookkeeping in the allocator means we have the
+freedom to change the underlying allocation strategy. We also ensure thread
+safety by guarding access to the allocator with a mutex.</p>
+<p>Below we describe this design in more detail, enumerating the types and
+functions we would like to add to the C API. In the <a class="reference internal" href="#memory"><span class="std std-ref">next section</span></a>
+we describe the memory layout and heap allocation strategy we plan to implement
+using this API.</p>
+<section id="the-pyarray-stringdtype-and-pyarray-stringdtypeobject-structs">
+<h4>The <code class="docutils literal notranslate"><span class="pre">PyArray_StringDType</span></code> and <code class="docutils literal notranslate"><span class="pre">PyArray_StringDTypeObject</span></code> structs<a class="headerlink" href="#the-pyarray-stringdtype-and-pyarray-stringdtypeobject-structs" title="Link to this heading">#</a></h4>
+<p>We will publicly expose structs for the <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> metaclass and a struct
+for the type of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> instances. The former <code class="docutils literal notranslate"><span class="pre">PyArray_StringDType</span></code>
+will be available in the C API in the same way as other <code class="docutils literal notranslate"><span class="pre">PyArray_DTypeMeta</span></code>
+instances for writing ufunc and cast loops. In addition, we will make the
+following struct public:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">PyArray_StringDTypeObject</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">PyArray_Descr</span><span class="w"> </span><span class="n">base</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The object representing a null value</span>
+<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">na_object</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Flag indicating whether or not to coerce arbitrary objects to strings</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">coerce</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Flag indicating the na object is NaN-like</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">has_nan_na</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Flag indicating the na object is a string</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">has_string_na</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// If nonzero, indicates that this instance is owned by an array already</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">array_owned</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The string data to use when a default string is needed</span>
+<span class="w">    </span><span class="n">npy_static_string</span><span class="w"> </span><span class="n">default_string</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// The name of the missing data object, if any</span>
+<span class="w">    </span><span class="n">npy_static_string</span><span class="w"> </span><span class="n">na_name</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// the allocator should only be directly accessed after</span>
+<span class="w">    </span><span class="c1">// acquiring the allocator_lock and the lock should</span>
+<span class="w">    </span><span class="c1">// be released immediately after the allocator is</span>
+<span class="w">    </span><span class="c1">// no longer needed</span>
+<span class="w">    </span><span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span><span class="n">allocator</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Making this definition public eases future integration with other dtypes.</p>
+</section>
+<section id="string-and-allocator-types">
+<h4>String and Allocator Types<a class="headerlink" href="#string-and-allocator-types" title="Link to this heading">#</a></h4>
+<p>Unpacked strings are represented in the C API with the <code class="docutils literal notranslate"><span class="pre">npy_static_string</span></code>
+type, which will be publicly exposed with the following definition:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">npy_static_string</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">;</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">size</span></code> is the size, in bytes, of the string and <code class="docutils literal notranslate"><span class="pre">buf</span></code> is a const
+pointer to the beginning of a UTF-8 encoded bytestream containing string
+data. This is a <em>read-only</em> view onto the string, we will not expose a public
+interface for modifying these strings. We do not append a trailing null
+character to the byte stream, so users attempting to pass the <code class="docutils literal notranslate"><span class="pre">buf</span></code> field to
+an API expecting a C string must create a copy with a trailing null.  In the
+future we may decide to always write a trailing null byte if the need to copy
+into a null-terminated buffer proves to be cost-prohibitive for downstream users
+of the C API.</p>
+<p>In addition, we will expose two opaque structs, <code class="docutils literal notranslate"><span class="pre">npy_packed_static_string</span></code> and
+<code class="docutils literal notranslate"><span class="pre">npy_string_allocator</span></code>. Each entry in <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> NumPy array will store
+the contents of an <code class="docutils literal notranslate"><span class="pre">npy_packed_static_string</span></code>; a packed representation of a
+string. The string data are stored either directly in the packed string or on
+the heap, in an allocation managed by a separate <code class="docutils literal notranslate"><span class="pre">npy_string_allocator</span></code> struct
+attached to the descriptor instance associated with the array. The precise
+layout of the packed string and the strategy used to allocate data on the heap
+will not be publicly exposed and users should not depend on these details.</p>
+</section>
+<section id="new-c-api-functions">
+<h4>New C API Functions<a class="headerlink" href="#new-c-api-functions" title="Link to this heading">#</a></h4>
+<p>The C API functions we plan to expose fall into two categories: functions for
+acquiring and releasing the allocator lock and functions for loading and packing
+strings.</p>
+<section id="acquiring-and-releasing-allocators">
+<h5>Acquiring and Releasing Allocators<a class="headerlink" href="#acquiring-and-releasing-allocators" title="Link to this heading">#</a></h5>
+<p>The main interface for acquiring and releasing the allocator is the following
+pair of static inline functions:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span>
+<span class="n">NpyString_acquire_allocator</span><span class="p">(</span><span class="n">PyArray_StringDTypeObject</span><span class="w"> </span><span class="o">*</span><span class="n">descr</span><span class="p">)</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span>
+<span class="n">NpyString_release_allocator</span><span class="p">(</span><span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span><span class="n">allocator</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first function acquires the allocator lock attached to the descriptor
+instance and returns a pointer to the allocator associated with the
+descriptor. The allocator can then be used by that thread to load existing
+packed strings or pack new strings into the array. Once the operation requiring
+the allocator is finished, the allocator lock must then be released. Use of the
+allocator after calling <code class="docutils literal notranslate"><span class="pre">NpyString_release_allocator</span></code> may lead to data races
+or memory corruption.</p>
+<p>There are also cases when it is convenient to simultaneously work with several
+allocators. For example, the <code class="docutils literal notranslate"><span class="pre">add</span></code> ufunc takes two string arrays and produces
+a third string array. This means the ufunc loop needs three allocators to be
+able to load the strings for each operand and pack the result into the output
+array. This is also made more tricky by the fact that input and output operands
+need not be distinct objects and operands can share allocators by virtue of
+being the same array. In principle we could require users to acquire and release
+locks inside of a ufunc loop, but that would add a large performance overhead
+compared to acquiring all three allocators in the loop setup and releasing them
+simultaneously after the end of the loop.</p>
+<p>To handle these situations, we will also expose variants of both functions that
+take an arbitrary number of descriptors and allocators
+(<code class="docutils literal notranslate"><span class="pre">NpyString_acquire_allocators</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">NpyString_release_allocators</span></code>). Exposing these functions makes it
+straightforward to write code that works simultaneously with more than one
+allocator. The naive approach that simply calls <code class="docutils literal notranslate"><span class="pre">NpyString_acquire_allocator</span></code>
+and <code class="docutils literal notranslate"><span class="pre">NpyString_release_allocator</span></code> multiple times will cause undefined behavior
+by attempting to acquire the same lock more than once in the same thread when
+ufunc operands share descriptors. The multiple-descriptor variants check
+for identical descriptors before trying to acquire locks, avoiding the undefined
+behavior. To do the correct thing, the user will only need to choose the variant
+to acquire or release allocators that accepts the same number of descriptors as
+the number they need to work with.</p>
+</section>
+<section id="packing-and-loading-strings">
+<h5>Packing and Loading Strings<a class="headerlink" href="#packing-and-loading-strings" title="Link to this heading">#</a></h5>
+<p>Accessing strings is mediated by the following function:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">NpyString_load</span><span class="p">(</span>
+<span class="w">    </span><span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span><span class="n">allocator</span><span class="p">,</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">npy_packed_static_string</span><span class="w"> </span><span class="o">*</span><span class="n">packed_string</span><span class="p">,</span>
+<span class="w">    </span><span class="n">npy_static_string</span><span class="w"> </span><span class="o">*</span><span class="n">unpacked_string</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This function returns -1 on error, which can happen if there is a threading bug
+or corruption preventing access to a heap allocation. On success it can either
+return 1 or 0. If it returns 1, this indicates that the contents of the packed
+string are the null string, and special logic for handling null strings can
+happen in this case. If the function returns 0, this indicates the contents of
+the <code class="docutils literal notranslate"><span class="pre">packed_string</span></code> can be read from the <code class="docutils literal notranslate"><span class="pre">unpacked_string</span></code>.</p>
+<p>Packing strings can happen via one of these functions:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">NpyString_pack</span><span class="p">(</span>
+<span class="w">    </span><span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span><span class="n">allocator</span><span class="p">,</span>
+<span class="w">    </span><span class="n">npy_packed_static_string</span><span class="w"> </span><span class="o">*</span><span class="n">packed_string</span><span class="p">,</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">)</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">NpyString_pack_null</span><span class="p">(</span>
+<span class="w">    </span><span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span><span class="n">allocator</span><span class="p">,</span>
+<span class="w">    </span><span class="n">npy_packed_static_string</span><span class="w"> </span><span class="o">*</span><span class="n">packed_string</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first function packs the contents of the first <code class="docutils literal notranslate"><span class="pre">size</span></code> elements of <code class="docutils literal notranslate"><span class="pre">buf</span></code>
+into <code class="docutils literal notranslate"><span class="pre">packed_string</span></code>. The second function packs the null string into
+<code class="docutils literal notranslate"><span class="pre">packed_string</span></code>. Both functions invalidate any previous heap allocation
+associated with the packed string and old unpacked representations that are
+still in scope are invalid after packing a string. Both functions return 0 on
+success and -1 on failure, for example if <code class="docutils literal notranslate"><span class="pre">malloc</span></code> fails.</p>
+</section>
+</section>
+<section id="example-c-api-usage">
+<h4>Example C API Usage<a class="headerlink" href="#example-c-api-usage" title="Link to this heading">#</a></h4>
+<section id="loading-a-string">
+<h5>Loading a String<a class="headerlink" href="#loading-a-string" title="Link to this heading">#</a></h5>
+<p>Say we are writing a ufunc implementation for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>. If we are given
+<code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">char</span> <span class="pre">*buf</span></code> pointer to the beginning of a <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> array entry, and a
+<code class="docutils literal notranslate"><span class="pre">PyArray_Descr</span> <span class="pre">*</span></code> pointer to the array descriptor, one can
+access the underlying string data like so:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span><span class="n">allocator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NpyString_acquire_allocator</span><span class="p">(</span>
+<span class="w">        </span><span class="p">(</span><span class="n">PyArray_StringDTypeObject</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">descr</span><span class="p">);</span>
+
+<span class="n">npy_static_string</span><span class="w"> </span><span class="n">sdata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">};</span>
+<span class="n">npy_packed_static_string</span><span class="w"> </span><span class="o">*</span><span class="n">packed_string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">npy_packed_static_string</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">is_null</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="n">is_null</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NpyString_load</span><span class="p">(</span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="n">packed_string</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">sdata</span><span class="p">);</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_null</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// failed to load string, set error</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// handle missing string</span>
+<span class="w">    </span><span class="c1">// sdata-&gt;buf is NULL</span>
+<span class="w">    </span><span class="c1">// sdata-&gt;size is 0</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// sdata-&gt;buf is a pointer to the beginning of a string</span>
+<span class="w">    </span><span class="c1">// sdata-&gt;size is the size of the string</span>
+<span class="p">}</span>
+<span class="n">NpyString_release_allocator</span><span class="p">(</span><span class="n">allocator</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="packing-a-string">
+<h5>Packing a String<a class="headerlink" href="#packing-a-string" title="Link to this heading">#</a></h5>
+<p>This example shows how to pack a new string into an array:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">str</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Hello world&quot;</span><span class="p">;</span>
+<span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">;</span>
+<span class="n">npy_packed_static_string</span><span class="w"> </span><span class="o">*</span><span class="n">packed_string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">npy_packed_static_string</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">;</span>
+
+<span class="n">npy_string_allocator</span><span class="w"> </span><span class="o">*</span><span class="n">allocator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NpyString_acquire_allocator</span><span class="p">(</span>
+<span class="w">        </span><span class="p">(</span><span class="n">PyArray_StringDTypeObject</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">descr</span><span class="p">);</span>
+
+<span class="c1">// copy contents of str into packed_string</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NpyString_pack</span><span class="p">(</span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="n">packed_string</span><span class="p">,</span><span class="w"> </span><span class="n">str</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// string packing failed, set error</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// packed_string contains a copy of &quot;Hello world&quot;</span>
+
+<span class="n">NpyString_release_allocator</span><span class="p">(</span><span class="n">allocator</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cython-support-and-the-buffer-protocol">
+<span id="memory"></span><h4>Cython Support and the Buffer Protocol<a class="headerlink" href="#cython-support-and-the-buffer-protocol" title="Link to this heading">#</a></h4>
+<p>It’s impossible for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> to support the Python buffer protocol, so
+Cython will not support idiomatic typed memoryview syntax for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>
+arrays unless special support is added in Cython in the future. We have some
+preliminary ideas for ways to either update the buffer protocol <a class="footnote-reference brackets" href="#id22" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> or make
+use of the Arrow C data interface <a class="footnote-reference brackets" href="#id23" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a> to expose NumPy arrays for DTypes that
+don’t make sense in the buffer protocol, but those efforts will likely not come
+to fruition in time for NumPy 2.0. This means adapting legacy Cython code that
+uses arrays of fixed-width strings to work with <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> will be
+non-trivial. Adapting code that worked with object string arrays should be
+straightforward since object arrays aren’t supported by the buffer protocol
+either and will likely have no types or have <code class="docutils literal notranslate"><span class="pre">object</span></code> type in Cython.</p>
+<p>We will add cython <code class="docutils literal notranslate"><span class="pre">nogil</span></code> wrappers for the public C API functions added as
+part of this work to ease integration with downstream cython code.</p>
+</section>
+</section>
+<section id="memory-layout-and-managing-heap-allocations">
+<h3>Memory Layout and Managing Heap Allocations<a class="headerlink" href="#memory-layout-and-managing-heap-allocations" title="Link to this heading">#</a></h3>
+<p>Below we provide a detailed description of the memory layout we have chosen, but
+before diving in we want to observe that the C API described above does not
+publicly expose any of these details. All of the following is subject to future
+revision, improvement, and change because the precise memory layout of the
+string data are not publicly exposed.</p>
+<section id="memory-layout-and-small-string-optimization">
+<h4>Memory Layout and Small String Optimization<a class="headerlink" href="#memory-layout-and-small-string-optimization" title="Link to this heading">#</a></h4>
+<p>Each array element is represented as a union, with the following definition on
+little-endian architectures:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">_npy_static_vstring_t</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kt">size_t</span><span class="w"> </span><span class="n">offset</span><span class="p">;</span>
+<span class="w">   </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size_and_flags</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">_npy_static_string_t</span><span class="p">;</span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">_short_string_buffer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="n">_npy_static_string_t</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span>
+<span class="w">   </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">size_and_flags</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">_short_string_buffer</span><span class="p">;</span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="nc">_npy_static_string_u</span><span class="w"> </span><span class="p">{</span>
+<span class="w"> </span><span class="n">_npy_static_string_t</span><span class="w"> </span><span class="n">vstring</span><span class="p">;</span>
+<span class="w"> </span><span class="n">_short_string_buffer</span><span class="w"> </span><span class="n">direct_buffer</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">_npy_static_string_u</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">_npy_static_vstring_t</span></code> representation is most useful for representing
+strings living on the heap directly or in an arena allocation, with the
+<code class="docutils literal notranslate"><span class="pre">offset</span></code> field either containing a <code class="docutils literal notranslate"><span class="pre">size_t</span></code> representation of the address
+directly, or an integer offset into an arena allocation. The
+<code class="docutils literal notranslate"><span class="pre">_short_string_buffer</span></code> representation is most useful for the small string
+optimization, with the string data stored in the <code class="docutils literal notranslate"><span class="pre">direct_buffer</span></code> field and the
+size in the <code class="docutils literal notranslate"><span class="pre">size_and_flags</span></code> field. In both cases the <code class="docutils literal notranslate"><span class="pre">size_and_flags</span></code> field
+stores both the <code class="docutils literal notranslate"><span class="pre">size</span></code> of the string as well as bitflags. Small strings store
+the size in the final four bits of the buffer, reserving the first four bits of
+<code class="docutils literal notranslate"><span class="pre">size_and_flags</span></code> for flags. Heap strings or strings in arena allocations use
+the most significant byte for flags, reserving the leading bytes for the string
+size. It’s worth pointing out that this choice limits the maximum string sized
+allowed to be stored in an array, particularly on 32 bit systems where the limit
+is 16 megabytes per string - small enough to worry about impacting real-world
+workflows.</p>
+<p>On big-endian systems, the layout is reversed, with the <code class="docutils literal notranslate"><span class="pre">size_and_flags</span></code> field
+appearing first in the structs. This allows the implementation to always use the
+most significant bits of the <code class="docutils literal notranslate"><span class="pre">size_and_flags</span></code> field for flags. The
+endian-dependent layouts of these structs is an implementation detail and is not
+publicly exposed in the API.</p>
+<p>Whether or not a string is stored directly on the arena buffer or in the heap is
+signaled by setting the <code class="docutils literal notranslate"><span class="pre">NPY_OUTSIDE_ARENA</span></code> and <code class="docutils literal notranslate"><span class="pre">NPY_STRING_LONG</span></code> flags on
+the string data. Because the maximum size of a heap-allocated string is limited
+to the size of the largest 7-byte unsized integer, these flags can never be set
+for a valid heap string.</p>
+<p>See <a class="reference internal" href="#memorylayoutexamples"><span class="std std-ref">Memory Layout Examples</span></a> for some visual examples of strings in each of these
+memory layouts.</p>
+</section>
+<section id="arena-allocator">
+<h4>Arena Allocator<a class="headerlink" href="#arena-allocator" title="Link to this heading">#</a></h4>
+<p>Strings longer than 15 bytes on 64 bit systems and 7 bytes on 32 bit systems are
+stored on the heap outside of the array buffer. The bookkeeping for the
+allocations is managed by an arena allocator attached to the <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>
+instance associated with an array. The allocator will be exposed publicly as an
+opaque <code class="docutils literal notranslate"><span class="pre">npy_string_allocator</span></code> struct. Internally, it has the following layout:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">npy_string_allocator</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">npy_string_malloc_func</span><span class="w"> </span><span class="n">malloc</span><span class="p">;</span>
+<span class="w">    </span><span class="n">npy_string_free_func</span><span class="w"> </span><span class="n">free</span><span class="p">;</span>
+<span class="w">    </span><span class="n">npy_string_realloc_func</span><span class="w"> </span><span class="n">realloc</span><span class="p">;</span>
+<span class="w">    </span><span class="n">npy_string_arena</span><span class="w"> </span><span class="n">arena</span><span class="p">;</span>
+<span class="w">    </span><span class="n">PyThread_type_lock</span><span class="w"> </span><span class="o">*</span><span class="n">allocator_lock</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>This allows us to group memory-allocation functions together and choose
+different allocation functions at runtime if we desire.  Use of
+the allocator is guarded by a mutex, see below for more discussion about thread
+safety.</p>
+<p>The memory allocations are handled by the <code class="docutils literal notranslate"><span class="pre">npy_string_arena</span></code> struct member,
+which has the following layout:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">npy_string_arena</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">cursor</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buffer</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">buffer</span></code> is a pointer to the beginning of a heap-allocated arena,
+<code class="docutils literal notranslate"><span class="pre">size</span></code> is the size of that allocation, and <code class="docutils literal notranslate"><span class="pre">cursor</span></code> is the location in the
+arena where the last arena allocation ended. The arena is filled using an
+exponentially expanding buffer, with an expansion factor of 1.25.</p>
+<p>Each string entry in the arena is prepended by a size, stored either in a
+<code class="docutils literal notranslate"><span class="pre">char</span></code> or a <code class="docutils literal notranslate"><span class="pre">size_t</span></code>, depending on the length of the string. Strings with
+lengths between 16 or 8 (depending on architecture) and 255 are stored with a
+<code class="docutils literal notranslate"><span class="pre">char</span></code> size. We refer to these as “medium” strings internally. This choice
+reduces the overhead for storing smaller strings on the heap by 7 bytes per
+medium-length string. Strings in the arena with lengths longer than 255 bytes
+have the <code class="docutils literal notranslate"><span class="pre">NPY_STRING_LONG</span></code> flag set.</p>
+<p>If the contents of a packed string are freed and then assigned to a new string
+with the same size or smaller than the string that was originally stored in the
+packed string, the existing short string or arena allocation is re-used. There
+is one exception however, when a string in the arena is overwritten with a short
+string, the arena metadata is lost and the arena allocation cannot be re-used.</p>
+<p>If the string is enlarged, the existing space in the arena buffer cannot be
+used, so instead we resort to allocating space directly on the heap via
+<code class="docutils literal notranslate"><span class="pre">malloc</span></code> and the <code class="docutils literal notranslate"><span class="pre">NPY_STRING_OUTSIDE_ARENA</span></code> and <code class="docutils literal notranslate"><span class="pre">NPY_STRING_LONG</span></code> flags
+are set. Note that <code class="docutils literal notranslate"><span class="pre">NPY_STRING_LONG</span></code> can be set even for strings with lengths
+less than 255 bytes in this case. Since the heap address overwrites the arena
+offset, and future string replacements will be stored on the heap or directly
+in the array buffer as a short string.</p>
+<p>No matter where it is stored, once a string is initialized it is marked with the
+<code class="docutils literal notranslate"><span class="pre">NPY_STRING_INITIALIZED</span></code> flag. This lets us clearly distinguish between an
+uninitialized empty string and a string that has been mutated into the empty
+string.</p>
+<p>The size of the allocation is stored in the arena to allow reuse of the arena
+allocation if a string is mutated. In principle we could disallow re-use of the
+arena buffer and not store the sizes in the arena. This may or may not save
+memory or be more performant depending on the exact usage pattern. For now we
+are erring on the side of avoiding unnecessary heap allocations when a string is
+mutated but in principle we could simplify the implementation by choosing to
+always store mutated arena strings as heap strings and ignore the arena
+allocation. See below for more detail on how we deal with the mutability of
+NumPy arrays in a multithreaded context.</p>
+<p>Using a per-array arena allocator ensures that the string buffers for nearby
+array elements are usually nearby on the heap. We do not guarantee that
+neighboring array elements are contiguous on the heap to support the small
+string optimization, missing data, and allow mutation of array entries. See
+below for more discussion on how these topics affect the memory layout.</p>
+</section>
+<section id="mutation-and-thread-safety">
+<h4>Mutation and Thread Safety<a class="headerlink" href="#mutation-and-thread-safety" title="Link to this heading">#</a></h4>
+<p>Mutation introduces the possibility of data races and use-after-free errors when
+an array is accessed and mutated by multiple threads. Additionally, if we
+allocate mutated strings in the arena buffer and mandate contiguous storage
+where the old string is replaced by the new one, mutating a single string may
+trigger reallocating the arena buffer for the entire array. This is a
+pathological performance degradation compared with object string arrays or
+fixed-width strings.</p>
+<p>One solution would be to disable mutation, but inevitably there will be
+downstream uses of object string arrays that mutate array elements that we would
+like to support.</p>
+<p>Instead, we have opted to pair the <code class="docutils literal notranslate"><span class="pre">npy_string_allocator</span></code> instance attached to
+<code class="docutils literal notranslate"><span class="pre">PyArray_StringDType</span></code> instances with a <code class="docutils literal notranslate"><span class="pre">PyThread_type_lock</span></code> mutex. Any function in
+the static string C API that allows manipulating heap-allocated data accepts an
+<code class="docutils literal notranslate"><span class="pre">allocator</span></code> argument. To use the C API correctly, a thread must acquire the
+allocator mutex before any usage of the <code class="docutils literal notranslate"><span class="pre">allocator</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">PyThread_type_lock</span></code> mutex is relatively heavyweight and does not provide
+more sophisticated locking primitives that allow multiple simultaneous
+readers. As part of the GIL-removal project, CPython is adding new
+synchronization primitives to the C API for projects like NumPy to make use
+of. When this happens, we can update the locking strategy to allow multiple
+simultaneous reading threads, along with other fixes for threading bugs in NumPy
+that will be needed once the GIL is removed.</p>
+</section>
+<section id="freeing-strings">
+<h4>Freeing Strings<a class="headerlink" href="#freeing-strings" title="Link to this heading">#</a></h4>
+<p>Existing strings must be freed before discarding or re-using a packed
+string. The API is constructed to require this for all strings, even for short
+strings with no heap allocations. In all cases, all data in the packed string
+are zeroed out, except for the flags, which are preserved.</p>
+</section>
+<section id="memory-layout-examples">
+<span id="memorylayoutexamples"></span><h4>Memory Layout Examples<a class="headerlink" href="#memory-layout-examples" title="Link to this heading">#</a></h4>
+<p>We have created illustrative diagrams for the three possible string memory
+layouts. All diagrams assume a 64 bit little endian architecture.</p>
+<img alt="_images/nep-0055-short-string-memory-layout.svg" src="_images/nep-0055-short-string-memory-layout.svg" /><p>Short strings store string data directly in the array buffer. On little-endian
+architectures, the string data appear first, followed by a single byte that
+allows space for four flags and stores the size of the string as an
+unsigned integer in the final 4 bits. In this example, the string contents are
+“Hello world”, with a size of 11. The flags indicate this string is stored
+outside the arena and is initialized.</p>
+<img alt="_images/nep-0055-arena-string-memory-layout.svg" src="_images/nep-0055-arena-string-memory-layout.svg" /><p>Arena strings store string data in a heap-allocated arena buffer that is managed
+by the <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> instance attached to the array. In this example, the
+string contents are “Numpy is a very cool library”, stored at offset <code class="docutils literal notranslate"><span class="pre">0x94C</span></code>
+in the arena allocation. Note that the <code class="docutils literal notranslate"><span class="pre">size</span></code> is stored twice, once in the
+<code class="docutils literal notranslate"><span class="pre">size_and_flags</span></code> field, and once in the arena allocation. This facilitates
+re-use of the arena allocation if a string is mutated. Also note that because
+the length of the string is small enough to fit in an <code class="docutils literal notranslate"><span class="pre">unsigned</span> <span class="pre">char</span></code>, this is
+a “medium”-length string and the size requires only one byte in the arena
+allocation. An arena string larger than 255 bytes would need 8 bytes in the
+arena to store the size in a <code class="docutils literal notranslate"><span class="pre">size_t</span></code>. The only flag set indicates this string
+is initialized.</p>
+<img alt="_images/nep-0055-heap-string-memory-layout.svg" src="_images/nep-0055-heap-string-memory-layout.svg" /><p>Heap strings store string data in a buffer returned by <code class="docutils literal notranslate"><span class="pre">PyMem_RawMalloc</span></code> and
+instead of storing an offset into an arena buffer, directly store the address of
+the heap address returned by <code class="docutils literal notranslate"><span class="pre">malloc</span></code>. In this example, the string contents
+are “Numpy is a very cool library” and are stored at heap address
+<code class="docutils literal notranslate"><span class="pre">0x4d3d3d3</span></code>. The string has three flags set, indicating it is a “long” string
+(e.g. not a short string) stored outside the arena, and is initialized. Note
+that if this string were stored inside the arena, it would not have the long
+string flag set because it requires less than 256 bytes to store.</p>
+</section>
+<section id="empty-strings-and-missing-data">
+<h4>Empty Strings and Missing Data<a class="headerlink" href="#empty-strings-and-missing-data" title="Link to this heading">#</a></h4>
+<p>The layout we have chosen has the benefit that newly created array buffer
+returned by <code class="docutils literal notranslate"><span class="pre">calloc</span></code> will be an array filled with empty strings by
+construction, since a string with no flags set is an uninitialized zero-length
+arena string. This is not the only valid representation of an empty string, since other
+flags may be set to indicate that the empty string is associated with a
+pre-existing short string or arena string.</p>
+<p>Missing strings will have an identical representation, except they will always
+have a flag, <code class="docutils literal notranslate"><span class="pre">NPY_STRING_MISSING</span></code> set in the flags field. Users will need to
+check if a string is null before accessing an unpacked string buffer and we have
+set up the C API in such a way as to force null-checking whenever a string is
+unpacked. Both missing and empty strings can be detected based on data in the
+packed string representation and do not require corresponding room in the arena
+allocation or extra heap allocations.</p>
+</section>
+</section>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<p>The main comparable prior art in the Python ecosystem is PyArrow arrays, which
+support variable length strings via Apache Arrow’s variable sized binary layout
+<a class="footnote-reference brackets" href="#id24" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>11<span class="fn-bracket">]</span></a>. In this approach, the array buffer contains integer offsets that index
+into a sidecar storage buffer. This allows a string array to be created using
+only two heap allocations, leaves adjacent strings in the array contiguous in
+memory, provides good cache locality, and enables straightforward SIMD
+optimization. Mutation of string array elements isn’t allowed and PyArrow only
+supports 1D arrays, so the design space is somewhat different from NumPy.</p>
+<p>Julia stores strings as UTF-8 encoded byte buffers. There is no special
+optimization for string arrays in Julia, and string arrays are represented as
+arrays of pointers in memory in the same way as any other array of sequences or
+containers in Julia.</p>
+<p>The tensorflow library supports variable-width UTF-8 encoded strings,
+implemented with <code class="docutils literal notranslate"><span class="pre">RaggedTensor</span></code>. This makes use of first-class support for
+ragged arrays in tensorflow.</p>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>We have an open pull request <a class="footnote-reference brackets" href="#id25" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>12<span class="fn-bracket">]</span></a> that is ready to merge into NumPy adding StringDType.</p>
+<p>We have created a development branch of Pandas that supports creating Pandas
+data structures using <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> <a class="footnote-reference brackets" href="#id26" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>13<span class="fn-bracket">]</span></a>. This illustrates the refactoring
+necessary to support <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> in downstream libraries that make
+substantial use of object string arrays.</p>
+<p>If accepted, the bulk of the remaining work of this NEP is in updating
+documentation and polishing the NumPy 2.0 release. We have already done the
+following:</p>
+<ul class="simple">
+<li><p>Create an <code class="docutils literal notranslate"><span class="pre">np.strings</span></code> namespace and expose the string ufuncs directly in
+that namespace.</p></li>
+<li><p>Move the <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> implementation from an external extension module
+into NumPy, refactoring NumPy where appropriate. This new DType will be
+added in one large pull request including documentation updates. Where
+possible, we will extract fixes and refactorings unrelated to
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code> into smaller pull requests before issuing the main pull
+request.</p></li>
+</ul>
+<p>We will continue doing the following:</p>
+<ul class="simple">
+<li><p>Deal with remaining issues in NumPy related to new DTypes. In particular,
+we are already aware that remaining usages of <code class="docutils literal notranslate"><span class="pre">copyswap</span></code> in <code class="docutils literal notranslate"><span class="pre">NumPy</span></code>
+should be migrated to use a cast or an as-yet-to-be-added single-element
+copy DType API slot. We also need to ensure that DType classes can be used
+interchangeably with DType instances in the Python API everywhere it makes
+sense to do so and add useful errors in all other places DType instances
+can be passed in but DType classes don’t make sense to use.</p></li>
+</ul>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>The main alternative is to maintain the status quo and offer object arrays as
+the solution for arrays of variable-length strings. While this will work, it
+means immediate memory usage and performance improvements, as well as future
+performance improvements, will not be implemented anytime soon and NumPy will
+lose relevance to other ecosystems with better support for arrays of textual
+data.</p>
+<p>We do not see the proposed DType as mutually exclusive to an improved
+fixed-width binary string DType that can represent arbitrary binary data or text
+in any encoding and adding such a DType in the future will be easier once
+overall support for string data in NumPy has improved after adding
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code>.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="github reference external" href="https://github.com/numpy/numpy/pull/24483">numpy/numpy#24483</a></p></li>
+<li><p><a class="github reference external" href="https://github.com/numpy/numpy/pull/25347">numpy/numpy#25347</a></p></li>
+<li><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/IHSVBZ7DWGMTOD6IEMURN23XM2BYM3RG/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/IHSVBZ7DWGMTOD6IEMURN23XM2BYM3RG/</a></p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="github reference external" href="https://github.com/pandas-dev/pandas/pull/52711">pandas-dev/pandas#52711</a></p>
+</aside>
+<aside class="footnote brackets" id="id15" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2017-April/thread.html#76668">https://mail.python.org/pipermail/numpy-discussion/2017-April/thread.html#76668</a></p>
+</aside>
+<aside class="footnote brackets" id="id16" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/WXWS4STFDSWFY6D7GP5UK2QB2NFPO3WE/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/WXWS4STFDSWFY6D7GP5UK2QB2NFPO3WE/</a></p>
+</aside>
+<aside class="footnote brackets" id="id17" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/DDYXJXRAAHVUGJGW47KNHZSESVBD5LKU/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/DDYXJXRAAHVUGJGW47KNHZSESVBD5LKU/</a></p>
+</aside>
+<aside class="footnote brackets" id="id18" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">5</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/6TNJWGNHZF5DMJ7WUCIWOGYVZD27GQ7L/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/6TNJWGNHZF5DMJ7WUCIWOGYVZD27GQ7L/</a></p>
+</aside>
+<aside class="footnote brackets" id="id19" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">6</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://numpy.org/neps/roadmap.html#extensibility">https://numpy.org/neps/roadmap.html#extensibility</a></p>
+</aside>
+<aside class="footnote brackets" id="id20" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">7</a><span class="fn-bracket">]</span></span>
+<p><a class="github reference external" href="https://github.com/h5py/h5py/issues/624#issuecomment-676633529">h5py/h5py#624</a></p>
+</aside>
+<aside class="footnote brackets" id="id21" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">8</a><span class="fn-bracket">]</span></span>
+<p><a class="github reference external" href="https://github.com/PyTables/PyTables/issues/499">PyTables/PyTables#499</a></p>
+</aside>
+<aside class="footnote brackets" id="id22" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">9</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://discuss.python.org/t/buffer-protocol-and-arbitrary-data-types/26256">https://discuss.python.org/t/buffer-protocol-and-arbitrary-data-types/26256</a></p>
+</aside>
+<aside class="footnote brackets" id="id23" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">10</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arrow.apache.org/docs/format/CDataInterface.html">https://arrow.apache.org/docs/format/CDataInterface.html</a></p>
+</aside>
+<aside class="footnote brackets" id="id24" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">11</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://arrow.apache.org/docs/format/Columnar.html#variable-size-binary-layout">https://arrow.apache.org/docs/format/Columnar.html#variable-size-binary-layout</a></p>
+</aside>
+<aside class="footnote brackets" id="id25" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">12</a><span class="fn-bracket">]</span></span>
+<p><a class="github reference external" href="https://github.com/numpy/numpy/pull/25347">numpy/numpy#25347</a></p>
+</aside>
+<aside class="footnote brackets" id="id26" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">13</a><span class="fn-bracket">]</span></span>
+<p><a class="github reference external" href="https://github.com/ngoldbaum/pandas/tree/stringdtype">ngoldbaum/pandas</a></p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#history-of-string-support-in-numpy">History of string support in Numpy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#problems-with-fixed-width-strings">Problems with fixed-width strings</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#previous-discussions">Previous discussions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proposed-work">Proposed work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance">Performance</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-api-for-stringdtype">Python API for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-data-support">Missing Data Support</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#nan-like-sentinels">NaN-like Sentinels</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#string-sentinels">String Sentinels</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#other-sentinels">Other Sentinels</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#implications-for-dtype-inference">Implications for DType Inference</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coercing-non-strings">Coercing non-strings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#casts-ufunc-support-and-string-manipulation-functions">Casts, ufunc support, and string manipulation functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#np-strings-namespace"><code class="docutils literal notranslate"><span class="pre">np.strings</span></code> namespace</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#serialization">Serialization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#c-api-for-stringdtype">C API for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#the-pyarray-stringdtype-and-pyarray-stringdtypeobject-structs">The <code class="docutils literal notranslate"><span class="pre">PyArray_StringDType</span></code> and <code class="docutils literal notranslate"><span class="pre">PyArray_StringDTypeObject</span></code> structs</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#string-and-allocator-types">String and Allocator Types</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#new-c-api-functions">New C API Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#acquiring-and-releasing-allocators">Acquiring and Releasing Allocators</a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#packing-and-loading-strings">Packing and Loading Strings</a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#example-c-api-usage">Example C API Usage</a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#loading-a-string">Loading a String</a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#packing-a-string">Packing a String</a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cython-support-and-the-buffer-protocol">Cython Support and the Buffer Protocol</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#memory-layout-and-managing-heap-allocations">Memory Layout and Managing Heap Allocations</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#memory-layout-and-small-string-optimization">Memory Layout and Small String Optimization</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#arena-allocator">Arena Allocator</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mutation-and-thread-safety">Mutation and Thread Safety</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#freeing-strings">Freeing Strings</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#memory-layout-examples">Memory Layout Examples</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#empty-strings-and-missing-data">Empty Strings and Missing Data</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

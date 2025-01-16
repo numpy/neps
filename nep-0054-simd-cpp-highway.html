@@ -1,0 +1,901 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++? &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0054-simd-cpp-highway';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Finished NEPs" href="finished.html" />
+    <link rel="prev" title="NEP 53 — Evolving the NumPy C-API for NumPy 2.0" href="nep-0053-c-abi-evolution.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 16, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="open.html" class="nav-link">Open NEPs (under consideration)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-54-simd-infrastructure-evolution-adopting-google-highway-when-moving-to-c">
+<span id="nep54"></span><h1>NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?<a class="headerlink" href="#nep-54-simd-infrastructure-evolution-adopting-google-highway-when-moving-to-c" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sayed Adel, Jan Wassenberg, Matti Picus, Ralf Gommers, Chris Sidebottom</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Draft</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2023-07-06</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><p>TODO</p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>We are moving the SIMD intrinsic framework, Universal Intrinsics, from C to
+C++. We have also moved to Meson as the build system. The Google Highway
+intrinsics project is proposing we use Highway instead of our Universal
+Intrinsics as described in <a class="reference internal" href="nep-0038-SIMD-optimizations.html#nep38"><span class="std std-ref">NEP 38</span></a>. This is a complex and multi-faceted
+decision - this NEP is an attempt to describe the trade-offs involved and
+what would need to be done.</p>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and Scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>We want to refactor the C-based Universal Intrinsics (see <a class="reference internal" href="nep-0038-SIMD-optimizations.html#nep38"><span class="std std-ref">NEP 38</span></a>) to C++. This work was ongoing for some time, and Google’s Highway
+was suggested as an alternative, which was already written in C++ and had
+support for scalable SVE and other reusable components (such as VQSort).</p>
+<p>The move from C to C++ is motivated by (a) code readability and ease of
+development, (b) the need to add support for sizeless SIMD instructions (e.g.,
+ARM’s SVE, RISC-V’s RVV).</p>
+<p>As an example of the readability improvement, here is a typical line of C code
+from our current C universal intrinsics framework:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">The</span> <span class="nd">@name</span><span class="o">@</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">numpy</span><span class="o">-</span><span class="n">specific</span> <span class="n">templating</span> <span class="ow">in</span> <span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">src</span> <span class="n">files</span>
+<span class="n">npyv_</span><span class="nd">@sfx</span><span class="o">@</span>  <span class="n">a5</span> <span class="o">=</span> <span class="n">npyv_load_</span><span class="nd">@sfx</span><span class="o">@</span><span class="p">(</span><span class="n">src1</span> <span class="o">+</span> <span class="n">npyv_nlanes_</span><span class="nd">@sfx</span><span class="o">@</span> <span class="o">*</span> <span class="mi">4</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This will change (as implemented in PR <a class="reference external" href="https://github.com/numpy/numpy/pull/21057">gh-21057</a>) to:</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">auto</span><span class="w"> </span><span class="n">a5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Load</span><span class="p">(</span><span class="n">src1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nlanes</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If the above C++ code were to use Highway under the hood it would look quite
+similar, it uses similarly understandable names as <code class="docutils literal notranslate"><span class="pre">Load</span></code> for individual
+portable intrinsics.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&#64;sfx</span></code> in the C version above is the template variable for type
+identifiers, e.g.: <code class="docutils literal notranslate"><span class="pre">#sfx</span> <span class="pre">=</span> <span class="pre">u8,</span> <span class="pre">s8,</span> <span class="pre">u16,</span> <span class="pre">s16,</span> <span class="pre">u32,</span> <span class="pre">s32,</span> <span class="pre">u64,</span> <span class="pre">s64,</span> <span class="pre">f32,</span> <span class="pre">f64#</span></code>.
+Explicit use of bitsize-encoded types like this won’t work for sizeless SIMD
+instruction sets. With C++ this is easier to handle; PR <a class="reference external" href="https://github.com/numpy/numpy/pull/21057">gh-21057</a> shows how
+and contains more complete examples of what the C++ code will look like.</p>
+<p>The scope of this NEP includes discussing most relevant aspects of adopting
+Google Highway to replace our current Universal Intrinsics framework, including
+but not limited to:</p>
+<ul class="simple">
+<li><p>Maintainability, domain expertise availability, ease of onboarding new
+contributor, and other social aspects,</p></li>
+<li><p>Key technical differences and constraints that may impact NumPy’s internal
+design or performance,</p></li>
+<li><p>Build system related aspects,</p></li>
+<li><p>Release timing related aspects.</p></li>
+</ul>
+<p>Out of scope (at least for now) is revisiting other aspects of our current SIMD
+support strategy:</p>
+<ul class="simple">
+<li><p>accuracy vs. performance trade-offs when adding SIMD support to a function</p></li>
+<li><p>use of SVML and x86-simd-sort (and possibly its equivalents for aarch64)</p></li>
+<li><p>pulling in individual bits or algorithms of Highway (as in <a class="reference external" href="https://github.com/numpy/numpy/pull/24018">gh-24018</a>) or
+SLEEF (as discussed in that same PR)</p></li>
+</ul>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and Impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>N/A - there will be no significant user-visible changes.</p>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>There will be no changes in user-facing Python or C APIs: all the methods to
+control compilation and runtime CPU feature selection should remain, although
+there may be some changes due to moving to C++ without regards to the
+Highway/Universal Intrinsics choice.</p>
+<p>The naming of the CPU features in Highway is different from that of the
+Universal Intrinsics (see “Supported features/targets” below)</p>
+<p>On Windows, MSVC may have to be avoided, as a result of Highway’s use of
+pragmas which are less well supported by MSVC. This means that we likely have
+to build our wheels with clang-cl or Mingw-w64. Both of those should work - we
+merged clang-cl support a while back (see <a class="reference external" href="https://github.com/numpy/numpy/pull/20866">gh-20866</a>), and SciPy builds with
+Mingw-w64. It may however impact other redistributors or end users who build
+from source on Windows.</p>
+<p>In response to the earlier discussions around this NEP, Highway is now
+dual-licensed as Apache 2 / BSD-3.</p>
+</section>
+<section id="high-level-considerations">
+<h2>High-level considerations<a class="headerlink" href="#high-level-considerations" title="Link to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently this section attempts to cover each topic separately, and
+comparing the future use of a NumPy-specific C++ implementation vs. use of
+Google Highway with our own numerical routines on top of that. It does not
+(yet) assume a decision or proposed decision is made. Hence this NEP is not
+“this is proposed” with another option in the Alternatives section, but
+rather a side-by-side comparison.</p>
+</div>
+<section id="development-effort-and-long-term-maintainability">
+<h3>Development effort and long-term maintainability<a class="headerlink" href="#development-effort-and-long-term-maintainability" title="Link to this heading">#</a></h3>
+<p>Moving to Highway is likely to be a significant development effort.
+Longer-term, this will hopefully be offset by Highway itself having more
+maintainer bandwidth to deal with ongoing issues in compiler support and adding
+new platforms.</p>
+<p>Highway being used by other projects, like Chromium and <a class="reference external" href="https://github.com/libjxl/libjxl">JPEG XL</a> (see
+<a class="reference external" href="https://google.github.io/highway/en/master/README.html#examples">this more complete list</a>
+in the Highway documentation), does imply that there is likely to be a benefit
+of a wider range of testing and bug reporting/fixing.</p>
+<p>One concern is that new instructions may have to be added, and that that is
+often best done as part of the process of developing the numerical kernel that
+needs the instruction. This will be a little more clumsy if the instruction
+lives in Highway which is a git submodule inside the NumPy repo - there will be
+a need to implement a temporary/generic version first, and then update the
+submodule after upstreaming the new intrinsic.</p>
+<p>Documentation-wise, Highway would be a clear win. NumPy’s
+<a class="reference external" href="https://numpy.org/doc/1.25/reference/simd/">CPU/SIMD Optimizations</a> docs are fairly sparse compared to
+<a class="reference external" href="https://google.github.io/highway/">the Highway docs</a>.</p>
+</section>
+<section id="migration-strategy-can-it-be-gradual">
+<h3>Migration strategy - can it be gradual?<a class="headerlink" href="#migration-strategy-can-it-be-gradual" title="Link to this heading">#</a></h3>
+<p>This is a story of two halves. Moving to Highway’s statically dispatched
+intrinsics could be done gradually, as already seen in PR <a class="reference external" href="https://github.com/numpy/numpy/pull/24018">gh-24018</a>. However,
+adopting Highway’s way of performing runtime dispatching has to be done in one
+go - we can’t (or shouldn’t) have two ways of doing that.</p>
+</section>
+<section id="highway-policies-for-compiler-and-platform-support">
+<h3>Highway policies for compiler and platform support<a class="headerlink" href="#highway-policies-for-compiler-and-platform-support" title="Link to this heading">#</a></h3>
+<p>When adding new instructions, Highway has a policy that they must be
+implemented in a way that fairly balances across CPU architectures.</p>
+<p>Regarding the support status and whether all currently-supported architectures
+will remain supported, Jan stated that Highway can commit to the following:</p>
+<ol class="arabic simple">
+<li><p>If it cross-compiles with Clang and can be tested via standard QEMU, it can
+go into Highway’s CI.</p></li>
+<li><p>If it cross-compiles via clang/gcc and can be tested with a new QEMU
+(possibly with extra flags), then it can be support via manual testing
+before each Highway release.</p></li>
+<li><p>Existing targets will remain supported as long as they compile/run in QEMU.</p></li>
+</ol>
+<p>Highway is not subject to Google’s “no longer supported” strategy (or, as
+written in its README, <em>This is not an officially supported Google product</em>).
+That is not a bad thing; it means that it is less likely to go unsupported due
+to a Google business decision about the project. Quite a few well-known open
+source projects under the <code class="docutils literal notranslate"><span class="pre">google</span></code> GitHub org state this, e.g. <a class="reference external" href="https://github.com/google/jax">JAX</a> and
+<a class="reference external" href="https://github.com/google/tcmalloc">tcmalloc</a>.</p>
+</section>
+<section id="supported-features-targets">
+<h3>Supported features/targets<a class="headerlink" href="#supported-features-targets" title="Link to this heading">#</a></h3>
+<p>Both frameworks support a large set of platforms and SIMD instruction sets,
+as well as generic scalar/fallback versions. The main differences right now are:</p>
+<ul class="simple">
+<li><p>NumPy supports IBM Z-system (s390x, VX/VXE/VXE2) while Highway supports Z14, Z15.</p></li>
+<li><p>Highway supports ARM SVE/SVE2 and RISC-V RVV (sizeless instructions), while
+NumPy does not.</p>
+<ul>
+<li><p>The groundwork for sizeless SIMD support in NumPy has been done in
+<a class="reference external" href="https://github.com/numpy/numpy/pull/21057">gh-21057</a>, however SVE/SVE2 and RISC-V are not yet implemented there.</p></li>
+</ul>
+</li>
+</ul>
+<p>There is also a difference in the granularity of instruction set groups: NumPy
+supports a more granular set of architectures than Highway. See the list of
+targets for Highway <a class="reference external" href="https://github.com/google/highway/#targets">here</a>
+(it’s roughly per CPU family) and for NumPy
+<a class="reference external" href="https://numpy.org/doc/1.25/reference/simd/build-options.html#supported-features">here</a>
+(roughly per SIMD instruction set). Hence with Highway we’d lose some
+granularity - but that is probably fine, we don’t really need this level of
+granularity, and there isn’t much evidence that users explicitly play with this
+to squeeze out the last bit of performance for their own CPU.</p>
+</section>
+<section id="compilation-strategy-for-multiple-targets-and-runtime-dispatching">
+<h3>Compilation strategy for multiple targets and runtime dispatching<a class="headerlink" href="#compilation-strategy-for-multiple-targets-and-runtime-dispatching" title="Link to this heading">#</a></h3>
+<p>Highway compiles once while using preprocessing tricks to generate multiple
+stanzas for each CPU feature within the same compilation unit (see the
+<code class="docutils literal notranslate"><span class="pre">foreach_target.h</span></code> usage and dynamic dispatch docs for how that is done).
+Universal Intrinsics generate multiple compilation units, one for each CPU
+feature group, and compiles multiple times, linking them all together (with
+different names) for runtime dispatch. The Highway technique may not work
+reliably on MSVC, the Universal Intrinsic technique does work on MSVC.</p>
+<p>Which one is more robust? The experts disagree. Jan thinks that the Highway
+approach is more robust and in particular avoids the linker pulling in
+functions with too-new instructions into the final binary. Sayed thinks that
+the current NumPy approach (also used by OpenCV) is more robust, and in
+particular is less likely to run into compiler-specific bugs or catch them
+earlier. Both agree the meson build system allows specifying object link order,
+which produces more consistent builds. However that does tie NumPy to meson.</p>
+<p>Matti and Ralf think the current build strategy is working well for NumPy and
+the advantages of changing the build and runtime dispatch, with possible
+unknown instabilities outweighs the advantages that adopting Highway’s dynamic
+dispatch may bring.</p>
+<p>Our experience of the past four years says that bugs with “invalid instruction”
+type crashes are invariably due to issues with feature detection - most often
+because users are running under emulation, and sometimes because there are
+actual issues with our CPU feature detection code. There is little evidence
+we’re aware of of the linker pulling in a function which is compiled multiple
+times for different architectures and picking the one with unsupported
+instructions. To ensure to avoid the issue, it’s advisable to keep numerical
+kernels inside the source code and refrain from defining non-inlined functions
+within cache-able objects.</p>
+</section>
+<section id="c-refactoring-considerations">
+<h3>C++ refactoring considerations<a class="headerlink" href="#c-refactoring-considerations" title="Link to this heading">#</a></h3>
+<p>We want to move from C to C++, which will naturally involve a significant
+amount of refactoring, for two main reasons:</p>
+<ul class="simple">
+<li><p>get rid of the NumPy-specific templating language for more expressive C++</p></li>
+<li><p>this would make using sizeless intrinsics (like for SVE) easier.</p></li>
+</ul>
+<p>In addition, we see the following considerations:</p>
+<ul class="simple">
+<li><p>If we use Highway, we would need to switch the C++ wrappers from universal
+intrinsics to Highway. On the other hand, the work to move to C++ is not
+complete.</p></li>
+<li><p>If we use Highway, we’d need to rewrite existing kernels using Highway
+intrinsics. But again, moving to C++ requires touching all those kernels
+anyway.</p></li>
+<li><p>One concern regarding Highway was whether it is possible to obtain a function
+pointer for an architecture-specific function instead of calling that
+function directly. This so that we can be sure that calling 1-D inner loop
+many times for a single Python API invocation does not incur the dispatching
+overhead many times. This was investigated: this can be done with Highway
+too.</p></li>
+<li><p>A second concern was whether it’s possible with Highway to allow the user at
+runtime to select or disable dispatching to certain instruction sets. This is
+possible.</p></li>
+<li><p>Use of tags in Highway’s C++ implementation reduces code duplication but the
+added templating makes C-level testing and tracing more complicated.</p></li>
+</ul>
+</section>
+<section id="the-simd-unit-testing-module">
+<h3>The <code class="docutils literal notranslate"><span class="pre">_simd</span></code> unit testing module<a class="headerlink" href="#the-simd-unit-testing-module" title="Link to this heading">#</a></h3>
+<p>Rewriting the <code class="docutils literal notranslate"><span class="pre">_simd</span> <span class="pre">testing</span></code> module to use C++ was done very recently in PR
+<a class="reference external" href="https://github.com/numpy/numpy/pull/24069">gh-24069</a>. It depends on the main PR for the move to C++, <a class="reference external" href="https://github.com/numpy/numpy/pull/21057">gh-21057</a>.
+It allows one to access the C++ intrinsics with almost the same signature, but
+from Python. This is a great way not only for testing, but also for designing
+new SIMD kernels.</p>
+<p>It may be possible to add a similar testing and prototyping feature to Highway
+(which uses plain <code class="docutils literal notranslate"><span class="pre">googletest</span></code>), however currently the NumPy way is quite a
+bit nicer.</p>
+</section>
+<section id="math-routines">
+<h3>Math routines<a class="headerlink" href="#math-routines" title="Link to this heading">#</a></h3>
+<p>Math or numerical routines are written at a higher level of abstraction than
+the universal intrinsics that are the main focus of this NEP. Highway has only
+a limited number of math routines, and they are not precise enough for NumPy’s
+needs. So either way, NumPy’s existing routines (which use universal
+intrinsics) will stay, and if we go the Highway route they’ll simply have to
+use Highway primitives internally. We could still use Highway sorting routines.
+If we do accept lower-precision routines (via a user-supplied choice, i.e.
+extending <code class="docutils literal notranslate"><span class="pre">errstate</span></code> to allow a precision option), we could use
+Highway-native routines.</p>
+<p>There may be other libraries that have numerical routines that can be reused in
+NumPy (e.g., from SLEEF, or perhaps from JPEG XL or some other Highway-using
+libraries). There may be a small benefit here, but likely it doesn’t matter too
+much.</p>
+</section>
+<section id="supported-and-missing-intrinsics">
+<h3>Supported and missing intrinsics<a class="headerlink" href="#supported-and-missing-intrinsics" title="Link to this heading">#</a></h3>
+<p>Some specific intrinsics that NumPy needs may be missing from Highway.
+Similarly, some intrinsics that NumPy needs to implement routines are already
+implemented in Highway and are missing from NumPy.</p>
+<p>Highway has more instructions that NumPy’s universal intrinsics, so it’s
+possible that some future needs for NumPy kernels may already be met there.</p>
+<p>Either way, we will always have to implement intrinsics in either solution.</p>
+</section>
+</section>
+<section id="related-work">
+<h2>Related Work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/google/highway/">Google Highway</a></p></li>
+<li><p><a class="reference external" href="https://github.com/xtensor-stack/xsimd">Xsimd</a></p></li>
+<li><p>OpenCV’s SIMD framework (<a class="reference external" href="https://docs.opencv.org/4.x/df/d91/group__core__hal__intrin.html">API reference</a>, <a class="reference external" href="https://github.com/opencv/opencv/wiki/CPU-optimizations-build-options">docs</a>)</p></li>
+<li><p><a class="reference external" href="https://en.cppreference.com/w/cpp/experimental/simd/simd">std::experimental::simd</a></p></li>
+<li><p>See the Related Work section in <a class="reference internal" href="nep-0038-SIMD-optimizations.html#nep38"><span class="std std-ref">NEP 38 — Using SIMD optimization instructions for performance</span></a> for more related work (as of 2019)</p></li>
+</ul>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>TODO</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>Use Google Highway for dynamic dispatch. Other alternatives include: do nothing and
+stay with C universal intrinsics, use <a class="reference external" href="https://github.com/xtensor-stack/xsimd">Xsimd</a> as the SIMD framework (less
+comprehensive than Highway - no SVE or PowerPC support for example), or
+use/vendor <a class="reference external" href="https://sleef.org/">SLEEF</a> (a good library, but inconsistently maintained). Neither of
+these alternatives seems appealing.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+</section>
+<section id="references-and-footnotes">
+<h2>References and Footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Each NEP must either be explicitly labeled as placed in the public domain (see
+this NEP as an example) or licensed under the <a class="reference external" href="https://www.opencontent.org/openpub/">Open Publication License</a>.</p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain. <a class="footnote-reference brackets" href="#id1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and Scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and Impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#high-level-considerations">High-level considerations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#development-effort-and-long-term-maintainability">Development effort and long-term maintainability</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#migration-strategy-can-it-be-gradual">Migration strategy - can it be gradual?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#highway-policies-for-compiler-and-platform-support">Highway policies for compiler and platform support</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-features-targets">Supported features/targets</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compilation-strategy-for-multiple-targets-and-runtime-dispatching">Compilation strategy for multiple targets and runtime dispatching</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#c-refactoring-considerations">C++ refactoring considerations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-simd-unit-testing-module">The <code class="docutils literal notranslate"><span class="pre">_simd</span></code> unit testing module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#math-routines">Math routines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-and-missing-intrinsics">Supported and missing intrinsics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related Work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and Footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1445 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 50 — Promotion rules for Python scalars &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0050-scalar-promotion';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 52 — Python API cleanup for NumPy 2.0" href="nep-0052-python-api-cleanup.html" />
+    <link rel="prev" title="NEP 49 — Data allocation strategies" href="nep-0049.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 16, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 50 — Promotion rules for Python scalars</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-50-promotion-rules-for-python-scalars">
+<span id="nep50"></span><h1>NEP 50 — Promotion rules for Python scalars<a class="headerlink" href="#nep-50-promotion-rules-for-python-scalars" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sebastian Berg</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2021-05-25</p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>Since NumPy 1.7, promotion rules use so-called “safe casting”
+which relies on inspection of the values involved.
+This helped identify a number of edge cases for users, but was
+complex to implement and also made behavior hard to predict.</p>
+<p>There are two kinds of confusing results:</p>
+<ol class="arabic">
+<li><p>Value-based promotion means that the value, for example of a Python integer,
+can determine output type as found by <code class="docutils literal notranslate"><span class="pre">np.result_type</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span>
+<span class="n">np</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span>
+</pre></div>
+</div>
+<p>This logic arises because <code class="docutils literal notranslate"><span class="pre">1</span></code> can be represented by a <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or
+<code class="docutils literal notranslate"><span class="pre">int8</span></code> while <code class="docutils literal notranslate"><span class="pre">255</span></code> cannot be represented by an <code class="docutils literal notranslate"><span class="pre">int8</span></code> but only by
+by a <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">int16</span></code>.</p>
+<p>This also holds when working with 0-D arrays (so-called “scalar arrays”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">int64_0d_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="n">int64_0d_array</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span>
+</pre></div>
+</div>
+<p>Where the fact that <code class="docutils literal notranslate"><span class="pre">int64_0d_array</span></code> has an <code class="docutils literal notranslate"><span class="pre">int64</span></code> dtype has no
+influence on the resulting dtype.  The <code class="docutils literal notranslate"><span class="pre">dtype=np.int64</span></code> is effectively
+ignored in this example since only its value matters.</p>
+</li>
+<li><p>For a Python <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, or <code class="docutils literal notranslate"><span class="pre">complex</span></code> the value is inspected as
+previously shown.  But surprisingly <em>not</em> when the NumPy object is a 0-D array
+or NumPy scalar:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+<span class="n">np</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+</pre></div>
+</div>
+<p>The reason is that value-based promotion is disabled when all
+objects are scalars or 0-D arrays.
+NumPy thus returns the same type as <code class="docutils literal notranslate"><span class="pre">np.array(1)</span></code>, which is usually
+an <code class="docutils literal notranslate"><span class="pre">int64</span></code> (this depends on the system).</p>
+</li>
+</ol>
+<p>Note that the examples apply also to operations like multiplication,
+addition, comparisons, and their corresponding functions like <code class="docutils literal notranslate"><span class="pre">np.multiply</span></code>.</p>
+<p>This NEP proposes to refactor the behaviour around two guiding principles:</p>
+<ol class="arabic simple">
+<li><p>Values must never influence result type.</p></li>
+<li><p>NumPy scalars and 0-D arrays should behave consistently with their
+N-D counterparts.</p></li>
+</ol>
+<p>We propose to remove all value-based logic and add special handling for
+Python scalars to preserve some convenient behaviors.
+Python scalars will be considered “weakly” typed.
+When a NumPy array/scalar is combined with a Python scalar, it will
+be converted to the NumPy dtype, such that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># returns a uint8 array</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">+</span> <span class="mf">2.</span>  <span class="c1"># returns a float32 array</span>
+</pre></div>
+</div>
+<p>There will be no dependence on the Python value itself.</p>
+<p>The proposed changes also apply to <code class="docutils literal notranslate"><span class="pre">np.can_cast(100,</span> <span class="pre">np.int8)</span></code>, however,
+we expect that the behaviour in functions (promotion) will, in practice, be far
+more important than the casting change itself.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of the NumPy 1.24.x series, NumPy has preliminary and limited support to
+test this proposal.</p>
+<p>It is further necessary to set the following environment variable:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">NPY_PROMOTION_STATE</span><span class="o">=</span><span class="n">weak</span>
+</pre></div>
+</div>
+<p>Valid values are <code class="docutils literal notranslate"><span class="pre">weak</span></code>, <code class="docutils literal notranslate"><span class="pre">weak_and_warn</span></code>, and <code class="docutils literal notranslate"><span class="pre">legacy</span></code>.  Note that
+<code class="docutils literal notranslate"><span class="pre">weak_and_warn</span></code> implements the optional warnings proposed in this NEP
+and is expected to be <em>very</em> noisy.
+We recommend starting using the <code class="docutils literal notranslate"><span class="pre">weak</span></code> option and use <code class="docutils literal notranslate"><span class="pre">weak_and_warn</span></code>
+mainly to understand a specific observed change in behaviour.</p>
+<p>The following additional API exists:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">np._set_promotion_state()</span></code> and <code class="docutils literal notranslate"><span class="pre">np._get_promotion_state()</span></code> which is
+equivalent to the environment variable.  (Not thread/context safe.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">with</span> <span class="pre">np._no_nep50_warning():</span></code> allows to suppress warnings when
+<code class="docutils literal notranslate"><span class="pre">weak_and_warn</span></code> promotion is used.  (Thread and context safe.)</p></li>
+</ul>
+<p>At this time overflow warnings on integer power are missing.
+Further, <code class="docutils literal notranslate"><span class="pre">np.can_cast</span></code> fails to give warnings in the
+<code class="docutils literal notranslate"><span class="pre">weak_and_warn</span></code> mode.  Its behavior with respect to Python scalar input
+may still be in flux (this should affect very few users).</p>
+</div>
+<section id="schema-of-the-new-proposed-promotion-rules">
+<h3>Schema of the new proposed promotion rules<a class="headerlink" href="#schema-of-the-new-proposed-promotion-rules" title="Link to this heading">#</a></h3>
+<p>After the change, the promotions in NumPy will follow the schema below.
+Promotion always occurs along the green lines:
+from left to right within their kind and to a higher kind only when
+necessary.
+The result kind is always the largest kind of the inputs.
+Note that <code class="docutils literal notranslate"><span class="pre">float32</span></code> has a lower precision than <code class="docutils literal notranslate"><span class="pre">int32</span></code> or <code class="docutils literal notranslate"><span class="pre">uint32</span></code> and
+is thus sorted slightly to the left in the schematic.  This is because
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> cannot represent all <code class="docutils literal notranslate"><span class="pre">int32</span></code> values exactly.
+However, for practical reasons, NumPy allows promoting <code class="docutils literal notranslate"><span class="pre">int64</span></code> to <code class="docutils literal notranslate"><span class="pre">float64</span></code>
+effectively considering them to have the same precision.</p>
+<p>The Python scalars are inserted at the very left of each “kind” and the
+Python integer does not distinguish signed and unsigned.  NumPy promotion
+thus uses the following, ordered, kind categories:</p>
+<ul class="simple">
+<li><p><cite>boolean</cite></p></li>
+<li><p><cite>integral</cite>: signed or unsigned integers</p></li>
+<li><p><cite>inexact</cite>: floating point numbers and complex floating point numbers</p></li>
+</ul>
+<p>When promoting a Python scalar with a dtype of lower kind
+category (<cite>boolean &lt; integral &lt; inexact</cite>) with a higher one, we  use the
+minimum/default precision: that is <code class="docutils literal notranslate"><span class="pre">float64</span></code>, <code class="docutils literal notranslate"><span class="pre">complex128</span></code> or <code class="docutils literal notranslate"><span class="pre">int64</span></code>
+(<code class="docutils literal notranslate"><span class="pre">int32</span></code> is used on some systems, e.g. windows).</p>
+<figure class="align-center align-default">
+<img alt="_images/nep-0050-promotion-no-fonts.svg" src="_images/nep-0050-promotion-no-fonts.svg" /></figure>
+<p>See the next section for examples which clarify the proposed behavior.
+Further examples with a comparison to the current behavior can be found
+in the table below.</p>
+</section>
+<section id="examples-of-new-behaviour">
+<h3>Examples of new behaviour<a class="headerlink" href="#examples-of-new-behaviour" title="Link to this heading">#</a></h3>
+<p>To make interpretation of above text and figure easier, we provide a few examples of the new behaviour.  Below, the Python integer has no influence on the result type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the following the Python <code class="docutils literal notranslate"><span class="pre">float</span></code> and <code class="docutils literal notranslate"><span class="pre">complex</span></code> are “inexact”, but the
+NumPy value is integral, so we use at least <code class="docutils literal notranslate"><span class="pre">float64</span></code>/<code class="docutils literal notranslate"><span class="pre">complex128</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">6.0</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="n">j</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">(</span><span class="mi">4</span><span class="o">+</span><span class="mi">4</span><span class="n">j</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>But this does not happen for <code class="docutils literal notranslate"><span class="pre">float</span></code> to <code class="docutils literal notranslate"><span class="pre">complex</span></code> promotions, where
+<code class="docutils literal notranslate"><span class="pre">float32</span></code> and <code class="docutils literal notranslate"><span class="pre">complex64</span></code> have the same precision:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">5</span><span class="n">j</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex64</span><span class="p">(</span><span class="mi">5</span><span class="o">+</span><span class="mi">5</span><span class="n">j</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the schematic omits <code class="docutils literal notranslate"><span class="pre">bool</span></code>.  It is set below “integral”, so that the
+following hold:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="kc">True</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that while this NEP uses simple operators as example, the rules described
+generally apply to all of NumPy operations.</p>
+</section>
+<section id="table-comparing-new-and-old-behaviour">
+<h3>Table comparing new and old behaviour<a class="headerlink" href="#table-comparing-new-and-old-behaviour" title="Link to this heading">#</a></h3>
+<p>The following table lists relevant changes and unchanged behaviours.
+Please see the <a class="reference internal" href="#old-implementation">Old implementation</a> for a detailed explanation of the rules
+that lead to the “Old result”, and the following sections for the rules
+detailing the new.
+The backwards compatibility section discusses how these changes are likely
+to impact users.</p>
+<p>Note the important distinction between a 0-D array like <code class="docutils literal notranslate"><span class="pre">array(2)</span></code> and
+arrays that are not 0-D, such as <code class="docutils literal notranslate"><span class="pre">array([2])</span></code>.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id18">
+<caption><span class="caption-text">Table of changed behaviours</span><a class="headerlink" href="#id18" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 45.5%" />
+<col style="width: 27.3%" />
+<col style="width: 27.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Expression</p></th>
+<th class="head"><p>Old result</p></th>
+<th class="head"><p>New result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">uint8(1)</span> <span class="pre">+</span> <span class="pre">2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int64(3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8(3)</span></code> <a class="reference internal" href="#t1" id="id1"><span>[T1]</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">array([1],</span> <span class="pre">uint8)</span> <span class="pre">+</span> <span class="pre">int64(1)</span></code> or</p>
+<p><code class="docutils literal notranslate"><span class="pre">array([1],</span> <span class="pre">uint8)</span> <span class="pre">+</span> <span class="pre">array(1,</span> <span class="pre">int64)</span></code></p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([2],</span> <span class="pre">uint8)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([2],</span> <span class="pre">int64)</span></code> <a class="reference internal" href="#t2" id="id2"><span>[T2]</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">array([1.],</span> <span class="pre">float32)</span> <span class="pre">+</span> <span class="pre">float64(1.)</span></code> or</p>
+<p><code class="docutils literal notranslate"><span class="pre">array([1.],</span> <span class="pre">float32)</span> <span class="pre">+</span> <span class="pre">array(1.,</span> <span class="pre">float64)</span></code></p>
+</td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([2.],</span> <span class="pre">float32)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([2.],</span> <span class="pre">float64)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">array([1],</span> <span class="pre">uint8)</span> <span class="pre">+</span> <span class="pre">1</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([2],</span> <span class="pre">uint8)</span></code></p></td>
+<td><p><em>unchanged</em></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">array([1],</span> <span class="pre">uint8)</span> <span class="pre">+</span> <span class="pre">200</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([201],</span> <span class="pre">np.uint8)</span></code></p></td>
+<td><p><em>unchanged</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">array([100],</span> <span class="pre">uint8)</span> <span class="pre">+</span> <span class="pre">200</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([</span> <span class="pre">44],</span> <span class="pre">uint8)</span></code></p></td>
+<td><p><em>unchanged</em> <a class="reference internal" href="#t3" id="id3"><span>[T3]</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">array([1],</span> <span class="pre">uint8)</span> <span class="pre">+</span> <span class="pre">300</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([301],</span> <span class="pre">uint16)</span></code></p></td>
+<td><p><em>Exception</em> <a class="reference internal" href="#t4" id="id4"><span>[T4]</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">uint8(1)</span> <span class="pre">+</span> <span class="pre">300</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int64(301)</span></code></p></td>
+<td><p><em>Exception</em> <a class="reference internal" href="#t5" id="id5"><span>[T5]</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">uint8(100)</span> <span class="pre">+</span> <span class="pre">200</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">int64(300)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">uint8(44)</span></code> <em>and</em> <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code>  <a class="reference internal" href="#t6" id="id6"><span>[T6]</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">float32(1)</span> <span class="pre">+</span> <span class="pre">3e100</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float64(3e100)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">float32(Inf)</span></code> <em>and</em> <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> <a class="reference internal" href="#t7" id="id7"><span>[T7]</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">array([1.0],</span> <span class="pre">float32)</span> <span class="pre">+</span> <span class="pre">1e-14</span> <span class="pre">==</span> <span class="pre">1.0</span></code>  <a class="reference internal" href="#t8" id="id8"><span>[T8]</span></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([True])</span></code></p></td>
+<td><p><em>unchanged</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">array(1.0,</span> <span class="pre">float32)</span> <span class="pre">+</span> <span class="pre">1e-14</span> <span class="pre">==</span> <span class="pre">1.0</span></code>  <a class="reference internal" href="#t8" id="id9"><span>[T8]</span></a></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">array([1.],</span> <span class="pre">float32)</span> <span class="pre">+</span> <span class="pre">3</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([4.],</span> <span class="pre">float32)</span></code></p></td>
+<td><p><em>unchanged</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">array([1.],</span> <span class="pre">float32)</span> <span class="pre">+</span> <span class="pre">int64(3)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([4.],</span> <span class="pre">float32)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">array([4.],</span> <span class="pre">float64)</span></code>  <a class="reference internal" href="#t9" id="id10"><span>[T9]</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">(3j</span> <span class="pre">+</span> <span class="pre">array(3,</span> <span class="pre">complex64)).dtype</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex128</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex64</span></code> <a class="reference internal" href="#t10" id="id11"><span>[T10]</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">(float32(1)</span> <span class="pre">+</span> <span class="pre">1j)).dtype</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex128</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex64</span></code> <a class="reference internal" href="#t11" id="id12"><span>[T11]</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">(int32(1)</span> <span class="pre">+</span> <span class="pre">5j).dtype</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">complex128</span></code></p></td>
+<td><p><em>unchanged</em> <a class="reference internal" href="#t12" id="id13"><span>[T12]</span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div role="list" class="citation-list">
+<div class="citation" id="t1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">T1</a><span class="fn-bracket">]</span></span>
+<p>New behaviour honours the dtype of the <code class="docutils literal notranslate"><span class="pre">uint8</span></code> scalar.</p>
+</div>
+<div class="citation" id="t2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">T2</a><span class="fn-bracket">]</span></span>
+<p>Current NumPy ignores the precision of 0-D arrays or NumPy scalars
+when combined with arrays.</p>
+</div>
+<div class="citation" id="t3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">T3</a><span class="fn-bracket">]</span></span>
+<p>Current NumPy ignores the precision of 0-D arrays or NumPy scalars
+when combined with arrays.</p>
+</div>
+<div class="citation" id="t4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">T4</a><span class="fn-bracket">]</span></span>
+<p>Old behaviour uses <code class="docutils literal notranslate"><span class="pre">uint16</span></code> because <code class="docutils literal notranslate"><span class="pre">300</span></code> does not fit <code class="docutils literal notranslate"><span class="pre">uint8</span></code>,
+new behaviour raises an error for the same reason.</p>
+</div>
+<div class="citation" id="t5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">T5</a><span class="fn-bracket">]</span></span>
+<p><code class="docutils literal notranslate"><span class="pre">300</span></code> cannot be converted to <code class="docutils literal notranslate"><span class="pre">uint8</span></code>.</p>
+</div>
+<div class="citation" id="t6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">T6</a><span class="fn-bracket">]</span></span>
+<p>One of the most dangerous changes maybe.  Retaining the type leads to
+overflow.  A <code class="docutils literal notranslate"><span class="pre">RuntimeWarning</span></code> indicating overflow is given for the
+NumPy scalars.</p>
+</div>
+<div class="citation" id="t7" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">T7</a><span class="fn-bracket">]</span></span>
+<p><code class="docutils literal notranslate"><span class="pre">np.float32(3e100)</span></code> overflows to infinity with a warning.</p>
+</div>
+<div class="citation" id="t8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>T8<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id8">1</a>,<a role="doc-backlink" href="#id9">2</a>)</span>
+<p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">1e-14</span></code> loses precision when done in float32 but not in float64.
+The old behavior was casting the scalar argument to float32 or float64
+differently depending on the dimensionality of the array; with the new
+behavior the computation is always done in the array
+precision (float32 in this case).</p>
+</div>
+<div class="citation" id="t9" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">T9</a><span class="fn-bracket">]</span></span>
+<p>NumPy promotes <code class="docutils literal notranslate"><span class="pre">float32</span></code> and <code class="docutils literal notranslate"><span class="pre">int64</span></code> to <code class="docutils literal notranslate"><span class="pre">float64</span></code>.  The old
+behaviour ignored the <code class="docutils literal notranslate"><span class="pre">int64</span></code> here.</p>
+</div>
+<div class="citation" id="t10" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">T10</a><span class="fn-bracket">]</span></span>
+<p>The new behavior is consistent between <code class="docutils literal notranslate"><span class="pre">array(3,</span> <span class="pre">complex64)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">array([3],</span> <span class="pre">complex64)</span></code>: the dtype of the result is that of the
+array argument.</p>
+</div>
+<div class="citation" id="t11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id12">T11</a><span class="fn-bracket">]</span></span>
+<p>The new behavior uses the complex dtype of the precision compatible
+with the array argument, <code class="docutils literal notranslate"><span class="pre">float32</span></code>.</p>
+</div>
+<div class="citation" id="t12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id13">T12</a><span class="fn-bracket">]</span></span>
+<p>Since the array kind is integer, the result uses the default complex
+precision, which is <code class="docutils literal notranslate"><span class="pre">complex128</span></code>.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>The motivation for changing the behaviour with respect to inspecting the value
+of Python scalars and NumPy scalars/0-D arrays is three-fold:</p>
+<ol class="arabic simple">
+<li><p>The special handling of NumPy scalars/0-D arrays as well as the value
+inspection can be very surprising to users,</p></li>
+<li><p>The value-inspection logic is much harder to explain and implement.
+It is further harder to make it available to user-defined DTypes through
+<a class="reference internal" href="nep-0042-new-dtypes.html#nep42"><span class="std std-ref">NEP 42</span></a>.
+Currently, this leads to a dual implementation of a new and an old (value
+sensitive) system.  Fixing this will greatly simplify the internal logic
+and make results more consistent.</p></li>
+<li><p>It largely aligns with the choice of other projects like <cite>JAX</cite> and
+<cite>data-apis.org</cite> (see also <cite>Related Work</cite>).</p></li>
+</ol>
+<p>We believe that the proposal of “weak” Python scalars will help users by
+providing a clear mental model for which datatype an operation will
+result in.
+This model fits well with the preservation of array precisions that NumPy
+currently often follows, and also uses for in-place operations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">+=</span> <span class="n">value</span>
+</pre></div>
+</div>
+<p>Preserves precision as long as “kind” boundaries are not crossed (otherwise
+an error is raised).</p>
+<p>While some users will potentially miss the value inspecting behavior, even for
+those cases where it seems useful it quickly leads to surprises.  This may be
+expected:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1000</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1100</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>But the following will then be a surprise:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">200</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">44</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Considering that the proposal aligns with the behavior of in-place operands
+and avoids the surprising switch in behavior that only sometimes avoids
+overflow in the result,
+we believe that the proposal follows the “principle of least surprise”.</p>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>This NEP is expected to be implemented with <strong>no</strong> transition period that warns
+for all changes.  Such a transition period would create many (often harmless)
+warnings which would be difficult to silence.
+We expect that most users will benefit long term from the clearer promotion
+rules and that few are directly (negatively) impacted by the change.
+However, certain usage patterns may lead to problematic changes, these are
+detailed in the backwards compatibility section.</p>
+<p>The solution to this will be an <em>optional</em> warning mode capable of notifying
+users of potential changes in behavior.
+This mode is expected to generate many harmless warnings, but provide a way
+to systematically vet code and track down changes if problems are observed.</p>
+<section id="impact-on-can-cast">
+<h3>Impact on <code class="docutils literal notranslate"><span class="pre">can_cast</span></code><a class="headerlink" href="#impact-on-can-cast" title="Link to this heading">#</a></h3>
+<p><cite>can_cast</cite> will never inspect the value anymore.  So that the following results
+are expected to change from <code class="docutils literal notranslate"><span class="pre">True</span></code> to <code class="docutils literal notranslate"><span class="pre">False</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">can_cast</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">can_cast</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">can_cast</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We expect that the impact of this change will be small compared to that of
+the following changes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The last example where the input is a Python scalar _may_ be preserved
+since <code class="docutils literal notranslate"><span class="pre">100</span></code> can be represented by a <code class="docutils literal notranslate"><span class="pre">uint8</span></code>.</p>
+</div>
+</section>
+<section id="impact-on-operators-and-functions-involving-numpy-arrays-or-scalars">
+<h3>Impact on operators and functions involving NumPy arrays or scalars<a class="headerlink" href="#impact-on-operators-and-functions-involving-numpy-arrays-or-scalars" title="Link to this heading">#</a></h3>
+<p>The main impact on operations not involving Python scalars (<code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">int</span></code>,
+<code class="docutils literal notranslate"><span class="pre">complex</span></code>) will be that operations on 0-D arrays and NumPy scalars will never
+depend on their values.
+This removes currently surprising cases.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># and:</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Will return an <code class="docutils literal notranslate"><span class="pre">int64</span></code> array in the future because the type of
+<code class="docutils literal notranslate"><span class="pre">np.int64(1)</span></code> is strictly honoured.
+Currently a <code class="docutils literal notranslate"><span class="pre">uint8</span></code> array is returned.</p>
+</section>
+<section id="impact-on-operators-involving-python-int-float-and-complex">
+<h3>Impact on operators involving Python <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, and <code class="docutils literal notranslate"><span class="pre">complex</span></code><a class="headerlink" href="#impact-on-operators-involving-python-int-float-and-complex" title="Link to this heading">#</a></h3>
+<p>This NEP attempts to preserve the convenience of the old behaviour
+when working with literal values.
+The current value-based logic had some nice properties when “untyped”,
+literal Python scalars are involved:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># returns an int8 array</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="mf">3.5</span>  <span class="c1"># returns a float32 array</span>
+</pre></div>
+</div>
+<p>But led to surprises when it came to “unrepresentable” values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">256</span>  <span class="c1"># returns int16</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e200</span>  <span class="c1"># returns float64</span>
+</pre></div>
+</div>
+<p>The proposal is to preserve this behaviour for the most part.  This is achieved
+by considering Python <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, and <code class="docutils literal notranslate"><span class="pre">complex</span></code> to be “weakly” typed
+in operations.
+However, to avoid surprises, we plan to make conversion to the new type
+more strict:  The results will be unchanged in the first two examples,
+but in the second one, it will change the following way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">256</span>  <span class="c1"># raises a TypeError</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">2.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e200</span>  <span class="c1"># warning and returns infinity</span>
+</pre></div>
+</div>
+<p>The second one warns because <code class="docutils literal notranslate"><span class="pre">np.float32(1e200)</span></code> overflows to infinity.
+It will then continue to do the calculation with <code class="docutils literal notranslate"><span class="pre">inf</span></code> as usual.</p>
+<div class="admonition-behaviour-in-other-libraries admonition">
+<p class="admonition-title">Behaviour in other libraries</p>
+<p>Overflowing in the conversion rather than raising an error is a choice;
+it is one that is the default in most C setups (similar to NumPy C can be
+set up to raise an error due to the overflow, however).
+It is also for example the behaviour of <code class="docutils literal notranslate"><span class="pre">pytorch</span></code> 1.10.</p>
+</div>
+<section id="particular-behavior-of-python-integers">
+<h4>Particular behavior of Python integers<a class="headerlink" href="#particular-behavior-of-python-integers" title="Link to this heading">#</a></h4>
+<p>The NEPs promotion rules stated in terms of the resulting dtype which is
+typically also the operation dtype (in terms of result precision).
+This leads to what may seem like exceptions for Python integers:
+While <code class="docutils literal notranslate"><span class="pre">uint8(3)</span> <span class="pre">+</span> <span class="pre">1000</span></code> must be rejected because operating
+in <code class="docutils literal notranslate"><span class="pre">uint8</span></code> is not possible, <code class="docutils literal notranslate"><span class="pre">uint8(3)</span> <span class="pre">/</span> <span class="pre">1000</span></code> returns a <code class="docutils literal notranslate"><span class="pre">float64</span></code> and
+can convert both inputs to <code class="docutils literal notranslate"><span class="pre">float64</span></code> to find the result.</p>
+<p>In practice this means that arbitrary Python integer values are accepted in
+the following cases:</p>
+<ul class="simple">
+<li><p>All comparisons (<code class="docutils literal notranslate"><span class="pre">==</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, etc.) between NumPy and Python integers are
+always well defined.</p></li>
+<li><p>Unary functions like <code class="docutils literal notranslate"><span class="pre">np.sqrt</span></code> that give a floating point result can and
+will convert the Python integer to a float.</p></li>
+<li><p>Division of integers returns floating point by casting input to <code class="docutils literal notranslate"><span class="pre">float64</span></code>.</p></li>
+</ul>
+<p>Note that there may be additional functions where these exceptions could be
+applied but are not.  In these cases it should be considered an improvement
+to allow them, but when the user impact is low we may not do so for simplicity.</p>
+</section>
+</section>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>In general, code which only uses the default dtypes float64, or int32/int64
+or more precise ones should not be affected.</p>
+<p>However, the proposed changes will modify results in quite a few cases where
+0-D or scalar values (with non-default dtypes) are mixed.
+In many cases, these will be bug-fixes, however, there are certain changes
+which may be problematic to the end-user.</p>
+<p>The most important possible failure is probably the following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>  <span class="c1"># storage array with low precision</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+
+<span class="c1"># calculation continues with &quot;value&quot; without considering where it came from</span>
+<span class="n">value</span> <span class="o">*</span> <span class="mi">100</span>
+</pre></div>
+</div>
+<p>Where previously the <code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">*</span> <span class="pre">100</span></code> would cause an up-cast to
+<code class="docutils literal notranslate"><span class="pre">int32</span></code>/<code class="docutils literal notranslate"><span class="pre">int64</span></code> (because value is a scalar).
+The new behaviour will preserve the lower precision unless explicitly
+dealt with (just as if <code class="docutils literal notranslate"><span class="pre">value</span></code> was an array).
+This can lead to integer overflows and thus incorrect results beyond precision.
+In many cases this may be silent, although NumPy usually gives warnings for the
+scalar operators.</p>
+<p>Similarly, if the storage array is <code class="docutils literal notranslate"><span class="pre">float32</span></code> a calculation may retain the
+lower <code class="docutils literal notranslate"><span class="pre">float32</span></code> precision rather than use the default <code class="docutils literal notranslate"><span class="pre">float64</span></code>.</p>
+<p>Further issues can occur.  For example:</p>
+<ul>
+<li><p>Floating point comparisons, especially equality, may change when mixing
+precisions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span>  <span class="c1"># was False, will be True.</span>
+</pre></div>
+</div>
+</li>
+<li><p>Certain operations are expected to start failing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1000</span>  <span class="c1"># possibly also</span>
+</pre></div>
+</div>
+<p>to protect users in cases where previous value-based casting led to an
+upcast.  (Failures occur when converting <code class="docutils literal notranslate"><span class="pre">1000</span></code> to a <code class="docutils literal notranslate"><span class="pre">uint8</span></code>.)</p>
+</li>
+<li><p>Floating point overflow may occur in odder cases:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mf">1e-30</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e50</span>  <span class="c1"># will return ``inf`` and a warning</span>
+</pre></div>
+</div>
+<p>Because <code class="docutils literal notranslate"><span class="pre">np.float32(1e50)</span></code> returns <code class="docutils literal notranslate"><span class="pre">inf</span></code>.  Previously, this would return
+a double precision result even if the <code class="docutils literal notranslate"><span class="pre">1e50</span></code> was not a 0-D array</p>
+</li>
+</ul>
+<p>In other cases, increased precision may occur.  For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">multiple</span><span class="p">(</span><span class="n">float32_arr</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span>
+<span class="n">float32_arr</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Will both return a float64 rather than <code class="docutils literal notranslate"><span class="pre">float32</span></code>.  This improves precision but
+slightly changes results and uses double the memory.</p>
+<section id="changes-due-to-the-integer-ladder-of-precision">
+<h3>Changes due to the integer “ladder of precision”<a class="headerlink" href="#changes-due-to-the-integer-ladder-of-precision" title="Link to this heading">#</a></h3>
+<p>When creating an array from a Python integer, NumPy will try the following
+types in order, with the result depending on the value:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>long (usually int64) → int64 → uint64 -&gt; object
+</pre></div>
+</div>
+<p>which is subtly different from the promotion described above.</p>
+<p>This NEP currently does not include changing this ladder (although it may be
+suggested in a separate document).
+However, in mixed operations, this ladder will be ignored, since the value
+will be ignored.  This means, that operations will never silently use the
+<code class="docutils literal notranslate"><span class="pre">object</span></code> dtype:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="mi">100</span>  <span class="c1"># Will error</span>
+</pre></div>
+</div>
+<p>The user will have to write one of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">100</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As such implicit conversion to <code class="docutils literal notranslate"><span class="pre">object</span></code> should be rare and the work-around
+is clear, we expect that the backwards compatibility concerns are fairly small.</p>
+</section>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<p>The following provides some additional details on the current “value based”
+promotion logic, and then on the “weak scalar” promotion and how it is handled
+internally.</p>
+<section id="old-implementation-of-values-based-promotion">
+<span id="old-implementation"></span><h3>Old implementation of “values based” promotion<a class="headerlink" href="#old-implementation-of-values-based-promotion" title="Link to this heading">#</a></h3>
+<p>This section reviews how the current value-based logic works in practice,
+please see the following section for examples on how it can be useful.</p>
+<p>When NumPy sees a “scalar” value, which can be a Python int, float, complex,
+a NumPy scalar or an array:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">1000</span>  <span class="c1"># Python scalar</span>
+<span class="n">int32</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>  <span class="c1"># NumPy scalar</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">int64</span><span class="p">)</span>  <span class="c1"># zero dimensional</span>
+</pre></div>
+</div>
+<p>Or the float/complex equivalents, NumPy will ignore the precision of the dtype
+and find the smallest possible dtype that can hold the value.
+That is, it will try the following dtypes:</p>
+<ul class="simple">
+<li><p>Integral: <code class="docutils literal notranslate"><span class="pre">uint8</span></code>, <code class="docutils literal notranslate"><span class="pre">int8</span></code>, <code class="docutils literal notranslate"><span class="pre">uint16</span></code>, <code class="docutils literal notranslate"><span class="pre">int16</span></code>, <code class="docutils literal notranslate"><span class="pre">uint32</span></code>, <code class="docutils literal notranslate"><span class="pre">int32</span></code>,
+<code class="docutils literal notranslate"><span class="pre">uint64</span></code>, <code class="docutils literal notranslate"><span class="pre">int64</span></code>.</p></li>
+<li><p>Floating: <code class="docutils literal notranslate"><span class="pre">float16</span></code>, <code class="docutils literal notranslate"><span class="pre">float32</span></code>, <code class="docutils literal notranslate"><span class="pre">float64</span></code>, <code class="docutils literal notranslate"><span class="pre">longdouble</span></code>.</p></li>
+<li><p>Complex: <code class="docutils literal notranslate"><span class="pre">complex64</span></code>, <code class="docutils literal notranslate"><span class="pre">complex128</span></code>, <code class="docutils literal notranslate"><span class="pre">clongdouble</span></code>.</p></li>
+</ul>
+<p>Note that e.g. for the integer value of <code class="docutils literal notranslate"><span class="pre">10</span></code>, the smallest dtype can be
+<em>either</em> <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">int8</span></code>.</p>
+<p>NumPy never applied this rule when all arguments are scalar values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For integers, whether a value fits is decided precisely by whether it can
+be represented by the dtype.
+For float and complex, the a dtype is considered sufficient if:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">float16</span></code>: <code class="docutils literal notranslate"><span class="pre">-65000</span> <span class="pre">&lt;</span> <span class="pre">value</span> <span class="pre">&lt;</span> <span class="pre">65000</span></code>  (or NaN/Inf)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">float32</span></code>: <code class="docutils literal notranslate"><span class="pre">-3.4e38</span> <span class="pre">&lt;</span> <span class="pre">value</span> <span class="pre">&lt;</span> <span class="pre">3.4e38</span></code>  (or NaN/Inf)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">float64</span></code>: <code class="docutils literal notranslate"><span class="pre">-1.7e308</span> <span class="pre">&lt;</span> <span class="pre">value</span> <span class="pre">&lt;</span> <span class="pre">1.7e308</span></code>  (or Nan/Inf)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">longdouble</span></code>:  (largest range, so no limit)</p></li>
+</ul>
+<p>for complex these bounds were applied to the real and imaginary component.
+These values roughly correspond to <code class="docutils literal notranslate"><span class="pre">np.finfo(np.float32).max</span></code>.
+(NumPy did never force the use of <code class="docutils literal notranslate"><span class="pre">float64</span></code> for a value of
+<code class="docutils literal notranslate"><span class="pre">float32(3.402e38)</span></code> though, but it will for a Python value of <code class="docutils literal notranslate"><span class="pre">3.402e38</span></code>.)</p>
+</section>
+<section id="state-of-the-current-value-based-promotion">
+<h3>State of the current “value based” promotion<a class="headerlink" href="#state-of-the-current-value-based-promotion" title="Link to this heading">#</a></h3>
+<p>Before we can propose alternatives to the current datatype system,
+it is helpful to review how “value based promotion” is used and can be useful.
+Value based promotion allows for the following code to work:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create uint8 array, as this is sufficient:</span>
+<span class="n">uint8_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">uint8_arr</span> <span class="o">+</span> <span class="mi">4</span>
+<span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">uint8_arr</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span>  <span class="c1"># upcast as little as possible.</span>
+</pre></div>
+</div>
+<p>Where especially the first part can be useful: The user knows that the input
+is an integer array with a specific precision. Considering that plain <code class="docutils literal notranslate"><span class="pre">+</span> <span class="pre">4</span></code>
+retaining the previous datatype is intuitive.
+Replacing this example with <code class="docutils literal notranslate"><span class="pre">np.float32</span></code> is maybe even more clear,
+as float will rarely have overflows.
+Without this behaviour, the above example would require writing <code class="docutils literal notranslate"><span class="pre">np.uint8(4)</span></code>
+and lack of the behaviour would make the following surprising:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">*</span> <span class="mf">2.</span>
+<span class="n">result</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+</pre></div>
+</div>
+<p>where lack of a special case would cause <code class="docutils literal notranslate"><span class="pre">float64</span></code> to be returned.</p>
+<p>It is important to note that the behaviour also applies to universal functions
+and zero dimensional arrays:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This logic is also used for ufuncs:</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">uint8_arr</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+<span class="c1"># And even if the other array is explicitly typed:</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">uint8_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span>
+</pre></div>
+</div>
+<p>To review, if we replace <code class="docutils literal notranslate"><span class="pre">4</span></code> with <code class="docutils literal notranslate"><span class="pre">[4]</span></code> to make it one dimensional, the
+result will be different:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This logic is also used for ufuncs:</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">uint8_arr</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>  <span class="c1"># platform dependent</span>
+<span class="c1"># And even if the other array is explicitly typed:</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">uint8_arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+</pre></div>
+</div>
+</section>
+<section id="proposed-weak-promotion">
+<h3>Proposed weak promotion<a class="headerlink" href="#proposed-weak-promotion" title="Link to this heading">#</a></h3>
+<p>This proposal uses a “weak scalar” logic.  This means that Python <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">complex</span></code> are not assigned one of the typical dtypes, such as float64 or int64.
+Rather, they are assigned a special abstract DType, similar to the “scalar” hierarchy
+names: Integral, Floating, ComplexFloating.</p>
+<p>When promotion occurs (as it does for ufuncs if no exact loop matches),
+the other DType is able to decide how to regard the Python
+scalar.  E.g. a <code class="docutils literal notranslate"><span class="pre">UInt16</span></code> promoting with an <code class="docutils literal notranslate"><span class="pre">Integral</span></code> will give <code class="docutils literal notranslate"><span class="pre">UInt16</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A default will most likely be provided in the future for user-defined DTypes.
+Most likely this will end up being the default integer/float, but in principle
+more complex schemes could be implemented.</p>
+</div>
+<p>At no time is the value used to decide the result of this promotion.  The value is only
+considered when it is converted to the new dtype; this may raise an error.</p>
+</section>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<p>Different Python projects that fill a similar space to NumPy prefer the weakly
+typed Python scalars as proposed in this NEP.  Details of these may differ
+or be unspecified though:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jax.readthedocs.io/en/latest/type_promotion.html">JAX promotion</a> also uses the weak-scalar concept.  However, it makes use
+of it also for most functions.  JAX further stores the “weak-type” information
+on the array: <code class="docutils literal notranslate"><span class="pre">jnp.array(1)</span></code> remains weakly typed.</p></li>
+<li><p><a class="reference external" href="https://data-apis.org/array-api/latest/API_specification/type_promotion.html">data-apis.org</a> also suggests this weak-scalar logic for the Python scalars.</p></li>
+</ul>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>Implementing this NEP requires some additional machinery to be added to all
+binary operators (or ufuncs), so that they attempt to use the “weak” logic
+if possible.
+There are two possible approaches to this:</p>
+<ol class="arabic simple">
+<li><p>The binary operator simply tries to call <code class="docutils literal notranslate"><span class="pre">np.result_type()</span></code> if this
+situation arises and converts the Python scalar to the result-type (if
+defined).</p></li>
+<li><p>The binary operator indicates that an input was a Python scalar, and the
+ufunc dispatching/promotion machinery is used for the rest (see
+<a class="reference internal" href="nep-0042-new-dtypes.html#nep42"><span class="std std-ref">NEP 42</span></a>).  This allows more flexibility, but requires some
+additional logic in the ufunc machinery.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As of now, it is not quite clear which approach is better, either will
+give fairly equivalent results and 1. could be extended by 2. in the future
+if necessary.</p>
+</div>
+<p>It further requires removing all current special value-based code paths.</p>
+<p>Unintuitively, a larger step in the implementation may be to implement a
+solution to allow an error to be raised in the following example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1000</span>
+</pre></div>
+</div>
+<p>Even though <code class="docutils literal notranslate"><span class="pre">np.uint8(1000)</span></code> returns the same value as <code class="docutils literal notranslate"><span class="pre">np.uint8(232)</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See alternatives, we may yet decide that this silent overflow is acceptable
+or at least a separate issue.</p>
+</div>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>There are several design axes where different choices are possible.
+The below sections outline these.</p>
+<section id="use-strongly-typed-scalars-or-a-mix-of-both">
+<h3>Use strongly-typed scalars or a mix of both<a class="headerlink" href="#use-strongly-typed-scalars-or-a-mix-of-both" title="Link to this heading">#</a></h3>
+<p>The simplest solution to the value-based promotion/casting issue would be to use
+strongly typed Python scalars, i.e. Python floats are considered double precision
+and Python integers are always considered the same as the default integer dtype.</p>
+<p>This would be the simplest solution, however, it would lead to many upcasts when
+working with arrays of <code class="docutils literal notranslate"><span class="pre">float32</span></code> or <code class="docutils literal notranslate"><span class="pre">int16</span></code>, etc.  The solution for these cases
+would be to rely on in-place operations.
+We currently believe that while less dangerous, this change would affect many users
+and would be surprising more often than not (although expectations differ widely).</p>
+<p>In principle, the weak vs. strong behaviour need not be uniform.  It would also
+be possible to make Python floats use the weak behaviour, but Python integers use the
+strong one, since integer overflows are far more surprising.</p>
+</section>
+<section id="do-not-use-weak-scalar-logic-in-functions">
+<h3>Do not use weak scalar logic in functions<a class="headerlink" href="#do-not-use-weak-scalar-logic-in-functions" title="Link to this heading">#</a></h3>
+<p>One alternative to this NEPs proposal is to narrow the use of weak types
+to Python operators.</p>
+<p>This has advantages and disadvantages:</p>
+<ul class="simple">
+<li><p>The main advantage is that limiting it to Python operators means that these
+“weak” types/dtypes are clearly ephemeral to short Python statements.</p></li>
+<li><p>A disadvantage is that <code class="docutils literal notranslate"><span class="pre">np.multiply</span></code> and <code class="docutils literal notranslate"><span class="pre">*</span></code> are less interchangeable.</p></li>
+<li><p>Using “weak” promotion only for operators means that libraries do not have
+to worry about whether they want to “remember” that an input was a Python
+scalar initially.  On the other hand, it would add a the need for slightly
+different (or additional) logic for Python operators.
+(Technically, probably as a flag to the ufunc dispatching mechanism to toggle
+the weak logic.)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> is often used on its own to provide Python operator
+support for array-likes implementing it.  If operators are special, these
+array-likes may need a mechanism to match NumPy (e.g. a kwarg to ufuncs to
+enable weak promotion.)</p></li>
+</ul>
+</section>
+<section id="numpy-scalars-could-be-special">
+<h3>NumPy scalars could be special<a class="headerlink" href="#numpy-scalars-could-be-special" title="Link to this heading">#</a></h3>
+<p>Many users expect that NumPy scalars should be different from NumPy
+arrays, in that <code class="docutils literal notranslate"><span class="pre">np.uint8(3)</span> <span class="pre">+</span> <span class="pre">3</span></code> should return an <code class="docutils literal notranslate"><span class="pre">int64</span></code> (or Python
+integer), when <code class="docutils literal notranslate"><span class="pre">uint8_arr</span> <span class="pre">+</span> <span class="pre">3</span></code> preserves the <code class="docutils literal notranslate"><span class="pre">uint8</span></code> dtype.</p>
+<p>This alternative would be very close to the current behaviour for NumPy scalars
+but it would cement a distinction between arrays and scalars (NumPy arrays
+are “stronger” than Python scalars, but NumPy scalars are not).</p>
+<p>Such a distinction is very much possible, however, at this time NumPy will
+often (and silently) convert 0-D arrays to scalars.
+It may thus make sense, to only consider this alternative if we also
+change this silent conversion (sometimes referred to as “decay”) behaviour.</p>
+</section>
+<section id="handling-conversion-of-scalars-when-unsafe">
+<h3>Handling conversion of scalars when unsafe<a class="headerlink" href="#handling-conversion-of-scalars-when-unsafe" title="Link to this heading">#</a></h3>
+<p>Cases such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1000</span>
+</pre></div>
+</div>
+<p>should raise an error as per this NEP.  This could be relaxed to give a warning
+or even ignore the “unsafe” conversion which (on all relevant hardware) would
+lead to <code class="docutils literal notranslate"><span class="pre">np.uint8(1000)</span> <span class="pre">==</span> <span class="pre">np.uint8(232)</span></code> being used.</p>
+</section>
+<section id="allowing-weakly-typed-arrays">
+<h3>Allowing weakly typed arrays<a class="headerlink" href="#allowing-weakly-typed-arrays" title="Link to this heading">#</a></h3>
+<p>One problem with having weakly typed Python scalars, but not weakly typed
+arrays is that in many cases <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code> is called indiscriminately on
+inputs.  To solve this issue JAX will consider the result of <code class="docutils literal notranslate"><span class="pre">np.asarray(1)</span></code>
+also to be weakly typed.
+There are, however, two difficulties with this:</p>
+<ol class="arabic">
+<li><p>JAX noticed that it can be confusing that:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>is a non 0-D array that “inherits” the weak typing. <a class="footnote-reference brackets" href="#id16" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
+</li>
+<li><p>Unlike JAX tensors, NumPy arrays are mutable, so assignment may need to
+cause it to be strongly typed?</p></li>
+</ol>
+<p>A flag will likely be useful as an implementation detail (e.g. in ufuncs),
+however, as of now we do not expect to have this as user API.
+The main reason is that such a flag may be surprising for users if it is
+passed out as a result from a function, rather than used only very localized.</p>
+<div class="admonition-todo admonition">
+<p class="admonition-title">TODO</p>
+<p>Before accepting the NEP it may be good to discuss this issue further.
+Libraries may need clearer patterns to “propagate” the “weak” type, this
+could just be an <code class="docutils literal notranslate"><span class="pre">np.asarray_or_literal()</span></code> to preserve Python scalars,
+or a pattern of calling <code class="docutils literal notranslate"><span class="pre">np.result_type()</span></code> before <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>.</p>
+</div>
+</section>
+<section id="keep-using-value-based-logic-for-python-scalars">
+<h3>Keep using value-based logic for Python scalars<a class="headerlink" href="#keep-using-value-based-logic-for-python-scalars" title="Link to this heading">#</a></h3>
+<p>Some of the main issues with the current logic arise, because we apply it
+to NumPy scalars and 0-D arrays, rather than the application to Python scalars.
+We could thus consider to keep inspecting the value for Python scalars.</p>
+<p>We reject this idea on the grounds that it will not remove the surprises
+given earlier:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1000</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">(</span><span class="mi">1100</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="mi">200</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">44</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And adapting the precision based on the result value rather than the input
+value might be possible for scalar operations, but is not feasible for array
+operations.
+This is because array operations need to allocate the result array before
+performing the calculation.</p>
+</section>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="github reference external" href="https://github.com/numpy/numpy/issues/2878">numpy/numpy#2878</a></p></li>
+<li><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/R7D65SNGJW4PD6V7N3CEI4NJUHU6QP2I/#RB3JLIYJITVO3BWUPGLN4FJUUIKWKZIW">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/R7D65SNGJW4PD6V7N3CEI4NJUHU6QP2I/#RB3JLIYJITVO3BWUPGLN4FJUUIKWKZIW</a></p></li>
+<li><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/NA3UBE3XAUTXFYBX6HPIOCNCTNF3PWSZ/#T5WAYQPRMI5UCK7PKPCE3LGK7AQ5WNGH">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/NA3UBE3XAUTXFYBX6HPIOCNCTNF3PWSZ/#T5WAYQPRMI5UCK7PKPCE3LGK7AQ5WNGH</a></p></li>
+<li><p>Poll about the desired future behavior: <a class="reference external" href="https://discuss.scientific-python.org/t/poll-future-numpy-behavior-when-mixing-arrays-numpy-scalars-and-python-scalars/202">https://discuss.scientific-python.org/t/poll-future-numpy-behavior-when-mixing-arrays-numpy-scalars-and-python-scalars/202</a></p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id15" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id17">1</a><span class="fn-bracket">]</span></span>
+<p>Each NEP must either be explicitly labeled as placed in the public domain (see
+this NEP as an example) or licensed under the <a class="reference external" href="https://www.opencontent.org/openpub/">Open Publication License</a>.</p>
+</aside>
+</aside>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id16" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id14">2</a><span class="fn-bracket">]</span></span>
+<p><a class="github reference external" href="https://github.com/numpy/numpy/pull/21103/files#r814188019">numpy/numpy#files</a></p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain. <a class="footnote-reference brackets" href="#id15" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#schema-of-the-new-proposed-promotion-rules">Schema of the new proposed promotion rules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-of-new-behaviour">Examples of new behaviour</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#table-comparing-new-and-old-behaviour">Table comparing new and old behaviour</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-on-can-cast">Impact on <code class="docutils literal notranslate"><span class="pre">can_cast</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-on-operators-and-functions-involving-numpy-arrays-or-scalars">Impact on operators and functions involving NumPy arrays or scalars</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-on-operators-involving-python-int-float-and-complex">Impact on operators involving Python <code class="docutils literal notranslate"><span class="pre">int</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, and <code class="docutils literal notranslate"><span class="pre">complex</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#particular-behavior-of-python-integers">Particular behavior of Python integers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changes-due-to-the-integer-ladder-of-precision">Changes due to the integer “ladder of precision”</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#old-implementation-of-values-based-promotion">Old implementation of “values based” promotion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#state-of-the-current-value-based-promotion">State of the current “value based” promotion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proposed-weak-promotion">Proposed weak promotion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-strongly-typed-scalars-or-a-mix-of-both">Use strongly-typed scalars or a mix of both</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#do-not-use-weak-scalar-logic-in-functions">Do not use weak scalar logic in functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-scalars-could-be-special">NumPy scalars could be special</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#handling-conversion-of-scalars-when-unsafe">Handling conversion of scalars when unsafe</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#allowing-weakly-typed-arrays">Allowing weakly typed arrays</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-using-value-based-logic-for-python-scalars">Keep using value-based logic for Python scalars</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
