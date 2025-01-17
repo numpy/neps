@@ -1,0 +1,875 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 11 — Deferred UFunc evaluation &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0011-deferred-ufunc-evaluation';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 12 — Missing data functionality in NumPy" href="nep-0012-missing-data.html" />
+    <link rel="prev" title="NEP 9 — Structured array extensions" href="nep-0009-structured_array_extensions.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 17, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="deferred.html" class="nav-link">Deferred and Superseded NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 11 — Deferred UFunc evaluation</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-11-deferred-ufunc-evaluation">
+<span id="nep11"></span><h1>NEP 11 — Deferred UFunc evaluation<a class="headerlink" href="#nep-11-deferred-ufunc-evaluation" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mark Wiebe &lt;<a class="reference external" href="mailto:mwwiebe&#37;&#52;&#48;gmail&#46;com">mwwiebe<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Content-Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>text/x-rst</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>30-Nov-2010</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Deferred</p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>This NEP describes a proposal to add deferred evaluation to NumPy’s
+UFuncs.  This will allow Python expressions like
+“a[:] = b + c + d + e” to be evaluated in a single pass through all
+the variables at once, with no temporary arrays.  The resulting
+performance will likely be comparable to the <em>numexpr</em> library,
+but with a more natural syntax.</p>
+<p>This idea has some interaction with UFunc error handling and
+the UPDATEIFCOPY flag, affecting the design and implementation,
+but the result allows for the usage of deferred evaluation
+with minimal effort from the Python user’s perspective.</p>
+</section>
+<section id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading">#</a></h2>
+<p>NumPy’s style of UFunc execution causes suboptimal performance for
+large expressions, because multiple temporaries are allocated and
+the inputs are swept through in multiple passes.  The <em>numexpr</em> library
+can outperform NumPy for such large expressions, by doing the execution
+in small cache-friendly blocks, and evaluating the whole expression
+per element.  This results in one sweep through each input, which
+is significantly better for the cache.</p>
+<p>For an idea of how to get this kind of behavior in NumPy without
+changing the Python code, consider the C++ technique of
+expression templates. These can be used to quite arbitrarily
+rearrange expressions using
+vectors or other data structures, example:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">D</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>can be transformed into something equivalent to:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">A</span><span class="p">.</span><span class="n">size</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">B</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">C</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">D</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is done by returning a proxy object that knows how to calculate
+the result instead of returning the actual object.  With modern C++
+optimizing compilers, the resulting machine code is often the same
+as hand-written loops.  For an example of this, see the
+<a class="reference external" href="http://www.oonumerics.org/blitz/docs/blitz_3.html">Blitz++ Library</a>.
+A more recently created library for helping write expression templates
+is <a class="reference external" href="http://beta.boost.org/doc/libs/1_44_0/doc/html/proto.html">Boost Proto</a>.</p>
+<p>By using the same idea of returning a proxy object in Python, we
+can accomplish the same thing dynamically.  The return object is
+an ndarray without its buffer allocated, and with enough knowledge
+to calculate itself when needed.  When a “deferred array” is
+finally evaluated, we can use the expression tree made up of
+all the operand deferred arrays, effectively creating a single new
+UFunc to evaluate on the fly.</p>
+</section>
+<section id="example-python-code">
+<h2>Example Python code<a class="headerlink" href="#example-python-code" title="Link to this heading">#</a></h2>
+<p>Here’s how it might be used in NumPy.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># a, b, c are large ndarrays</span>
+
+<span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">deferredstate</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="n">c</span>
+    <span class="c1"># Now d is a &#39;deferred array,&#39; a, b, and c are marked READONLY</span>
+    <span class="c1"># similar to the existing UPDATEIFCOPY mechanism.</span>
+
+    <span class="nb">print</span> <span class="n">d</span>
+    <span class="c1"># Since the value of d was required, it is evaluated so d becomes</span>
+    <span class="c1"># a regular ndarray and gets printed.</span>
+
+    <span class="n">d</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">b</span><span class="o">*</span><span class="n">c</span>
+    <span class="c1"># Here, the automatically combined &quot;ufunc&quot; that computes</span>
+    <span class="c1"># a*b*c effectively gets an out= parameter, so no temporary</span>
+    <span class="c1"># arrays are needed whatsoever.</span>
+
+    <span class="n">e</span> <span class="o">=</span> <span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="o">+</span><span class="n">c</span><span class="o">*</span><span class="n">d</span>
+    <span class="c1"># Now e is a &#39;deferred array,&#39; a, b, c, and d are marked READONLY</span>
+
+    <span class="n">d</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="c1"># d was marked readonly, but the assignment could see that</span>
+    <span class="c1"># this was due to it being a deferred expression operand.</span>
+    <span class="c1"># This triggered the deferred evaluation so it could assign</span>
+    <span class="c1"># the value of a to d.</span>
+</pre></div>
+</div>
+<p>There may be some surprising behavior, though.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">deferredstate</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span> <span class="o">+</span> <span class="n">c</span>
+    <span class="c1"># d is deferred</span>
+
+    <span class="n">e</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="n">f</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="n">g</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">d</span>
+    <span class="c1"># d is still deferred, and its deferred expression</span>
+    <span class="c1"># was evaluated three times, once for each assignment.</span>
+    <span class="c1"># This could be detected, with d being converted to</span>
+    <span class="c1"># a regular ndarray the second time it is evaluated.</span>
+</pre></div>
+</div>
+<p>I believe the usage that should be recommended in the documentation
+is to leave the deferred state at its default, except when
+evaluating a large expression that can benefit from it.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># calculations</span>
+
+<span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">deferredstate</span><span class="p">(</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">big</span> <span class="n">expression</span><span class="o">&gt;</span>
+
+<span class="c1"># more calculations</span>
+</pre></div>
+</div>
+<p>This will avoid surprises which would be cause by always keeping
+deferred usage True, like floating point warnings or exceptions
+at surprising times when deferred expression are used later.
+User questions like “Why does my print statement throw a
+divide by zero error?” can hopefully be avoided by recommending
+this approach.</p>
+</section>
+<section id="proposed-deferred-evaluation-api">
+<h2>Proposed deferred evaluation API<a class="headerlink" href="#proposed-deferred-evaluation-api" title="Link to this heading">#</a></h2>
+<p>For deferred evaluation to work, the C API needs to be aware of its
+existence, and be able to trigger evaluation when necessary.  The
+ndarray would gain two new flag.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">NPY_ISDEFERRED</span></code></p>
+<blockquote>
+<div><p>Indicates the expression evaluation for this ndarray instance
+has been deferred.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">NPY_DEFERRED_WASWRITEABLE</span></code></p>
+<blockquote>
+<div><p>Can only be set when <code class="docutils literal notranslate"><span class="pre">PyArray_GetDeferredUsageCount(arr)</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>.
+It indicates that when <code class="docutils literal notranslate"><span class="pre">arr</span></code> was first used in a deferred
+expression, it was a writeable array.  If this flag is set,
+calling <code class="docutils literal notranslate"><span class="pre">PyArray_CalculateAllDeferred()</span></code> will make <code class="docutils literal notranslate"><span class="pre">arr</span></code>
+writeable again.</p>
+</div></blockquote>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>QUESTION</p>
+<p>Should NPY_DEFERRED and NPY_DEFERRED_WASWRITEABLE be visible
+to Python, or should accessing the flags from python trigger
+PyArray_CalculateAllDeferred if necessary?</p>
+</div>
+<p>The API would be expanded with a number of functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">PyArray_CalculateAllDeferred()</span></code></p>
+<blockquote>
+<div><p>This function forces all currently deferred calculations to occur.</p>
+<p>For example, if the error state is set to ignore all, and
+np.seterr({all=’raise’}), this would change what happens
+to already deferred expressions.  Thus, all the existing
+deferred arrays should be evaluated before changing the
+error state.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">PyArray_CalculateDeferred(PyArrayObject*</span> <span class="pre">arr)</span></code></p>
+<blockquote>
+<div><p>If ‘arr’ is a deferred array, allocates memory for it and
+evaluates the deferred expression.  If ‘arr’ is not a deferred
+array, simply returns success.  Returns NPY_SUCCESS or NPY_FAILURE.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">PyArray_CalculateDeferredAssignment(PyArrayObject*</span> <span class="pre">arr,</span> <span class="pre">PyArrayObject*</span> <span class="pre">out)</span></code></p>
+<blockquote>
+<div><p>If ‘arr’ is a deferred array, evaluates the deferred expression
+into ‘out’, and ‘arr’ remains a deferred array.  If ‘arr’ is not
+a deferred array, copies its value into out.  Returns NPY_SUCCESS
+or NPY_FAILURE.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">int</span> <span class="pre">PyArray_GetDeferredUsageCount(PyArrayObject*</span> <span class="pre">arr)</span></code></p>
+<blockquote>
+<div><p>Returns a count of how many deferred expressions use this array
+as an operand.</p>
+</div></blockquote>
+<p>The Python API would be expanded as follows.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">numpy.setdeferred(state)</span></code></p>
+<blockquote>
+<div><p>Enables or disables deferred evaluation. True means to always
+use deferred evaluation.  False means to never use deferred
+evaluation.  None means to use deferred evaluation if the error
+handling state is set to ignore everything.  At NumPy initialization,
+the deferred state is None.</p>
+<p>Returns the previous deferred state.</p>
+</div></blockquote>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">numpy.getdeferred()</span></code></p>
+<blockquote>
+<div><p>Returns the current deferred state.</p>
+</div></blockquote>
+<p><code class="docutils literal notranslate"><span class="pre">numpy.deferredstate(state)</span></code></p>
+<blockquote>
+<div><p>A context manager for deferred state handling, similar to
+<code class="docutils literal notranslate"><span class="pre">numpy.errstate</span></code>.</p>
+</div></blockquote>
+<section id="error-handling">
+<h3>Error handling<a class="headerlink" href="#error-handling" title="Link to this heading">#</a></h3>
+<p>Error handling is a thorny issue for deferred evaluation.  If the
+NumPy error state is {all=’ignore’}, it might be reasonable to
+introduce deferred evaluation as the default, however if a UFunc
+can raise an error, it would be very strange for the later ‘print’
+statement to throw the exception instead of the actual operation which
+caused the error.</p>
+<p>What may be a good approach is to by default enable deferred evaluation
+only when the error state is set to ignore all, but allow user control with
+‘setdeferred’ and ‘getdeferred’ functions.  True would mean always
+use deferred evaluation, False would mean never use it, and None would
+mean use it only when safe (i.e. the error state is set to ignore all).</p>
+</section>
+<section id="interaction-with-updateifcopy">
+<h3>Interaction with UPDATEIFCOPY<a class="headerlink" href="#interaction-with-updateifcopy" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">NPY_UPDATEIFCOPY</span></code> documentation states:</p>
+<blockquote>
+<div><p>The data area represents a (well-behaved) copy whose information
+should be transferred back to the original when this array is deleted.</p>
+<p>This is a special flag that is set if this array represents a copy
+made because a user required certain flags in PyArray_FromAny and a
+copy had to be made of some other array (and the user asked for this
+flag to be set in such a situation). The base attribute then points
+to the “misbehaved” array (which is set read_only). When the array
+with this flag set is deallocated, it will copy its contents back to
+the “misbehaved” array (casting if necessary) and will reset the
+“misbehaved” array to NPY_WRITEABLE. If the “misbehaved” array was
+not NPY_WRITEABLE to begin with then PyArray_FromAny would have
+returned an error because NPY_UPDATEIFCOPY would not have been possible.</p>
+</div></blockquote>
+<p>The current implementation of UPDATEIFCOPY assumes that it is the only
+mechanism mucking with the writeable flag in this manner.  These mechanisms
+must be aware of each other to work correctly.  Here’s an example of how
+they might go wrong:</p>
+<ol class="arabic simple">
+<li><p>Make a temporary copy of ‘arr’ with UPDATEIFCOPY (‘arr’ becomes read only)</p></li>
+<li><p>Use ‘arr’ in a deferred expression (deferred usage count becomes one,
+NPY_DEFERRED_WASWRITEABLE is <strong>not</strong> set, since ‘arr’ is read only)</p></li>
+<li><p>Destroy the temporary copy, causing ‘arr’ to become writeable</p></li>
+<li><p>Writing to ‘arr’ destroys the value of the deferred expression</p></li>
+</ol>
+<p>To deal with this issue, we make these two states mutually exclusive.</p>
+<ul class="simple">
+<li><p>Usage of UPDATEIFCOPY checks the <code class="docutils literal notranslate"><span class="pre">NPY_DEFERRED_WASWRITEABLE</span></code> flag,
+and if it’s set, calls <code class="docutils literal notranslate"><span class="pre">PyArray_CalculateAllDeferred</span></code> to flush
+all deferred calculation before proceeding.</p></li>
+<li><p>The ndarray gets a new flag <code class="docutils literal notranslate"><span class="pre">NPY_UPDATEIFCOPY_TARGET</span></code> indicating
+the array will be updated and made writeable at some point in the
+future.  If the deferred evaluation mechanism sees this flag in
+any operand, it triggers immediate evaluation.</p></li>
+</ul>
+</section>
+<section id="other-implementation-details">
+<h3>Other implementation details<a class="headerlink" href="#other-implementation-details" title="Link to this heading">#</a></h3>
+<p>When a deferred array is created, it gets references to all the
+operands of the UFunc, along with the UFunc itself.  The
+‘DeferredUsageCount’ is incremented for each operand, and later
+gets decremented when the deferred expression is calculated or
+the deferred array is destroyed.</p>
+<p>A global list of weak references to all the deferred arrays
+is tracked, in order of creation.  When <code class="docutils literal notranslate"><span class="pre">PyArray_CalculateAllDeferred</span></code>
+gets called, the newest deferred array is calculated first.
+This may release references to other deferred arrays contained
+in the deferred expression tree, which then
+never have to be calculated.</p>
+</section>
+<section id="further-optimization">
+<h3>Further optimization<a class="headerlink" href="#further-optimization" title="Link to this heading">#</a></h3>
+<p>Instead of conservatively disabling deferred evaluation when any
+errors are not set to ‘ignore’, each UFunc could give a set
+of possible errors it generates.  Then, if all those errors
+are set to ‘ignore’, deferred evaluation could be used even
+if other errors are not set to ignore.</p>
+<p>Once the expression tree is explicitly stored, it is possible to
+do transformations on it.  For example add(add(a,b),c) could
+be transformed into add3(a,b,c), or add(multiply(a,b),c) could
+become fma(a,b,c) using the CPU fused multiply-add instruction
+where available.</p>
+<p>While I’ve framed deferred evaluation as just for UFuncs, it could
+be extended to other functions, such as dot().  For example, chained
+matrix multiplications could be reordered to minimize the size
+of intermediates, or peep-hole style optimizer passes could search
+for patterns that match optimized BLAS/other high performance
+library calls.</p>
+<p>For operations on really large arrays, integrating a JIT like LLVM into
+this system might be a big benefit.  The UFuncs and other operations
+would provide bitcode, which could be inlined together and optimized
+by the LLVM optimizers, then executed.  In fact, the iterator itself
+could also be represented in bitcode, allowing LLVM to consider
+the entire iteration while doing its optimization.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation">Motivation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-python-code">Example Python code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#proposed-deferred-evaluation-api">Proposed deferred evaluation API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#error-handling">Error handling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interaction-with-updateifcopy">Interaction with UPDATEIFCOPY</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-implementation-details">Other implementation details</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#further-optimization">Further optimization</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

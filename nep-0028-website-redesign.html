@@ -1,0 +1,906 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 28 — numpy.org website redesign &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0028-website-redesign';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 29 — Recommend Python and NumPy version support as a community policy standard" href="nep-0029-deprecation_policy.html" />
+    <link rel="prev" title="NEP 27 — Zero rank arrays" href="nep-0027-zero-rank-arrarys.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 17, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 28 — numpy.org website redesign</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-28-numpy-org-website-redesign">
+<span id="nep28"></span><h1>NEP 28 — numpy.org website redesign<a class="headerlink" href="#nep-28-numpy-org-website-redesign" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ralf Gommers &lt;<a class="reference external" href="mailto:ralf&#46;gommers&#37;&#52;&#48;gmail&#46;com">ralf<span>&#46;</span>gommers<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Joe LaChance &lt;<a class="reference external" href="mailto:joe&#37;&#52;&#48;boldmetrics&#46;com">joe<span>&#64;</span>boldmetrics<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Shekhar Rajak &lt;<a class="reference external" href="mailto:shekharrajak&#46;1994&#37;&#52;&#48;gmail&#46;com">shekharrajak<span>&#46;</span>1994<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Informational</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2019-07-16</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2019-August/079889.html">https://mail.python.org/pipermail/numpy-discussion/2019-August/079889.html</a></p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>NumPy is the fundamental library for numerical and scientific computing with
+Python. It is used by millions and has a large team of maintainers and
+contributors. Despite that, its <a class="reference external" href="http://numpy.org">numpy.org</a> website has
+never received the attention it needed and deserved. We hope and intend to
+change that soon. This document describes ideas and requirements for how to
+design a replacement for the current website, to better serve the needs of
+our diverse community.</p>
+<p>At a high level, what we’re aiming for is:</p>
+<ul class="simple">
+<li><p>a modern, clean look</p></li>
+<li><p>an easy to deploy static site</p></li>
+<li><p>a structure that’s easy to navigate</p></li>
+<li><p>content that addresses all types of stakeholders</p></li>
+<li><p>Possible multilingual translations / i18n</p></li>
+</ul>
+<p>This website serves a couple of roles:</p>
+<ul class="simple">
+<li><p>it’s the entry point to the project for new users</p></li>
+<li><p>it should link to the documentation (which is hosted separately, now on
+<a class="reference external" href="http://docs.scipy.org/">http://docs.scipy.org/</a> and in the near future on <a class="reference external" href="http://numpy.org/doc">http://numpy.org/doc</a>).</p></li>
+<li><p>it should address various aspects of the project (e.g. what NumPy is and
+why you’d want to use it, community, project organization, funding,
+relationship with NumFOCUS and possibly other organizations)</p></li>
+<li><p>it should link out to other places, so every type of stakeholder
+(beginning and advanced user, educators, packagers, funders, etc.)
+can find their way</p></li>
+</ul>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>The current numpy.org website has almost no content and its design is poor.
+This affects many users, who come there looking for information. It also
+affects many other aspects of the NumPy project, from finding new contributors
+to fundraising.</p>
+<p>The scope of the proposed redesign is the top-level numpy.org site, which
+now contains only a couple of pages and may contain on the order of ten
+pages after the redesign. Changing the documentation (user guide, reference
+guide, and some other pages in the NumPy Manual) is out of scope for
+this proposal.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<section id="user-experience">
+<h3>User Experience<a class="headerlink" href="#user-experience" title="Link to this heading">#</a></h3>
+<p>Besides the NumPy logo, there is little that can or needs to be kept from the
+current website. We will rely to a large extent on ideas and proposals by the
+designer(s) of the new website.</p>
+<p>As reference points we can use the <a class="reference external" href="https://jupyter.org/">Jupyter website</a>,
+which is probably the best designed site in our ecosystem, and the
+<a class="reference external" href="https://quantecon.org">QuantEcon</a> and <a class="reference external" href="https://julialang.org">Julia</a>
+sites which are well-designed too.</p>
+</section>
+<section id="the-website">
+<h3>The Website<a class="headerlink" href="#the-website" title="Link to this heading">#</a></h3>
+<p>A static site is a must. There are many high-quality static site generators.
+The current website uses Sphinx, however that is not the best choice - it’s
+hard to theme and results in sites that are too text-heavy due to Sphinx’
+primary aim being documentation.</p>
+<p>The following should be considered when choosing a static site generator:</p>
+<ol class="arabic simple">
+<li><p><em>How widely used is it?</em> This is important when looking for help maintaining
+or improving the site. More popular frameworks are usually also better
+maintained, so less chance of bugs or obsolescence.</p></li>
+<li><p><em>Ease of deployment.</em> Most generators meet this criterion, however things
+like built-in support for GitHub Pages helps.</p></li>
+<li><p><em>Preferences of who implements the new site.</em> Everyone has their own
+preferences. And it’s a significant amount of work to build a new site.
+So we should take the opinion of those doing the work into account.</p></li>
+</ol>
+<section id="traffic">
+<h4>Traffic<a class="headerlink" href="#traffic" title="Link to this heading">#</a></h4>
+<p>The current site receives on the order of 500,000 unique visitors per month.
+With a redesigned site and relevant content, there is potential for visitor
+counts to reach 5-6 million – a similar level as
+<a class="reference external" href="http://scipy.org">scipy.org</a> or <a class="reference external" href="http://matplotlib.org">matplotlib.org</a> –
+or more.</p>
+</section>
+<section id="possible-options-for-static-site-generators">
+<h4>Possible options for static site generators<a class="headerlink" href="#possible-options-for-static-site-generators" title="Link to this heading">#</a></h4>
+<ol class="arabic simple">
+<li><p><em>Jekyll.</em> This is a well maintained option with 855 Github contributors,
+with contributions within the last month. Jekyll is written in Ruby, and
+has a simple CLI interface. Jekyll also has a large directory of
+<a class="reference external" href="https://jekyllthemes.io">themes</a>, although a majority cost money.
+There are several themes (<a class="reference external" href="https://jekyllthemes.io/theme/serif">serif</a>,
+<a class="reference external" href="https://jekyllthemes.io/theme/ubuild-jekyll-theme">uBuild</a>,
+<a class="reference external" href="https://jekyllthemes.io/theme/just-the-docs">Just The Docs</a>) that are
+appropriate and free. Most themes are likely responsive for mobile, and
+that should be a requirement. Jekyll uses a combination of liquid templating
+and YAML to render HTML, and content is written in Markdown. i18n
+functionality is not native to Jekyll, but can be added easily.
+One nice benefit of Jekyll is that it can be run automatically by GitHub
+Pages, so deployment via a CI system doesn’t need to be implemented.</p></li>
+<li><p><em>Hugo.</em> This is another well maintained option with 554 contributors, with
+contributions within the last month. Hugo is written in Go, and similar to
+Jekyll, has a simple to use CLI interface to generate static sites. Again,
+similar to Jekyll, Hugo has a large directory of
+<a class="reference external" href="https://themes.gohugo.io">themes</a>. These themes appear to be free,
+unlike some of Jekyll’s themes.
+(<a class="reference external" href="https://themes.gohugo.io/hugo-hero-theme">Sample landing page theme</a>,
+<a class="reference external" href="https://themes.gohugo.io/hugo-whisper-theme">docs theme</a>). Hugo uses Jade
+as its templating language, and content is also written in Markdown. i18n
+functionality is native to Hugo.</p></li>
+<li><p><em>Docusaurus.</em> Docusaurus is a responsive static site generator made by Facebook.
+Unlike the previous options, Docusaurus doesn’t come with themes, and thus we
+would not want to use this for our landing page. This is an excellent docs
+option written in React. Docusaurus natively has support for i18n (via
+<a class="reference external" href="https://crowdin.com/pricing#annual">Crowdin</a>), document versioning, and document search.</p></li>
+</ol>
+<p>Both Jekyll and Hugo are excellent options that should be supported into the
+future and are good choices for NumPy. Docusaurus has several bonus features
+such as versioning and search that Jekyll and Hugo don’t have, but is likely
+a poor candidate for a landing page - it could be a good option for a
+high-level docs site later on though.</p>
+</section>
+</section>
+<section id="deployment">
+<h3>Deployment<a class="headerlink" href="#deployment" title="Link to this heading">#</a></h3>
+<p>There is no need for running a server, and doing so is in our experience a
+significant drain on the time of maintainers.</p>
+<ol class="arabic simple">
+<li><p><em>Netlify.</em> Using netlify is free until 100GB of bandwidth is used. Additional
+bandwidth costs $20/100GB. They support a global CDN system, which will keep
+load times quick for users in other regions. Netlify also has Github integration,
+which will allow for easy deployment. When a pull request is merged, Netlify
+will automatically deploy the changes. DNS is simple, and HTTPS is also supported.</p></li>
+<li><p><em>Github Pages.</em> Github Pages also has a 100GB bandwidth limit, and is unclear if
+additional bandwidth can be purchased. It is also unclear where sites are deployed,
+and should be assumed sites aren’t deployed globally. Github Pages has an easy to
+use CI &amp; DNS, similar to Netlify. HTTPS is supported.</p></li>
+<li><p><em>Cloudflare.</em> An excellent option, additional CI is likely needed for the same
+ease of deployment.</p></li>
+</ol>
+<p>All of the above options are appropriate for the NumPy site based on current
+traffic. Updating to a new deployment strategy, if needed, is a minor amount of
+work compared to developing the website itself. If a provider such as
+Cloudflare is chosen, additional CI may be required, such as CircleCI, to
+have a similar deployment to GitHub Pages or Netlify.</p>
+</section>
+<section id="analytics">
+<h3>Analytics<a class="headerlink" href="#analytics" title="Link to this heading">#</a></h3>
+<p>It’s beneficial to maintainers to know how many visitors are coming to
+numpy.org. Google Analytics offers visitor counts and locations. This will
+help to support and deploy more strategically, and help maintainers
+understand where traffic is coming from.</p>
+<p>Google Analytics is free. A script, provided by Google, must be added to the home page.</p>
+</section>
+<section id="website-structure">
+<h3>Website Structure<a class="headerlink" href="#website-structure" title="Link to this heading">#</a></h3>
+<p>We aim to keep the first version of the new website small in terms of amount
+of content. New pages can be added later on, it’s more important right now to
+get the site design right and get some essential information up. Note that in
+the second half of 2019 we expect to get 1 or 2 tech writers involved in the
+project via Google Season of Docs. They will likely help improve the content
+and organization of that content.</p>
+<p>We propose the following structure:</p>
+<ol class="arabic simple" start="0">
+<li><p>Front page: essentials of what NumPy is (compare e.g. jupyter.org), one or
+a couple key user stories (compare e.g. julialang.org)</p></li>
+<li><p>Install</p></li>
+<li><p>Documentation</p></li>
+<li><p>Array computing</p></li>
+<li><p>Community</p></li>
+<li><p>Learning</p></li>
+<li><p>About Us</p></li>
+<li><p>Contribute</p></li>
+<li><p>Donate</p></li>
+</ol>
+<p>There may be a few other pages, e.g. a page on performance, that are linked
+from one of the main pages.</p>
+</section>
+<section id="stakeholder-content">
+<h3>Stakeholder Content<a class="headerlink" href="#stakeholder-content" title="Link to this heading">#</a></h3>
+<p>This should have as little content as possible <em>within the site</em>. Somewhere
+on the site we should link out to content that’s specific to:</p>
+<ul class="simple">
+<li><p>beginning users (quickstart, tutorial)</p></li>
+<li><p>advanced users</p></li>
+<li><p>educators</p></li>
+<li><p>packagers</p></li>
+<li><p>package authors that depend on NumPy</p></li>
+<li><p>funders (governance, roadmap)</p></li>
+</ul>
+</section>
+<section id="translation-multilingual-i18n">
+<h3>Translation (multilingual / i18n)<a class="headerlink" href="#translation-multilingual-i18n" title="Link to this heading">#</a></h3>
+<p>NumPy has users all over the world. Most of those users are not native
+English speakers, and many don’t speak English well or at all. Therefore
+having content in multiple languages is potentially addressing a large unmet
+need. It would likely also help make the NumPy project more diverse and
+welcoming.</p>
+<p>On the other hand, there are good reasons why few projects have a
+multi-lingual site. It’s potentially a lot of extra work. Extra work for
+maintainers is costly - they’re already struggling to keep up with the work
+load. Therefore we have to very carefully consider whether a multi-lingual
+site is feasible and weight costs and benefits.</p>
+<p>We start with an assertion: maintaining translations of all documentation, or
+even the whole user guide, as part of the NumPy project is not feasible. One
+simply has to look at the volume of our documentation and the frequency with
+which we change it to realize that that’s the case. Perhaps it will be
+feasible though to translate just the top-level pages of the website. Those
+do not change very often, and it will be a limited amount of content (order
+of magnitude 5-10 pages of text).</p>
+<p>We propose the following requirements for adding a language:</p>
+<ul class="simple">
+<li><p>The language must have a dedicated maintainer</p></li>
+<li><p>There must be a way to validate content changes (e.g. a second
+maintainer/reviewer, or high quality language support in a freely
+available machine translation tool)</p></li>
+<li><p>The language must have a reasonable size target audience (to be
+assessed by the NumPy maintainers)</p></li>
+</ul>
+<p>Furthermore we propose a policy for when to remove support for a language again
+(preferably by hiding it rather than deleting content). This may be done when
+the language no longer has a maintainer, and coverage of translations falls
+below an acceptable threshold (say 80%).</p>
+<p>Benefits of having translations include:</p>
+<ul class="simple">
+<li><p>Better serve many existing and potential users</p></li>
+<li><p>Potentially attract a culturally and geographically more diverse set of contributors</p></li>
+</ul>
+<p>The tradeoffs are:</p>
+<ul class="simple">
+<li><p>Cost of maintaining a more complex code base</p></li>
+<li><p>Cost of making decisions about whether or not to add a new language</p></li>
+<li><p>Higher cost to making content changes, creates work for language maintainers</p></li>
+<li><p>Any content change should be rolled out with enough delay to have translations in place</p></li>
+</ul>
+<p>Can we define a small enough set of pages and content that it makes sense to do this?
+Probably yes.</p>
+<p>Is there an easy to use tool to maintain translations and add them to the website?
+To be discussed - it needs investigating, and may depend on the choice of static site
+generator. One potential option is <a class="reference external" href="https://crowdin.com/pricing#annual">Crowdin</a>, which is free for open source projects.</p>
+</section>
+<section id="style-and-graphic-design">
+<h3>Style and graphic design<a class="headerlink" href="#style-and-graphic-design" title="Link to this heading">#</a></h3>
+<p>Beyond the “a modern, clean look” goal we choose to not specify too much.  A
+designer may have much better ideas than the authors of this proposal, hence we
+will work with the designer(s) during the implementation phase.</p>
+<p>The NumPy logo could use a touch-up.  The logo widely recognized and its colors and
+design are good, however the look-and-feel is perhaps a little dated.</p>
+</section>
+<section id="other-aspects">
+<h3>Other aspects<a class="headerlink" href="#other-aspects" title="Link to this heading">#</a></h3>
+<p>A search box would be nice to have.  The Sphinx documentation already has a
+search box, however a search box on the main site which provides search results
+for the docs, the website, and perhaps other domains that are relevant for
+NumPy would make sense.</p>
+</section>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>Given a static site generator is chosen, we will migrate away from Sphinx for
+numpy.org (the website, <em>not including the docs</em>). The current deployment can
+be preserved until a future deprecation date is decided (potentially based on
+the comfort level of our new site).</p>
+<p>All site generators listed above have visibility into the HTML and Javascript
+that is generated, and can continue to be maintained in the event a given
+project ceases to be maintained.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>Alternatives we considered for the overall design of the website:</p>
+<ol class="arabic simple">
+<li><p><em>Update current site.</em> A new Sphinx theme could be chosen. This would likely
+take the least amount of resources initially, however, Sphinx does not have
+the features we are looking for moving forward such as i18n, responsive design,
+and a clean, modern look.
+Note that updating the docs Sphinx theme is likely still a good idea - it’s
+orthogonal to this NEP though.</p></li>
+<li><p><em>Create custom site.</em> This would take the most amount of resources, and is
+likely to have additional benefit in comparison to a static site generator.
+All features would be able to be added at the cost of developer time.</p></li>
+</ol>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Pull request for this NEP (with a good amount of discussion): <a class="github reference external" href="https://github.com/numpy/numpy/pull/14032">numpy/numpy#14032</a></p></li>
+<li><p>Email about NEP for review: <a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2019-July/079856.html">https://mail.python.org/pipermail/numpy-discussion/2019-July/079856.html</a></p></li>
+<li><p>Proposal to accept this NEP: <a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2019-August/079889.html">https://mail.python.org/pipermail/numpy-discussion/2019-August/079889.html</a></p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#user-experience">User Experience</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-website">The Website</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#traffic">Traffic</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#possible-options-for-static-site-generators">Possible options for static site generators</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deployment">Deployment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#analytics">Analytics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#website-structure">Website Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stakeholder-content">Stakeholder Content</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#translation-multilingual-i18n">Translation (multilingual / i18n)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#style-and-graphic-design">Style and graphic design</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-aspects">Other aspects</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

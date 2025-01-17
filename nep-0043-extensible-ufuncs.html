@@ -1,0 +1,1773 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 43 — Enhancing the extensibility of UFuncs &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0043-extensible-ufuncs';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 53 — Evolving the NumPy C-API for NumPy 2.0" href="nep-0053-c-abi-evolution.html" />
+    <link rel="prev" title="Open NEPs (under consideration)" href="open.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 17, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="open.html" class="nav-link">Open NEPs (under consideration)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 43 — Enhancing the extensibility of UFuncs</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-43-enhancing-the-extensibility-of-ufuncs">
+<span id="nep43"></span><h1>NEP 43 — Enhancing the extensibility of UFuncs<a class="headerlink" href="#nep-43-enhancing-the-extensibility-of-ufuncs" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">title<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Enhancing the Extensibility of UFuncs</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sebastian Berg</p>
+</dd>
+<dt class="field-odd">Status<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Draft</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Standard</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2020-06-20</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This NEP is fourth in a series:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="nep-0040-legacy-datatype-impl.html#nep40"><span class="std std-ref">NEP 40</span></a> explains the shortcomings of NumPy’s dtype implementation.</p></li>
+<li><p><a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a> gives an overview of our proposed replacement.</p></li>
+<li><p><a class="reference internal" href="nep-0042-new-dtypes.html#nep42"><span class="std std-ref">NEP 42</span></a>  describes the new design’s datatype-related APIs.</p></li>
+<li><p>NEP 43 (this document) describes the new design’s API for universal functions.</p></li>
+</ul>
+</div>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>The previous NEP 42 proposes the creation of new DTypes which can
+be defined by users outside of NumPy itself.
+The implementation of NEP 42 will enable users to create arrays with a custom dtype
+and stored values.
+This NEP outlines how NumPy will operate on arrays with custom dtypes in the future.
+The most important functions operating on NumPy arrays are the so called
+“universal functions” (ufunc) which include all math functions, such as
+<code class="docutils literal notranslate"><span class="pre">np.add</span></code>, <code class="docutils literal notranslate"><span class="pre">np.multiply</span></code>, and even <code class="docutils literal notranslate"><span class="pre">np.matmul</span></code>.
+These ufuncs must operate efficiently on multiple arrays with
+different datatypes.</p>
+<p>This NEP proposes to expand the design of ufuncs.
+It makes a new distinction between the ufunc which can operate
+on many different dtypes such as floats or integers,
+and a new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> which defines the efficient operation for
+specific dtypes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Details of the private and external APIs may change to reflect user
+comments and implementation constraints. The underlying principles and
+choices should not change significantly.</p>
+</div>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>The goal of this NEP is to extend universal
+functions support the new DType system detailed in NEPs 41 and 42.
+While the main motivation is enabling new user-defined DTypes, this will
+also significantly simplify defining universal functions for NumPy strings or
+structured DTypes.
+Until now, these DTypes are not supported by any of NumPy’s functions
+(such as <code class="docutils literal notranslate"><span class="pre">np.add</span></code> or <code class="docutils literal notranslate"><span class="pre">np.equal</span></code>), due to difficulties arising from
+their parametric nature (compare NEP 41 and 42), e.g. the string length.</p>
+<p>Functions on arrays must handle a number of distinct steps which are
+described in more detail in section “<a class="reference internal" href="#steps-involved-in-a-ufunc-call">Steps involved in a UFunc call</a>”.
+The most important ones are:</p>
+<ul class="simple">
+<li><p>Organizing all functionality required to define a ufunc call for specific
+DTypes.  This is often called the “inner-loop”.</p></li>
+<li><p>Deal with input for which no exact matching implementation is found.
+For example when <code class="docutils literal notranslate"><span class="pre">int32</span></code> and <code class="docutils literal notranslate"><span class="pre">float64</span></code> are added, the <code class="docutils literal notranslate"><span class="pre">int32</span></code>
+is cast to <code class="docutils literal notranslate"><span class="pre">float64</span></code>.  This requires a distinct “promotion” step.</p></li>
+</ul>
+<p>After organizing and defining these, we need to:</p>
+<ul class="simple">
+<li><p>Define the user API for customizing both of the above points.</p></li>
+<li><p>Allow convenient reuse of existing functionality.
+For example a DType representing physical units, such as meters,
+should be able to fall back to NumPy’s existing math implementations.</p></li>
+</ul>
+<p>This NEP details how these requirements will be achieved in NumPy:</p>
+<ul class="simple">
+<li><p>All DTyper-specific functionality currently part of the ufunc
+definition will be defined as part of a new <a class="reference internal" href="#arraymethod">ArrayMethod</a> object.
+This <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> object will be the new, preferred, way to describe any
+function operating on arrays.</p></li>
+<li><p>Ufuncs will dispatch to the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> and potentially use promotion
+to find the correct <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> to use.
+This will be described in the <a class="reference internal" href="#id1">Promotion and dispatching</a> section.</p></li>
+</ul>
+<p>A new C-API will be outlined in each section. A future Python API is
+expected to be very similar and the C-API is presented in terms of Python
+code for readability.</p>
+<p>The NEP proposes a large, but necessary, refactor of the NumPy ufunc internals.
+This modernization will not affect end users directly and is not only a necessary
+step for new DTypes, but in itself a maintenance effort which is expected to
+help with future improvements to the ufunc machinery.</p>
+<p>While the most important restructure proposed is the new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>
+object, the largest long-term consideration is the API choice for
+promotion and dispatching.</p>
+</section>
+<section id="backwards-compatibility">
+<h2>Backwards compatibility<a class="headerlink" href="#backwards-compatibility" title="Link to this heading">#</a></h2>
+<p>The general backwards compatibility issues have also been listed
+previously in NEP 41.</p>
+<p>The vast majority of users should not see any changes beyond those typical
+for NumPy releases.
+There are three main users or use-cases impacted by the proposed changes:</p>
+<ol class="arabic simple">
+<li><p>The Numba package uses direct access to the NumPy C-loops and modifies
+the NumPy ufunc struct directly for its own purposes.</p></li>
+<li><p>Astropy uses its own “type resolver”, meaning that a default switch over
+from the existing type resolution to a new default Promoter requires care.</p></li>
+<li><p>It is currently possible to register loops for dtype <em>instances</em>.
+This is theoretically useful for structured dtypes and is a resolution
+step happening <em>after</em> the DType resolution step proposed here.</p></li>
+</ol>
+<p>This NEP will try hard to maintain backward compatibility as much as
+possible. However, both of these projects have signaled willingness to adapt
+to breaking changes.</p>
+<p>The main reason why NumPy will be able to provide backward compatibility
+is that:</p>
+<ul class="simple">
+<li><p>Existing inner-loops can be wrapped, adding an indirection to the call but
+maintaining full backwards compatibility.
+The <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> function can, in this case, search the existing
+inner-loop functions (which are stored on the ufunc directly) in order
+to maintain full compatibility even with potential direct structure access.</p></li>
+<li><p>Legacy type resolvers can be called as a fallback (potentially caching
+the result). The resolver may need to be called twice (once for the DType
+resolution and once for the <code class="docutils literal notranslate"><span class="pre">resolve_descriptor</span></code> implementation).</p></li>
+<li><p>The fallback to the legacy type resolver should in most cases handle loops
+defined for such structured dtype instances.  This is because if there is no
+other <code class="docutils literal notranslate"><span class="pre">np.Void</span></code> implementation, the legacy fallback will retain the old
+behaviour at least initially.</p></li>
+</ul>
+<p>The masked type resolvers specifically will <em>not</em> remain supported, but
+has no known users (including NumPy itself, which only uses the default
+version).</p>
+<p>Further, no compatibility attempt will be made for <em>calling</em> as opposed
+to providing either the normal or the masked type resolver.  As NumPy
+will use it only as a fallback.  There are no known users of this
+(undocumented) possibility.</p>
+<p>While the above changes potentially break some workflows,
+we believe that the long-term improvements vastly outweigh this.
+Further, packages such as astropy and Numba are capable of adapting so that
+end-users may need to update their libraries but not their code.</p>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>This NEP restructures how operations on NumPy arrays are defined both
+within NumPy and for external implementers.
+The NEP mainly concerns those who either extend ufuncs for custom DTypes
+or create custom ufuncs.  It does not aim to finalize all
+potential use-cases, but rather restructure NumPy to be extensible and allow
+addressing new issues or feature requests as they arise.</p>
+<section id="overview-and-end-user-api">
+<h3>Overview and end user API<a class="headerlink" href="#overview-and-end-user-api" title="Link to this heading">#</a></h3>
+<p>To give an overview of how this NEP proposes to structure ufuncs,
+the following describes the potential exposure of the proposed restructure
+to the end user.</p>
+<p>Universal functions are much like a Python method defined on the DType of
+the array when considering a ufunc with only a single input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">positive</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>could be implemented (conceptually) as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">positive_impl</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">positive</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">positive_impl</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, unlike methods, <code class="docutils literal notranslate"><span class="pre">positive_impl</span></code> is not stored on the dtype itself.
+It is rather the implementation of <code class="docutils literal notranslate"><span class="pre">np.positive</span></code> for a specific DType.
+Current NumPy partially exposes this “choice of implementation” using
+the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> (or more exact <code class="docutils literal notranslate"><span class="pre">signature</span></code>) attribute in universal functions,
+although these are rarely used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">positive</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>forces NumPy to use the <code class="docutils literal notranslate"><span class="pre">positive_impl</span></code> written specifically for the Float64
+DType.</p>
+<p>This NEP makes the distinction more explicit, by creating a new object to
+represent <code class="docutils literal notranslate"><span class="pre">positive_impl</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">positive_impl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">positive</span><span class="o">.</span><span class="n">resolve_impl</span><span class="p">((</span><span class="nb">type</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="kc">None</span><span class="p">))</span>
+<span class="c1"># The `None` represents the output DType which is automatically chosen.</span>
+</pre></div>
+</div>
+<p>While the creation of a <code class="docutils literal notranslate"><span class="pre">positive_impl</span></code> object and the <code class="docutils literal notranslate"><span class="pre">resolve_impl</span></code>
+method is part of this NEP, the following code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">positive_impl</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>may not be implemented initially and is not central to the redesign.</p>
+<p>In general NumPy universal functions can take many inputs.
+This requires looking up the implementation by considering all of them
+and makes ufuncs “multi-methods” with respect to the input DTypes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">add_impl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">resolve_impl</span><span class="p">((</span><span class="nb">type</span><span class="p">(</span><span class="n">arr1</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">arr2</span><span class="o">.</span><span class="n">dtype</span><span class="p">),</span> <span class="kc">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This NEP defines how <code class="docutils literal notranslate"><span class="pre">positive_impl</span></code> and <code class="docutils literal notranslate"><span class="pre">add_impl</span></code> will be represented
+as a new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> which can be implemented outside of NumPy.
+Further, it defines how <code class="docutils literal notranslate"><span class="pre">resolve_impl</span></code> will implement and solve dispatching
+and promotion.</p>
+<p>The reasons for this split may be more clear after reviewing the
+<a class="reference internal" href="#steps-involved-in-a-ufunc-call">Steps involved in a UFunc call</a> section.</p>
+</section>
+<section id="defining-a-new-ufunc-implementation">
+<h3>Defining a new ufunc implementation<a class="headerlink" href="#defining-a-new-ufunc-implementation" title="Link to this heading">#</a></h3>
+<p>The following is a mock-up of how a new implementation, in this case
+to define string equality, will be added to a ufunc.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">StringEquality</span><span class="p">(</span><span class="n">BoundArrayMethod</span><span class="p">):</span>
+    <span class="n">nin</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">nout</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># DTypes are stored on the BoundArrayMethod and not on the internal</span>
+    <span class="c1"># ArrayMethod, to reference cyles.</span>
+    <span class="n">DTypes</span> <span class="o">=</span> <span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Bool</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">ArrayMethod</span><span class="p">,</span> <span class="n">DTypes</span><span class="p">,</span> <span class="n">given_descrs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The strided loop supports all input string dtype instances</span>
+<span class="sd">        and always returns a boolean. (String is always native byte order.)</span>
+
+<span class="sd">        Defining this function is not necessary, since NumPy can provide</span>
+<span class="sd">        it by default.</span>
+
+<span class="sd">        The `self` argument here refers to the unbound array method, so</span>
+<span class="sd">        that DTypes are passed in explicitly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">given_descrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">DTypes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">given_descrs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">DTypes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">given_descrs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">given_descrs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">DTypes</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="n">out_descr</span> <span class="o">=</span> <span class="n">given_descrs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># preserve input (e.g. metadata)</span>
+        <span class="k">if</span> <span class="n">given_descrs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out_descr</span> <span class="o">=</span> <span class="n">DTypes</span><span class="p">[</span><span class="mi">2</span><span class="p">]()</span>
+
+        <span class="c1"># The operation is always &quot;no&quot; casting (most ufuncs are)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">given_descrs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">given_descrs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">out_descr</span><span class="p">),</span> <span class="s2">&quot;no&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">strided_loop</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">strides</span><span class="p">,</span> <span class="n">innerloop_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The 1-D strided loop, similar to those used in current ufuncs&quot;&quot;&quot;</span>
+        <span class="c1"># dimensions: Number of loop items and core dimensions</span>
+        <span class="c1"># data: Pointers to the array data.</span>
+        <span class="c1"># strides: strides to iterate all elements</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">dimensions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># number of items to loop over</span>
+        <span class="n">num_chars1</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">descriptors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="n">num_chars2</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">descriptors</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">itemsize</span>
+
+        <span class="c1"># C code using the above information to compare the strings in</span>
+        <span class="c1"># both arrays.  In particular, this loop requires the `num_chars1`</span>
+        <span class="c1"># and `num_chars2`.  Information which is currently not easily</span>
+        <span class="c1"># available.</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">equal</span><span class="o">.</span><span class="n">register_impl</span><span class="p">(</span><span class="n">StringEquality</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">StringEquality</span>  <span class="c1"># may be deleted.</span>
+</pre></div>
+</div>
+<p>This definition will be sufficient to create a new loop, and the
+structure allows for expansion in the future; something that is already
+required to implement casting within NumPy itself.
+We use <code class="docutils literal notranslate"><span class="pre">BoundArrayMethod</span></code> and a <code class="docutils literal notranslate"><span class="pre">context</span></code> structure here.  These
+are described and motivated in details later. Briefly:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">context</span></code> is a generalization of the <code class="docutils literal notranslate"><span class="pre">self</span></code> that Python passes to its
+methods.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">BoundArrayMethod</span></code> is equivalent to the Python distinction that
+<code class="docutils literal notranslate"><span class="pre">class.method</span></code> is a method, while <code class="docutils literal notranslate"><span class="pre">class().method</span></code> returns a “bound” method.</p></li>
+</ul>
+</section>
+<section id="customizing-dispatching-and-promotion">
+<h3>Customizing dispatching and Promotion<a class="headerlink" href="#customizing-dispatching-and-promotion" title="Link to this heading">#</a></h3>
+<p>Finding the correct implementation when <code class="docutils literal notranslate"><span class="pre">np.positive.resolve_impl()</span></code> is
+called is largely an implementation detail.
+But, in some cases it may be necessary to influence this process when no
+implementation matches the requested DTypes exactly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">multiple</span><span class="o">.</span><span class="n">resolve_impl</span><span class="p">((</span><span class="n">Timedelta64</span><span class="p">,</span> <span class="n">Int8</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>will not have an exact match, because NumPy only has an implementation for
+multiplying <code class="docutils literal notranslate"><span class="pre">Timedelta64</span></code> with <code class="docutils literal notranslate"><span class="pre">Int64</span></code>.
+In simple cases, NumPy will use a default promotion step to attempt to find
+the correct implementation, but to implement the above step, we will allow
+the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">promote_timedelta_integer</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">):</span>
+    <span class="n">new_dtypes</span> <span class="o">=</span> <span class="p">(</span><span class="n">Timdelta64</span><span class="p">,</span> <span class="n">Int64</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># Resolve again, using Int64:</span>
+    <span class="k">return</span> <span class="n">ufunc</span><span class="o">.</span><span class="n">resolve_impl</span><span class="p">(</span><span class="n">new_dtypes</span><span class="p">)</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">multiple</span><span class="o">.</span><span class="n">register_promoter</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">Timedelta64</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">promote_timedelta_integer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">Integer</span></code> is an abstract DType (compare NEP 42).</p>
+</section>
+</section>
+<section id="steps-involved-in-a-ufunc-call">
+<span id="steps-of-a-ufunc-call"></span><h2>Steps involved in a UFunc call<a class="headerlink" href="#steps-involved-in-a-ufunc-call" title="Link to this heading">#</a></h2>
+<p>Before going into more detailed API choices, it is helpful to review the
+steps involved in a call to a universal function in NumPy.</p>
+<p>A UFunc call is split into the following steps:</p>
+<ol class="arabic simple">
+<li><p>Handle <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> protocol:</p>
+<ul class="simple">
+<li><p>For array-likes such as a Dask arrays, NumPy can defer the operation.
+This step is performed first, and unaffected by this NEP (compare <a class="reference internal" href="nep-0018-array-function-protocol.html#nep18"><span class="std std-ref">NEP 18 — A dispatch mechanism for NumPy’s high level array functions</span></a>).</p></li>
+</ul>
+</li>
+<li><p>Promotion and dispatching</p>
+<ul class="simple">
+<li><p>Given the DTypes of all inputs, find the correct implementation.
+E.g. an implementation for <code class="docutils literal notranslate"><span class="pre">float64</span></code>, <code class="docutils literal notranslate"><span class="pre">int64</span></code> or a user-defined DType.</p></li>
+<li><p>When no exact implementation exists, <em>promotion</em> has to be performed.
+For example, adding a <code class="docutils literal notranslate"><span class="pre">float32</span></code> and a <code class="docutils literal notranslate"><span class="pre">float64</span></code> is implemented by
+first casting the <code class="docutils literal notranslate"><span class="pre">float32</span></code> to <code class="docutils literal notranslate"><span class="pre">float64</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Parametric <code class="docutils literal notranslate"><span class="pre">dtype</span></code> resolution:</p>
+<ul class="simple">
+<li><p>In general, whenever an output DType is parametric the parameters have
+to be found (resolved).</p></li>
+<li><p>For example, if a loop adds two strings, it is necessary to define the
+correct output (and possibly input) dtypes.  <code class="docutils literal notranslate"><span class="pre">S5</span> <span class="pre">+</span> <span class="pre">S4</span> <span class="pre">-&gt;</span> <span class="pre">S9</span></code>, while
+an <code class="docutils literal notranslate"><span class="pre">upper</span></code> function has the signature <code class="docutils literal notranslate"><span class="pre">S5</span> <span class="pre">-&gt;</span> <span class="pre">S5</span></code>.</p></li>
+<li><p>When they are not parametric, a default implementation is provided
+which fills in the default dtype instances (ensuring for example native
+byte order).</p></li>
+</ul>
+</li>
+<li><p>Preparing the iteration:</p>
+<ul class="simple">
+<li><p>This step is largely handled by <code class="docutils literal notranslate"><span class="pre">NpyIter</span></code> internally (the iterator).</p></li>
+<li><p>Allocate all outputs and temporary buffers necessary to perform casts.
+This <em>requires</em> the dtypes as resolved in step 3.</p></li>
+<li><p>Find the best iteration order, which includes information to efficiently
+implement broadcasting. For example, adding a single value to an array
+repeats the same value.</p></li>
+</ul>
+</li>
+<li><p>Setup and fetch the C-level function:</p>
+<ul class="simple">
+<li><p>If necessary, allocate temporary working space.</p></li>
+<li><p>Find the C-implemented, light weight, inner-loop function.
+Finding the inner-loop function can allow specialized implementations
+in the future.
+For example casting currently optimizes contiguous casts and
+reductions have optimizations that are currently handled
+inside the inner-loop function itself.</p></li>
+<li><p>Signal whether the inner-loop requires the Python API or whether
+the GIL may be released (to allow threading).</p></li>
+<li><p>Clear floating point exception flags.</p></li>
+</ul>
+</li>
+<li><p>Perform the actual calculation:</p>
+<ul class="simple">
+<li><p>Run the DType specific inner-loop function.</p></li>
+<li><p>The inner-loop may require access to additional data, such as dtypes or
+additional data set in the previous step.</p></li>
+<li><p>The inner-loop function may be called an undefined number of times.</p></li>
+</ul>
+</li>
+<li><p>Finalize:</p>
+<ul class="simple">
+<li><p>Free any temporary working space allocated in step 5.</p></li>
+<li><p>Check for floating point exception flags.</p></li>
+<li><p>Return the result.</p></li>
+</ul>
+</li>
+</ol>
+<p>The <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> provides a concept to group steps 3 to 6 and partially 7.
+However, implementers of a new ufunc or <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> usually do not need to
+customize the behaviour in steps 4 or 6 which NumPy can and does provide.
+For the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> implementer, the central steps to customize
+are step 3 and step 5.  These provide the custom inner-loop function and
+potentially inner-loop specific setup.
+Further customization is possible and anticipated as future extensions.</p>
+<p>Step 2. is promotion and dispatching and will be restructured
+with new API to allow customization of the process where necessary.</p>
+<p>Step 1 is listed for completeness and is unaffected by this NEP.</p>
+<p>The following sketch provides an overview of step 2 to 6 with an emphasize
+of how dtypes are handled and which parts are customizable (“Registered”)
+and which are handled by NumPy:</p>
+<figure class="align-center align-default">
+<img alt="_images/nep43-sketch.svg" src="_images/nep43-sketch.svg" /></figure>
+</section>
+<section id="arraymethod">
+<h2>ArrayMethod<a class="headerlink" href="#arraymethod" title="Link to this heading">#</a></h2>
+<p>A central proposal of this NEP is the creation of the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> as an object
+describing each implementation specific to a given set of DTypes.
+We use the <code class="docutils literal notranslate"><span class="pre">class</span></code> syntax to describe the information required to create
+a new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ArrayMethod</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># Name, mainly useful for debugging</span>
+
+    <span class="c1"># Casting safety information (almost always &quot;safe&quot;, necessary to</span>
+    <span class="c1"># unify casting and universal functions)</span>
+    <span class="n">casting</span><span class="p">:</span> <span class="n">Casting</span> <span class="o">=</span> <span class="s2">&quot;no&quot;</span>
+
+    <span class="c1"># More general flags:</span>
+    <span class="n">flags</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">Tuple</span><span class="p">[</span><span class="n">DTypeMeta</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DType</span><span class="o">|</span><span class="kc">None</span><span class="p">]:</span> <span class="n">given_descrs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Casting</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DType</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the safety of the operation (casting safety) and the</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># A default implementation can be provided for non-parametric</span>
+        <span class="c1"># output dtypes.</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_loop</span><span class="p">(</span><span class="n">Context</span> <span class="p">:</span> <span class="n">context</span><span class="p">,</span> <span class="n">strides</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">strided_loop_function</span><span class="p">,</span> <span class="n">flags</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the low-level C (strided inner-loop) function which</span>
+<span class="sd">        performs the actual operation.</span>
+
+<span class="sd">        This method may initially private, users will be able to provide</span>
+<span class="sd">        a set of optimized inner-loop functions instead:</span>
+
+<span class="sd">        * `strided_inner_loop`</span>
+<span class="sd">        * `contiguous_inner_loop`</span>
+<span class="sd">        * `unaligned_strided_loop`</span>
+<span class="sd">        * ...</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">strided_inner_loop</span><span class="p">(</span>
+            <span class="n">Context</span> <span class="p">:</span> <span class="n">context</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">strides</span><span class="p">,</span> <span class="n">innerloop_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The inner-loop (equivalent to the current ufunc loop)</span>
+<span class="sd">        which is returned by the default `get_loop()` implementation.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">Context</span></code> providing mostly static information about the function call:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">:</span>
+    <span class="c1"># The ArrayMethod object itself:</span>
+    <span class="n">ArrayMethod</span> <span class="p">:</span> <span class="n">method</span>
+
+    <span class="c1"># Information about the caller, e.g. the ufunc, such as `np.add`:</span>
+    <span class="nb">callable</span> <span class="p">:</span> <span class="n">caller</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># The number of input arguments:</span>
+    <span class="nb">int</span> <span class="p">:</span> <span class="n">nin</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># The number of output arguments:</span>
+    <span class="nb">int</span> <span class="p">:</span> <span class="n">nout</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># The actual dtypes instances the inner-loop operates on:</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">DType</span><span class="p">]</span> <span class="p">:</span> <span class="n">descriptors</span>
+
+    <span class="c1"># Any additional information required. In the future, this will</span>
+    <span class="c1"># generalize or duplicate things currently stored on the ufunc:</span>
+    <span class="c1">#  - The ufunc signature of generalized ufuncs</span>
+    <span class="c1">#  - The identity used for reductions</span>
+</pre></div>
+</div>
+<p>And <code class="docutils literal notranslate"><span class="pre">flags</span></code> stored properties, for whether:</p>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> supports unaligned input and output arrays</p></li>
+<li><p>the inner-loop function requires the Python API (GIL)</p></li>
+<li><p>NumPy has to check the floating point error CPU flags.</p></li>
+</ul>
+<p><em>Note: More information is expected to be added as necessary.</em></p>
+<section id="the-call-context">
+<h3>The call <code class="docutils literal notranslate"><span class="pre">Context</span></code><a class="headerlink" href="#the-call-context" title="Link to this heading">#</a></h3>
+<p>The “context” object is analogous to Python’s <code class="docutils literal notranslate"><span class="pre">self</span></code> that is
+passed to all methods.
+To understand why the “context” object is necessary and its
+internal structure, it is helpful to remember
+that a Python method can be written in the following way
+(see also the <a class="reference external" href="https://docs.python.org/3.8/reference/datamodel.html#object.__get__">documentation of __get__</a>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BoundMethod</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">method</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Method</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span> <span class="o">=</span> <span class="n">function</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># unsupported here</span>
+        <span class="k">return</span> <span class="n">BoundMethod</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With which the following <code class="docutils literal notranslate"><span class="pre">method1</span></code> and <code class="docutils literal notranslate"><span class="pre">method2</span></code> below, behave identically:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyClass</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">method1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="n">method2</span> <span class="o">=</span> <span class="n">Method</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And both will print the same result:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">myinstance</span> <span class="o">=</span> <span class="n">MyClass</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myinstance</span><span class="o">.</span><span class="n">method1</span><span class="p">()</span>
+<span class="go">&lt;__main__.MyClass object at 0x7eff65436d00&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myinstance</span><span class="o">.</span><span class="n">method2</span><span class="p">()</span>
+<span class="go">&lt;__main__.MyClass object at 0x7eff65436d00&gt;</span>
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">self.instance</span></code> would be all information passed on by <code class="docutils literal notranslate"><span class="pre">Context</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">Context</span></code> is a generalization and has to pass additional information:</p>
+<ul class="simple">
+<li><p>Unlike a method which operates on a single class instance, the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>
+operates on many input arrays and thus multiple dtypes.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">__call__</span></code> of the <code class="docutils literal notranslate"><span class="pre">BoundMethod</span></code> above contains only a single call
+to a function. But an <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> has to call <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code>
+and later pass on that information to the inner-loop function.</p></li>
+<li><p>A Python function has no state except that defined by its outer scope.
+Within C, <code class="docutils literal notranslate"><span class="pre">Context</span></code> is able to provide additional state if necessary.</p></li>
+</ul>
+<p>Just as Python requires the distinction of a method and a bound method,
+NumPy will have a <code class="docutils literal notranslate"><span class="pre">BoundArrayMethod</span></code>.
+This stores all of the constant information that is part of the <code class="docutils literal notranslate"><span class="pre">Context</span></code>,
+such as:</p>
+<ul class="simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">DTypes</span></code></p></li>
+<li><p>the number of input and output arguments</p></li>
+<li><p>the ufunc signature (specific to generalized ufuncs, compare <a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html#nep20"><span class="std std-ref">NEP 20 — Expansion of generalized universal function signatures</span></a>).</p></li>
+</ul>
+<p>Fortunately, most users and even ufunc implementers will not have to worry
+about these internal details; just like few Python users need to know
+about the <code class="docutils literal notranslate"><span class="pre">__get__</span></code> dunder method.
+The <code class="docutils literal notranslate"><span class="pre">Context</span></code> object or C-structure provides all necessary data to the
+fast C-functions and NumPy API creates the new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> or
+<code class="docutils literal notranslate"><span class="pre">BoundArrayMethod</span></code> as required.</p>
+</section>
+<section id="arraymethod-specifications">
+<span id="arraymethod-specs"></span><h3>ArrayMethod specifications<a class="headerlink" href="#arraymethod-specifications" title="Link to this heading">#</a></h3>
+<p>These specifications provide a minimal initial C-API, which shall be expanded
+in the future, for example to allow specialized inner-loops.</p>
+<p>Briefly, NumPy currently relies on strided inner-loops and this
+will be the only allowed method of defining a ufunc initially.
+We expect the addition of a <code class="docutils literal notranslate"><span class="pre">setup</span></code> function or exposure of <code class="docutils literal notranslate"><span class="pre">get_loop</span></code>
+in the future.</p>
+<p>UFuncs require the same information as casting, giving the following
+definitions (see also <a class="reference internal" href="nep-0042-new-dtypes.html#nep42"><span class="std std-ref">NEP 42</span></a> <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code>):</p>
+<ul>
+<li><p>A new structure to be passed to the resolve function and inner-loop:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">PyObject</span><span class="w"> </span><span class="o">*</span><span class="n">caller</span><span class="p">;</span><span class="w">  </span><span class="cm">/* The ufunc object */</span>
+<span class="w">    </span><span class="n">PyArrayMethodObject</span><span class="w"> </span><span class="o">*</span><span class="n">method</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">nin</span><span class="p">,</span><span class="w"> </span><span class="n">nout</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">PyArray_DTypeMeta</span><span class="w"> </span><span class="o">**</span><span class="n">dtypes</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/* Operand descriptors, filled in by resolve_desciptors */</span>
+<span class="w">    </span><span class="n">PyArray_Descr</span><span class="w"> </span><span class="o">**</span><span class="n">descriptors</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">reserved</span><span class="p">;</span><span class="w">  </span><span class="c1">// For Potential in threading (Interpreter state)</span>
+<span class="p">}</span><span class="w"> </span><span class="n">PyArrayMethod_Context</span>
+</pre></div>
+</div>
+<p>This structure may be appended to include additional information in future
+versions of NumPy and includes all constant loop metadata.</p>
+<p>We could version this structure, although it may be simpler to version
+the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> itself.</p>
+</li>
+<li><p>Similar to casting, ufuncs may need to find the correct loop dtype
+or indicate that a loop is only capable of handling certain instances of
+the involved DTypes (e.g. only native byteorder).  This is handled by
+a <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function (identical to the <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code>
+of <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code>):</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">NPY_CASTING</span>
+<span class="nf">resolve_descriptors</span><span class="p">(</span>
+<span class="w">        </span><span class="n">PyArrayMethodObject</span><span class="w"> </span><span class="o">*</span><span class="n">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">PyArray_DTypeMeta</span><span class="w"> </span><span class="o">*</span><span class="n">dtypes</span><span class="p">,</span>
+<span class="w">        </span><span class="n">PyArray_Descr</span><span class="w"> </span><span class="o">*</span><span class="n">given_dtypes</span><span class="p">[</span><span class="n">nin</span><span class="o">+</span><span class="n">nout</span><span class="p">],</span>
+<span class="w">        </span><span class="n">PyArray_Descr</span><span class="w"> </span><span class="o">*</span><span class="n">loop_dtypes</span><span class="p">[</span><span class="n">nin</span><span class="o">+</span><span class="n">nout</span><span class="p">]);</span>
+</pre></div>
+</div>
+<p>The function fills <code class="docutils literal notranslate"><span class="pre">loop_dtypes</span></code> based on the given <code class="docutils literal notranslate"><span class="pre">given_dtypes</span></code>.
+This requires filling in the descriptor of the output(s).
+Often also the input descriptor(s) have to be found, e.g. to ensure native
+byteorder when needed by the inner-loop.</p>
+<p>In most cases an <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> will have non-parametric output DTypes
+so that a default implementation can be provided.</p>
+</li>
+<li><p>An additional <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*user_data</span></code> will usually be typed to extend
+the existing <code class="docutils literal notranslate"><span class="pre">NpyAuxData</span> <span class="pre">*</span></code> struct:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">NpyAuxData_FreeFunc</span><span class="w"> </span><span class="o">*</span><span class="n">free</span><span class="p">;</span>
+<span class="w">    </span><span class="n">NpyAuxData_CloneFunc</span><span class="w"> </span><span class="o">*</span><span class="n">clone</span><span class="p">;</span>
+<span class="w">    </span><span class="cm">/* To allow for a bit of expansion without breaking the ABI */</span>
+<span class="w">   </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">reserved</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="p">}</span><span class="w"> </span><span class="n">NpyAuxData</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This struct is currently mainly used for the NumPy internal casting
+machinery and as of now both <code class="docutils literal notranslate"><span class="pre">free</span></code> and <code class="docutils literal notranslate"><span class="pre">clone</span></code> must be provided,
+although this could be relaxed.</p>
+<p>Unlike NumPy casts, the vast majority of ufuncs currently do not require
+this additional scratch-space, but may need simple flagging capability
+for example for implementing warnings (see Error and Warning Handling below).
+To simplify this NumPy will pass a single zero initialized <code class="docutils literal notranslate"><span class="pre">npy_intp</span> <span class="pre">*</span></code>
+when <code class="docutils literal notranslate"><span class="pre">user_data</span></code> is not set.
+<em>Note that it would be possible to pass this as part of Context.</em></p>
+</li>
+<li><p>The optional <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> function will not be public initially, to avoid
+finalizing the API which requires design choices also with casting:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">innerloop</span><span class="w"> </span><span class="o">*</span>
+<span class="nf">get_loop</span><span class="p">(</span>
+<span class="w">    </span><span class="n">PyArrayMethod_Context</span><span class="w"> </span><span class="o">*</span><span class="n">context</span><span class="p">,</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">aligned</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">move_references</span><span class="p">,</span>
+<span class="w">    </span><span class="n">npy_intp</span><span class="w"> </span><span class="o">*</span><span class="n">strides</span><span class="p">,</span>
+<span class="w">    </span><span class="n">PyArray_StridedUnaryOp</span><span class="w"> </span><span class="o">**</span><span class="n">out_loop</span><span class="p">,</span>
+<span class="w">    </span><span class="n">NpyAuxData</span><span class="w"> </span><span class="o">**</span><span class="n">innerloop_data</span><span class="p">,</span>
+<span class="w">    </span><span class="n">NPY_ARRAYMETHOD_FLAGS</span><span class="w"> </span><span class="o">*</span><span class="n">flags</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">NPY_ARRAYMETHOD_FLAGS</span></code> can indicate whether the Python API is required
+and floating point errors must be checked. <code class="docutils literal notranslate"><span class="pre">move_references</span></code> is used
+internally for NumPy casting at this time.</p>
+</li>
+<li><p>The inner-loop function:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="nf">inner_loop</span><span class="p">(</span><span class="n">PyArrayMethod_Context</span><span class="w"> </span><span class="o">*</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">innerloop_data</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Will have the identical signature to current inner-loops with the following
+changes:</p>
+<ul class="simple">
+<li><p>A return value to indicate an error when returning <code class="docutils literal notranslate"><span class="pre">-1</span></code> instead of <code class="docutils literal notranslate"><span class="pre">0</span></code>.
+When returning <code class="docutils literal notranslate"><span class="pre">-1</span></code> a Python error must be set.</p></li>
+<li><p>The new first argument <code class="docutils literal notranslate"><span class="pre">PyArrayMethod_Context</span> <span class="pre">*</span></code> is used to pass in
+potentially required information about the ufunc or descriptors in a
+convenient way.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">*innerloop_data</span></code> will be the <code class="docutils literal notranslate"><span class="pre">NpyAuxData</span> <span class="pre">**innerloop_data</span></code> as set by
+<code class="docutils literal notranslate"><span class="pre">get_loop</span></code>.  If <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> does not set <code class="docutils literal notranslate"><span class="pre">innerloop_data</span></code> an <code class="docutils literal notranslate"><span class="pre">npy_intp</span> <span class="pre">*</span></code>
+is passed instead (see <a class="reference internal" href="#error-handling">Error Handling</a> below for the motivation).</p></li>
+</ul>
+<p><em>Note:</em> Since <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> is expected to be private, the exact implementation
+of <code class="docutils literal notranslate"><span class="pre">innerloop_data</span></code> can be modified until final exposure.</p>
+</li>
+</ul>
+<p>Creation of a new <code class="docutils literal notranslate"><span class="pre">BoundArrayMethod</span></code> will use a <code class="docutils literal notranslate"><span class="pre">PyArrayMethod_FromSpec()</span></code>
+function.  A shorthand will allow direct registration to a ufunc using
+<code class="docutils literal notranslate"><span class="pre">PyUFunc_AddImplementationFromSpec()</span></code>.  The specification is expected
+to contain the following (this may extend in the future):</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">name</span><span class="p">;</span><span class="w">  </span><span class="cm">/* Generic name, mainly for debugging */</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">nin</span><span class="p">,</span><span class="w"> </span><span class="n">nout</span><span class="p">;</span>
+<span class="w">    </span><span class="n">NPY_CASTING</span><span class="w"> </span><span class="n">casting</span><span class="p">;</span>
+<span class="w">    </span><span class="n">NPY_ARRAYMETHOD_FLAGS</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span>
+<span class="w">    </span><span class="n">PyArray_DTypeMeta</span><span class="w"> </span><span class="o">**</span><span class="n">dtypes</span><span class="p">;</span>
+<span class="w">    </span><span class="n">PyType_Slot</span><span class="w"> </span><span class="o">*</span><span class="n">slots</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">PyArrayMethod_Spec</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="discussion-and-alternatives">
+<h3>Discussion and alternatives<a class="headerlink" href="#discussion-and-alternatives" title="Link to this heading">#</a></h3>
+<p>The above split into an <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> and <code class="docutils literal notranslate"><span class="pre">Context</span></code> and the additional
+requirement of a <code class="docutils literal notranslate"><span class="pre">BoundArrayMethod</span></code> is a necessary split mirroring the
+implementation of methods and bound methods in Python.</p>
+<p>One reason for this requirement is that it allows storing the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>
+object in many cases without holding references to the <code class="docutils literal notranslate"><span class="pre">DTypes</span></code> which may
+be important if DTypes are created (and deleted) dynamically.
+(This is a complex topic, which does not have a complete solution in current
+Python, but the approach solves the issue with respect to casting.)</p>
+<p>There seem to be no alternatives to this structure.  Separating the
+DType-specific steps from the general ufunc dispatching and promotion is
+absolutely necessary to allow future extension and flexibility.
+Furthermore, it allows unifying casting and ufuncs.</p>
+<p>Since the structure of <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> and <code class="docutils literal notranslate"><span class="pre">BoundArrayMethod</span></code> will be
+opaque and can be extended, there are few long-term design implications aside
+from the choice of making them Python objects.</p>
+<section id="resolve-descriptors">
+<h4><code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code><a class="headerlink" href="#resolve-descriptors" title="Link to this heading">#</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> method is possibly the main innovation of this
+NEP and it is central also in the implementation of casting in NEP 42.</p>
+<p>By ensuring that every <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> provides <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> we
+define a unified, clear API for step 3 in <a class="reference internal" href="#steps-involved-in-a-ufunc-call">Steps involved in a UFunc call</a>.
+This step is required to allocate output arrays and has to happen before
+casting can be prepared.</p>
+<p>While the returned casting-safety (<code class="docutils literal notranslate"><span class="pre">NPY_CASTING</span></code>) will almost always be
+“no” for universal functions, including it has two big advantages:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">-1</span></code> indicates that an error occurred. If a Python error is set, it will
+be raised.  If no Python error is set this will be considered an “impossible”
+cast and a custom error will be set. (This distinction is important for the
+<code class="docutils literal notranslate"><span class="pre">np.can_cast()</span></code> function, which should raise the first one and return
+<code class="docutils literal notranslate"><span class="pre">False</span></code> in the second case, it is not noteworthy for typical ufuncs).
+<em>This point is under consideration, we may use -1 to indicate
+a general error, and use a different return value for an impossible cast.</em></p></li>
+<li><p>Returning the casting safety is central to NEP 42 for casting and
+allows the unmodified use of <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> there.</p></li>
+<li><p>There may be a future desire to implement fast but unsafe implementations.
+For example for <code class="docutils literal notranslate"><span class="pre">int64</span> <span class="pre">+</span> <span class="pre">int64</span> <span class="pre">-&gt;</span> <span class="pre">int32</span></code> which is unsafe from a casting
+perspective. Currently, this would use <code class="docutils literal notranslate"><span class="pre">int64</span> <span class="pre">+</span> <span class="pre">int64</span> <span class="pre">-&gt;</span> <span class="pre">int64</span></code> and then
+cast to <code class="docutils literal notranslate"><span class="pre">int32</span></code>. An implementation that skips the cast would
+have to signal that it effectively includes the “same-kind” cast and is
+thus not considered “no”.</p></li>
+</ul>
+</section>
+<section id="get-loop-method">
+<h4><code class="docutils literal notranslate"><span class="pre">get_loop</span></code> method<a class="headerlink" href="#get-loop-method" title="Link to this heading">#</a></h4>
+<p>Currently, NumPy ufuncs typically only provide a single strided loop, so that
+the <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> method may seem unnecessary.
+For this reason we plan for <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> to be a private function initially.</p>
+<p>However, <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> is required for casting where specialized loops are
+used even beyond strided and contiguous loops.
+Thus, the <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> function must be a full replacement for
+the internal <code class="docutils literal notranslate"><span class="pre">PyArray_GetDTypeTransferFunction</span></code>.</p>
+<p>In the future, <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> may be made public or a new <code class="docutils literal notranslate"><span class="pre">setup</span></code> function
+be exposed to allow more control, for example to allow allocating
+working memory.
+Further, we could expand <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> and allow the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> implementer
+to also control the outer iteration and not only the 1-D inner-loop.</p>
+</section>
+<section id="extending-the-inner-loop-signature">
+<h4>Extending the inner-loop signature<a class="headerlink" href="#extending-the-inner-loop-signature" title="Link to this heading">#</a></h4>
+<p>Extending the inner-loop signature is another central and necessary part of
+the NEP.</p>
+<p><strong>Passing in the Context:</strong></p>
+<p>Passing in the <code class="docutils literal notranslate"><span class="pre">Context</span></code> potentially allows for the future extension of
+the signature by adding new fields to the context struct.
+Furthermore it provides direct access to the dtype instances which
+the inner-loop operates on.
+This is necessary information for parametric dtypes since for example comparing
+two strings requires knowing the length of both strings.
+The <code class="docutils literal notranslate"><span class="pre">Context</span></code> can also hold potentially useful information such as the
+original <code class="docutils literal notranslate"><span class="pre">ufunc</span></code>, which can be helpful when reporting errors.</p>
+<p>In principle passing in Context is not necessary, as all information could be
+included in <code class="docutils literal notranslate"><span class="pre">innerloop_data</span></code> and set up in the <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> function.
+In this NEP we propose passing the struct to simplify creation of loops for
+parametric DTypes.</p>
+<p><strong>Passing in user data:</strong></p>
+<p>The current casting implementation uses the existing <code class="docutils literal notranslate"><span class="pre">NpyAuxData</span> <span class="pre">*</span></code> to pass
+in additional data as defined by <code class="docutils literal notranslate"><span class="pre">get_loop</span></code>.
+There are certainly alternatives to the use of this structure, but it
+provides a simple solution, which is already used in NumPy and public API.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NpyAyxData</span> <span class="pre">*</span></code> is a light weight, allocated structure and since it already
+exists in NumPy for this purpose, it seems a natural choice.
+To simplify some use-cases (see “Error Handling” below), we will pass a
+<code class="docutils literal notranslate"><span class="pre">npy_intp</span> <span class="pre">*innerloop_data</span> <span class="pre">=</span> <span class="pre">0</span></code> instead when <code class="docutils literal notranslate"><span class="pre">innerloop_data</span></code> is not provided.</p>
+<p><em>Note:</em> Since <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> is expected to be private initially we can gain
+experience with <code class="docutils literal notranslate"><span class="pre">innerloop_data</span></code> before exposing it as public API.</p>
+<p><strong>Return value:</strong></p>
+<p>The return value to indicate an error is an important, but currently missing
+feature in NumPy. The error handling is further complicated by the way
+CPUs signal floating point errors.
+Both are discussed in the next section.</p>
+<section id="error-handling">
+<h5>Error handling<a class="headerlink" href="#error-handling" title="Link to this heading">#</a></h5>
+<p>We expect that future inner-loops will generally set Python errors as soon
+as an error is found. This is complicated when the inner-loop is run without
+locking the GIL.  In this case the function will have to lock the GIL,
+set the Python error and return <code class="docutils literal notranslate"><span class="pre">-1</span></code> to indicate an error occurred::</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span>
+<span class="nf">inner_loop</span><span class="p">(</span><span class="n">PyArrayMethod_Context</span><span class="w"> </span><span class="o">*</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">innerloop_data</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">NPY_ALLOW_C_API_DEF</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">npy_intp</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="cm">/* calculation */</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">error_occurred</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">NPY_ALLOW_C_API</span><span class="p">;</span>
+<span class="w">            </span><span class="n">PyErr_SetString</span><span class="p">(</span><span class="n">PyExc_ValueError</span><span class="p">,</span>
+<span class="w">                </span><span class="s">&quot;Error occurred inside inner_loop.&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="n">NPY_DISABLE_C_API</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Floating point errors are special, since they require checking the hardware
+state which is too expensive if done within the inner-loop function itself.
+Thus, NumPy will handle these if flagged by the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>.
+An <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> should never cause floating point error flags to be set
+if it flags that these should not be checked. This could interfere when
+calling multiple functions; in particular when casting is necessary.</p>
+<p>An alternative solution would be to allow setting the error only at the later
+finalization step when NumPy will also check the floating point error flags.</p>
+<p>We decided against this pattern at this time. It seems more complex and
+generally unnecessary.
+While safely grabbing the GIL in the loop may require passing in an additional
+<code class="docutils literal notranslate"><span class="pre">PyThreadState</span></code> or <code class="docutils literal notranslate"><span class="pre">PyInterpreterState</span></code> in the future (for subinterpreter
+support), this is acceptable and can be anticipated.
+Setting the error at a later point would add complexity: for instance
+if an operation is paused (which can currently happen for casting in particular),
+the error check needs to run explicitly ever time this happens.</p>
+<p>We expect that setting errors immediately is the easiest and most convenient
+solution and more complex solution may be possible future extensions.</p>
+<p>Handling <em>warnings</em> is slightly more complex: A warning should be
+given exactly once for each function call (i.e. for the whole array) even
+if naively it would be given many times.
+To simplify such a use case, we will pass in <code class="docutils literal notranslate"><span class="pre">npy_intp</span> <span class="pre">*innerloop_data</span> <span class="pre">=</span> <span class="pre">0</span></code>
+by default which can be used to store flags (or other simple persistent data).
+For instance, we could imagine an integer multiplication loop which warns
+when an overflow occurred:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span>
+<span class="nf">integer_multiply</span><span class="p">(</span><span class="n">PyArrayMethod_Context</span><span class="w"> </span><span class="o">*</span><span class="n">context</span><span class="p">,</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="n">npy_intp</span><span class="w"> </span><span class="o">*</span><span class="n">innerloop_data</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">overflow</span><span class="p">;</span>
+<span class="w">    </span><span class="n">NPY_ALLOW_C_API_DEF</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">npy_intp</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">multiply_integers</span><span class="p">(</span><span class="o">*</span><span class="n">in1</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">in2</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">overflow</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">overflow</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!*</span><span class="n">innerloop_data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">NPY_ALLOW_C_API</span><span class="p">;</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">PyErr_Warn</span><span class="p">(</span><span class="n">PyExc_UserWarning</span><span class="p">,</span>
+<span class="w">                    </span><span class="s">&quot;Integer overflow detected.&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">NPY_DISABLE_C_API</span>
+<span class="w">                </span><span class="k">return</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="o">*</span><span class="n">innerloop_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">            </span><span class="n">NPY_DISABLE_C_API</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><em>TODO:</em> The idea of passing an <code class="docutils literal notranslate"><span class="pre">npy_intp</span></code> scratch space when <code class="docutils literal notranslate"><span class="pre">innerloop_data</span></code>
+is not set seems convenient, but I am uncertain about it, since I am not
+aware of any similar prior art.  This “scratch space” could also be part of
+the <code class="docutils literal notranslate"><span class="pre">context</span></code> in principle.</p>
+</section>
+</section>
+</section>
+<section id="reusing-existing-loops-implementations">
+<h3>Reusing existing loops/implementations<a class="headerlink" href="#reusing-existing-loops-implementations" title="Link to this heading">#</a></h3>
+<p>For many DTypes the above definition for adding additional C-level loops will be
+sufficient and require no more than a single strided loop implementation
+and if the loop works with parametric DTypes, the
+<code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function <em>must</em> additionally be provided.</p>
+<p>However, in some use-cases it is desirable to call back to an existing implementation.
+In Python, this could be achieved by simply calling into the original ufunc.</p>
+<p>For better performance in C, and for large arrays, it is desirable to reuse
+an existing <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> as directly as possible, so that its inner-loop function
+can be used directly without additional overhead.
+We will thus allow to create a new, wrapping, <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> from an existing
+<code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>.</p>
+<p>This wrapped <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> will have two additional methods:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">view_inputs(Tuple[DType]:</span> <span class="pre">input_descr)</span> <span class="pre">-&gt;</span> <span class="pre">Tuple[DType]</span></code> replacing the
+user input descriptors with descriptors matching the wrapped loop.
+It must be possible to <em>view</em> the inputs as the output.
+For example for <code class="docutils literal notranslate"><span class="pre">Unit[Float64](&quot;m&quot;)</span> <span class="pre">+</span> <span class="pre">Unit[Float32](&quot;km&quot;)</span></code> this will
+return <code class="docutils literal notranslate"><span class="pre">float64</span> <span class="pre">+</span> <span class="pre">int32</span></code>. The original <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> will
+convert this to <code class="docutils literal notranslate"><span class="pre">float64</span> <span class="pre">+</span> <span class="pre">float64</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">wrap_outputs(Tuple[DType]:</span> <span class="pre">input_descr)</span> <span class="pre">-&gt;</span> <span class="pre">Tuple[DType]</span></code> replacing the
+resolved descriptors with the desired actual loop descriptors.
+The original <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function will be called between these
+two calls, so that the output descriptors may not be set in the first call.
+In the above example it will use the <code class="docutils literal notranslate"><span class="pre">float64</span></code> as returned (which might
+have changed the byte-order), and further resolve the physical unit making
+the final signature:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Unit</span><span class="p">[</span><span class="n">Float64</span><span class="p">](</span><span class="s2">&quot;m&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Unit</span><span class="p">[</span><span class="n">Float64</span><span class="p">](</span><span class="s2">&quot;m&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Unit</span><span class="p">[</span><span class="n">Float64</span><span class="p">](</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>the UFunc machinery will take care of casting the “km” input to “m”.</p>
+</li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">view_inputs</span></code> method allows passing the correct inputs into the
+original <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function, while <code class="docutils literal notranslate"><span class="pre">wrap_outputs</span></code> ensures
+the correct descriptors are used for output allocation and input buffering casts.</p>
+<p>An important use-case for this is that of an abstract Unit DType
+with subclasses for each numeric dtype (which could be dynamically created):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Unit</span><span class="p">[</span><span class="n">Float64</span><span class="p">](</span><span class="s2">&quot;m&quot;</span><span class="p">)</span>
+<span class="c1"># with Unit[Float64] being the concrete DType:</span>
+<span class="nb">isinstance</span><span class="p">(</span><span class="n">Unit</span><span class="p">[</span><span class="n">Float64</span><span class="p">],</span> <span class="n">Unit</span><span class="p">)</span>  <span class="c1"># is True</span>
+</pre></div>
+</div>
+<p>Such a <code class="docutils literal notranslate"><span class="pre">Unit[Float64](&quot;m&quot;)</span></code> instance has a well-defined signature with
+respect to type promotion.
+The author of the <code class="docutils literal notranslate"><span class="pre">Unit</span></code> DType can implement most necessary logic by
+wrapping the existing math functions and using the two additional methods
+above.
+Using the <em>promotion</em> step, this will allow to create a register a single
+promoter for the abstract <code class="docutils literal notranslate"><span class="pre">Unit</span></code> DType with the <code class="docutils literal notranslate"><span class="pre">ufunc</span></code>.
+The promoter can then add the wrapped concrete <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> dynamically
+at promotion time, and NumPy can cache (or store it) after the first call.</p>
+<p><strong>Alternative use-case:</strong></p>
+<p>A different use-case is that of a <code class="docutils literal notranslate"><span class="pre">Unit(float64,</span> <span class="pre">&quot;m&quot;)</span></code> DType, where
+the numerical type is part of the DType parameter.
+This approach is possible, but will require a custom <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>
+which wraps existing loops.
+It must also always require two steps of dispatching (one to the <code class="docutils literal notranslate"><span class="pre">Unit</span></code>
+DType and a second one for the numerical type).</p>
+<p>Furthermore, the efficient implementation will require the ability to
+fetch and reuse the inner-loop function from another <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>.
+(Which is probably necessary for users like Numba, but it is uncertain
+whether it should be a common pattern and it cannot be accessible from
+Python itself.)</p>
+</section>
+</section>
+<section id="promotion-and-dispatching">
+<span id="id1"></span><h2>Promotion and dispatching<a class="headerlink" href="#promotion-and-dispatching" title="Link to this heading">#</a></h2>
+<p>NumPy ufuncs are multi-methods in the sense that they operate on (or with)
+multiple DTypes at once.
+While the input (and output) dtypes are attached to NumPy arrays,
+the <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> type itself does not carry the information of which
+function to apply to the data.</p>
+<p>For example, given the input:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">int_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<span class="n">float_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">int_arr</span><span class="p">,</span> <span class="n">float_arr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>has to find the correct <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> to perform the operation.
+Ideally, there is an exact match defined, e.g. for <code class="docutils literal notranslate"><span class="pre">np.add(int_arr,</span> <span class="pre">int_arr)</span></code>
+the <code class="docutils literal notranslate"><span class="pre">ArrayMethod[Int64,</span> <span class="pre">Int64,</span> <span class="pre">out=Int64]</span></code> matches exactly and can be used.
+However, for <code class="docutils literal notranslate"><span class="pre">np.add(int_arr,</span> <span class="pre">float_arr)</span></code> there is no direct match,
+requiring a promotion step.</p>
+<section id="promotion-and-dispatching-process">
+<h3>Promotion and dispatching process<a class="headerlink" href="#promotion-and-dispatching-process" title="Link to this heading">#</a></h3>
+<p>In general the <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> is found by searching for an exact match of
+all input DTypes.
+The output dtypes should <em>not</em> affect calculation, but if multiple registered
+<code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>s match exactly, the output DType will be used to find the
+better match.
+This will allow the current distinction for <code class="docutils literal notranslate"><span class="pre">np.equal</span></code> loops which define
+both <code class="docutils literal notranslate"><span class="pre">Object,</span> <span class="pre">Object</span> <span class="pre">-&gt;</span> <span class="pre">Bool</span></code> (default) and <code class="docutils literal notranslate"><span class="pre">Object,</span> <span class="pre">Object</span> <span class="pre">-&gt;</span> <span class="pre">Object</span></code>.</p>
+<p>Initially, an <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> will be defined for <em>concrete</em> DTypes only
+and since these cannot be subclassed an exact match is guaranteed.
+In the future we expect that <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>s can also be defined for
+<em>abstract</em> DTypes. In which case the best match is found as detailed below.</p>
+<p><strong>Promotion:</strong></p>
+<p>If a matching <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> exists, dispatching is straight forward.
+However, when it does not, additional definitions are required to implement
+this “promotion”:</p>
+<ul class="simple">
+<li><p>By default any UFunc has a promotion which uses the common DType of all
+inputs and dispatches a second time.  This is well-defined for most
+mathematical functions, but can be disabled or customized if necessary.
+For instances <code class="docutils literal notranslate"><span class="pre">int32</span> <span class="pre">+</span> <span class="pre">float64</span></code> tries again using <code class="docutils literal notranslate"><span class="pre">float64</span> <span class="pre">+</span> <span class="pre">float64</span></code>
+which is the common DType.</p></li>
+<li><p>Users can <em>register</em> new Promoters just as they can register a
+new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>.  These will use abstract DTypes to allow matching
+a large variety of signatures.
+The return value of a promotion function shall be a new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>
+or <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code>.  It must be consistent over multiple calls with
+the same input to allow caching of the result.</p></li>
+</ul>
+<p>The signature of a promotion function would be:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">promoter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ufunc</span><span class="p">:</span> <span class="n">ufunc</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DTypeMeta</span><span class="p">]:</span> <span class="n">DTypes</span><span class="p">):</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">ArrayMethod</span><span class="p">,</span> <span class="bp">NotImplemented</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Note that DTypes may include the output’s DType, however, normally the
+output DType will <em>not</em> affect which <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> is chosen.</p>
+<p>In most cases, it should not be necessary to add a custom promotion function.
+An example which requires this is multiplication with a unit:
+in NumPy <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> can be multiplied with most integers,
+but NumPy only defines a loop (<code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>) for <code class="docutils literal notranslate"><span class="pre">timedelta64</span> <span class="pre">*</span> <span class="pre">int64</span></code>
+so that multiplying with <code class="docutils literal notranslate"><span class="pre">int32</span></code> would fail.</p>
+<p>To allow this, the following promoter can be registered for
+<code class="docutils literal notranslate"><span class="pre">(Timedelta64,</span> <span class="pre">Integral,</span> <span class="pre">None)</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">promote</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">DTypes</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">DTypes</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">common_dtype</span><span class="p">(</span><span class="n">DTypes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Int64</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="c1"># Could check that res[1] is actually Int64</span>
+    <span class="k">return</span> <span class="n">ufunc</span><span class="o">.</span><span class="n">resolve_impl</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">res</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In this case, just as a <code class="docutils literal notranslate"><span class="pre">Timedelta64</span> <span class="pre">*</span> <span class="pre">int64</span></code> and <code class="docutils literal notranslate"><span class="pre">int64</span> <span class="pre">*</span> <span class="pre">timedelta64</span></code>
+<code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> is necessary, a second promoter will have to be registered to
+handle the case where the integer is passed first.</p>
+<p><strong>Dispatching rules for ArrayMethod and Promoters:</strong></p>
+<p>Promoter and <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> are discovered by finding the best match as
+defined by the DType class hierarchy.
+The best match is defined if:</p>
+<ul class="simple">
+<li><p>The signature matches for all input DTypes, so that
+<code class="docutils literal notranslate"><span class="pre">issubclass(input_DType,</span> <span class="pre">registered_DType)</span></code>  returns true.</p></li>
+<li><p>No other promoter or <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> is more precise in any input:
+<code class="docutils literal notranslate"><span class="pre">issubclass(other_DType,</span> <span class="pre">this_DType)</span></code> is true (this may include if both
+are identical).</p></li>
+<li><p>This promoter or <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> is more precise in at least one input or
+output DType.</p></li>
+</ul>
+<p>It will be an error if <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> is returned or if two
+promoters match the input equally well.
+When an existing promoter is not precise enough for new functionality, a
+new promoter has to be added.
+To ensure that this promoter takes precedence it may be necessary to define
+new abstract DTypes as more precise subclasses of existing ones.</p>
+<p>The above rules enable specialization if an output is supplied
+or the full loop is specified.  This should not typically be necessary,
+but allows resolving <code class="docutils literal notranslate"><span class="pre">np.logic_or</span></code>, etc. which have both
+<code class="docutils literal notranslate"><span class="pre">Object,</span> <span class="pre">Object</span> <span class="pre">-&gt;</span> <span class="pre">Bool</span></code> and <code class="docutils literal notranslate"><span class="pre">Object,</span> <span class="pre">Object</span> <span class="pre">-&gt;</span> <span class="pre">Object</span></code> loops (using the
+first by default).</p>
+</section>
+<section id="id2">
+<h3>Discussion and alternatives<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<p>Instead of resolving and returning a new implementation, we could also
+return a new set of DTypes to use for dispatching.  This works, however,
+it has the disadvantage that it is impossible to dispatch to a loop
+defined on a different ufunc or to dynamically create a new <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>.</p>
+<p><strong>Rejected Alternatives:</strong></p>
+<p>In the above the promoters use a multiple dispatching style type resolution
+while the current UFunc machinery uses the first
+“safe” loop (see also <a class="reference internal" href="nep-0040-legacy-datatype-impl.html#nep40"><span class="std std-ref">NEP 40</span></a>) in an ordered hierarchy.</p>
+<p>While the “safe” casting rule is not restrictive enough, we could imagine
+using a new “promote” casting rule, or the common-DType logic to find the
+best matching loop by upcasting the inputs as necessary.</p>
+<p>One downside to this approach is that upcasting alone allows upcasting the
+result beyond what is expected by users:
+Currently (which will remain supported as a fallback) any ufunc which defines
+only a float64 loop will also work for float16 and float32 by <em>upcasting</em>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">erf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">erf</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">4.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">))</span>  <span class="c1"># float16</span>
+<span class="go">array([1.], dtype=float32)</span>
+</pre></div>
+</div>
+<p>with a float32 result.  It is impossible to change the <code class="docutils literal notranslate"><span class="pre">erf</span></code> function to
+return a float16 result without changing the result of following code.
+In general, we argue that automatic upcasting should not occur in cases
+where a less precise loop can be defined, <em>unless</em> the ufunc
+author does this intentionally using a promotion.</p>
+<p>This consideration means that upcasting has to be limited by some additional
+method.</p>
+<p><em>Alternative 1:</em></p>
+<p>Assuming general upcasting is not intended, a rule must be defined to
+limit upcasting the input from <code class="docutils literal notranslate"><span class="pre">float16</span> <span class="pre">-&gt;</span> <span class="pre">float32</span></code> either using generic
+logic on the DTypes or the UFunc itself (or a combination of both).
+The UFunc cannot do this easily on its own, since it cannot know all possible
+DTypes which register loops.
+Consider the two examples:</p>
+<p>First (should be rejected):</p>
+<ul class="simple">
+<li><p>Input: <code class="docutils literal notranslate"><span class="pre">float16</span> <span class="pre">*</span> <span class="pre">float16</span></code></p></li>
+<li><p>Existing loop: <code class="docutils literal notranslate"><span class="pre">float32</span> <span class="pre">*</span> <span class="pre">float32</span></code></p></li>
+</ul>
+<p>Second (should be accepted):</p>
+<ul class="simple">
+<li><p>Input: <code class="docutils literal notranslate"><span class="pre">timedelta64</span> <span class="pre">*</span> <span class="pre">int32</span></code></p></li>
+<li><p>Existing loop: <code class="docutils literal notranslate"><span class="pre">timedelta64</span> <span class="pre">*</span> <span class="pre">int16</span></code></p></li>
+</ul>
+<p>This requires either:</p>
+<ol class="arabic simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> to somehow signal that the <code class="docutils literal notranslate"><span class="pre">int64</span></code> upcast is
+always supported if it is involved in the operation.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">float32</span> <span class="pre">*</span> <span class="pre">float32</span></code> loop to reject upcasting.</p></li>
+</ol>
+<p>Implementing the first approach requires signaling that upcasts are
+acceptable in the specific context.  This would require additional hooks
+and may not be simple for complex DTypes.</p>
+<p>For the second approach in most cases a simple <code class="docutils literal notranslate"><span class="pre">np.common_dtype</span></code> rule will
+work for initial dispatching, however, even this is only clearly the case
+for homogeneous loops.
+This option will require adding a function to check whether the input
+is a valid upcast to each loop individually, which seems problematic.
+In many cases a default could be provided (homogeneous signature).</p>
+<p><em>Alternative 2:</em></p>
+<p>An alternative “promotion” step is to ensure that the <em>output</em> DType matches
+with the loop after first finding the correct output DType.
+If the output DTypes are known, finding a safe loop becomes easy.
+In the majority of cases this works, the correct output dtype is just:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">common_dtype</span><span class="p">(</span><span class="o">*</span><span class="n">input_DTypes</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or some fixed DType (e.g. Bool for logical functions).</p>
+<p>However, it fails for example in the <code class="docutils literal notranslate"><span class="pre">timedelta64</span> <span class="pre">*</span> <span class="pre">int32</span></code> case above since
+there is a-priori no way to know that the “expected” result type of this
+output is indeed <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> (<code class="docutils literal notranslate"><span class="pre">np.common_dtype(Datetime64,</span> <span class="pre">Int32)</span></code> fails).
+This requires some additional knowledge of the timedelta64 precision being
+int64. Since a ufunc can have an arbitrary number of (relevant) inputs
+it would thus at least require an additional <code class="docutils literal notranslate"><span class="pre">__promoted_dtypes__</span></code> method
+on <code class="docutils literal notranslate"><span class="pre">Datetime64</span></code> (and all DTypes).</p>
+<p>A further limitation is shown by masked DTypes.  Logical functions do not
+have a boolean result when masked are involved, which would thus require the
+original ufunc author to anticipate masked DTypes in this scheme.
+Similarly, some functions defined for complex values will return real numbers
+while others return complex numbers.  If the original author did not anticipate
+complex numbers, the promotion may be incorrect for a later added complex loop.</p>
+<p>We believe that promoters, while allowing for an huge theoretical complexity,
+are the best solution:</p>
+<ol class="arabic simple">
+<li><p>Promotion allows for dynamically adding new loops. E.g. it is possible
+to define an abstract Unit DType, which dynamically creates classes to
+wrap other existing DTypes.  Using a single promoter, this DType can
+dynamically wrap existing <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> enabling it to find the correct
+loop in a single lookup instead of two.</p></li>
+<li><p>The promotion logic will usually err on the safe side: A newly-added
+loop cannot be misused unless a promoter is added as well.</p></li>
+<li><p>They put the burden of carefully thinking of whether the logic is correct
+on the programmer adding new loops to a UFunc.  (Compared to Alternative 2)</p></li>
+<li><p>In case of incorrect existing promotion, writing a promoter to restrict
+or refine a generic rule is possible.  In general a promotion rule should
+never return an <em>incorrect</em> promotion, but if it the existing promotion
+logic fails or is incorrect for a newly-added loop, the loop can add a
+new promoter to refine the logic.</p></li>
+</ol>
+<p>The option of having each loop verify that no upcast occurred is probably
+the best alternative, but does not include the ability to dynamically
+adding new loops.</p>
+<p>The main downsides of general promoters is that they allow a possible
+very large complexity.
+A third-party library <em>could</em> add incorrect promotions to NumPy, however,
+this is already possible by adding new incorrect loops.
+In general we believe we can rely on downstream projects to use this
+power and complexity carefully and responsibly.</p>
+</section>
+</section>
+<section id="user-guidelines">
+<h2>User guidelines<a class="headerlink" href="#user-guidelines" title="Link to this heading">#</a></h2>
+<p>In general adding a promoter to a UFunc must be done very carefully.
+A promoter should never affect loops which can be reasonably defined
+by other datatypes.  Defining a hypothetical <code class="docutils literal notranslate"><span class="pre">erf(UnitFloat16)</span></code> loop
+must not lead to <code class="docutils literal notranslate"><span class="pre">erf(float16)</span></code>.
+In general a promoter should fulfill the following requirements:</p>
+<ul>
+<li><p>Be conservative when defining a new promotion rule. An incorrect result
+is a much more dangerous error than an unexpected error.</p></li>
+<li><p>One of the (abstract) DTypes added should typically match specifically with a
+DType (or family of DTypes) defined by your project.
+Never add promotion rules which go beyond normal common DType rules!
+It is <em>not</em> reasonable to add a loop for <code class="docutils literal notranslate"><span class="pre">int16</span> <span class="pre">+</span> <span class="pre">uint16</span> <span class="pre">-&gt;</span> <span class="pre">int24</span></code> if
+you write an <code class="docutils literal notranslate"><span class="pre">int24</span></code> dtype. The result of this operation was already
+defined previously as <code class="docutils literal notranslate"><span class="pre">int32</span></code> and will be used with this assumption.</p></li>
+<li><p>A promoter (or loop) should never affect existing loop results.
+This includes adding faster but less precise loops/promoters to replace
+existing ones.</p></li>
+<li><p>Try to stay within a clear, linear hierarchy for all promotion (and casting)
+related logic. NumPy itself breaks this logic for integers and floats
+(they are not strictly linear, since int64 cannot promote to float32).</p></li>
+<li><p>Loops and promoters can be added by any project, which could be:</p>
+<ul class="simple">
+<li><p>The project defining the ufunc</p></li>
+<li><p>The project defining the DType</p></li>
+<li><p>A third-party project</p></li>
+</ul>
+<p>Try to find out which is the best project to add the loop.  If neither
+the project defining the ufunc nor the project defining the DType add the
+loop, issues with multiple definitions (which are rejected) may arise
+and care should be taken that the loop behaviour is always more desirable
+than an error.</p>
+</li>
+</ul>
+<p>In some cases exceptions to these rules may make sense, however, in general
+we ask you to use extreme caution and when in doubt create a new UFunc
+instead.  This clearly notifies the users of differing rules.
+When in doubt, ask on the NumPy mailing list or issue tracker!</p>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>Implementation of this NEP will entail a large refactor and restructuring
+of the current ufunc machinery (as well as casting).</p>
+<p>The implementation unfortunately will require large maintenance of the
+UFunc machinery, since both the actual UFunc loop calls, as well as the
+initial dispatching steps have to be modified.</p>
+<p>In general, the correct <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>, also those returned by a promoter,
+will be cached (or stored) inside a hashtable for efficient lookup.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<p>There is a large space of possible implementations with many discussions
+in various places, as well as initial thoughts and design documents.
+These are listed in the discussion of <a class="reference internal" href="nep-0040-legacy-datatype-impl.html#nep40"><span class="std std-ref">NEP 40</span></a> and not repeated here for
+brevity.</p>
+<p>A long discussion which touches many of these points and points towards
+similar solutions can be found in
+<a class="reference external" href="https://github.com/numpy/numpy/issues/12518">the github issue 12518 “What should be the calling convention for ufunc inner loop signatures?”</a></p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<p>Please see NEP 40 and 41 for more discussion and references.</p>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backwards-compatibility">Backwards compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overview-and-end-user-api">Overview and end user API</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-a-new-ufunc-implementation">Defining a new ufunc implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#customizing-dispatching-and-promotion">Customizing dispatching and Promotion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#steps-involved-in-a-ufunc-call">Steps involved in a UFunc call</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arraymethod">ArrayMethod</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-call-context">The call <code class="docutils literal notranslate"><span class="pre">Context</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#arraymethod-specifications">ArrayMethod specifications</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion-and-alternatives">Discussion and alternatives</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#resolve-descriptors"><code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#get-loop-method"><code class="docutils literal notranslate"><span class="pre">get_loop</span></code> method</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#extending-the-inner-loop-signature">Extending the inner-loop signature</a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#error-handling">Error handling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reusing-existing-loops-implementations">Reusing existing loops/implementations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#promotion-and-dispatching">Promotion and dispatching</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#promotion-and-dispatching-process">Promotion and dispatching process</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Discussion and alternatives</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#user-guidelines">User guidelines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

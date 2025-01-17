@@ -1,0 +1,1228 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 21 — Simplified and explicit advanced indexing &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0021-advanced-indexing';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 24 — Missing data functionality - alternative 1 to NEP 12" href="nep-0024-missing-data-2.html" />
+    <link rel="prev" title="NEP 12 — Missing data functionality in NumPy" href="nep-0012-missing-data.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Jan 17, 2025"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wish list
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">Wish list</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++?</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="deferred.html" class="nav-link">Deferred and Superseded NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 21 — Simplified and explicit advanced indexing</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-21-simplified-and-explicit-advanced-indexing">
+<span id="nep21"></span><h1>NEP 21 — Simplified and explicit advanced indexing<a class="headerlink" href="#nep-21-simplified-and-explicit-advanced-indexing" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sebastian Berg</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Stephan Hoyer &lt;<a class="reference external" href="mailto:shoyer&#37;&#52;&#48;google&#46;com">shoyer<span>&#64;</span>google<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-odd">Status<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Deferred</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Standards Track</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2015-08-27</p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>NumPy’s “advanced” indexing support for indexing array with other arrays is
+one of its most powerful and popular features. Unfortunately, the existing
+rules for advanced indexing with multiple array indices are typically confusing
+to both new, and in many cases even old, users of NumPy. Here we propose an
+overhaul and simplification of advanced indexing, including two new “indexer”
+attributes <code class="docutils literal notranslate"><span class="pre">oindex</span></code> and <code class="docutils literal notranslate"><span class="pre">vindex</span></code> to facilitate explicit indexing.</p>
+</section>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
+<section id="existing-indexing-operations">
+<h3>Existing indexing operations<a class="headerlink" href="#existing-indexing-operations" title="Link to this heading">#</a></h3>
+<p>NumPy arrays currently support a flexible range of indexing operations:</p>
+<ul class="simple">
+<li><p>“Basic” indexing involving only slices, integers, <code class="docutils literal notranslate"><span class="pre">np.newaxis</span></code> and ellipsis
+(<code class="docutils literal notranslate"><span class="pre">...</span></code>), e.g., <code class="docutils literal notranslate"><span class="pre">x[0,</span> <span class="pre">:3,</span> <span class="pre">np.newaxis]</span></code> for selecting the first element
+from the 0th axis, the first three elements from the 1st axis and inserting a
+new axis of size 1 at the end. Basic indexing always return a view of the
+indexed array’s data.</p></li>
+<li><p>“Advanced” indexing, also called “fancy” indexing, includes all cases where
+arrays are indexed by other arrays. Advanced indexing always makes a copy:</p>
+<ul>
+<li><p>“Boolean” indexing by boolean arrays, e.g., <code class="docutils literal notranslate"><span class="pre">x[x</span> <span class="pre">&gt;</span> <span class="pre">0]</span></code> for
+selecting positive elements.</p></li>
+<li><p>“Vectorized” indexing by one or more integer arrays, e.g., <code class="docutils literal notranslate"><span class="pre">x[[0,</span> <span class="pre">1]]</span></code>
+for selecting the first two elements along the first axis. With multiple
+arrays, vectorized indexing uses broadcasting rules to combine indices along
+multiple dimensions. This allows for producing a result of arbitrary shape
+with arbitrary elements from the original arrays.</p></li>
+<li><p>“Mixed” indexing involving any combinations of the other advancing types.
+This is no more powerful than vectorized indexing, but is sometimes more
+convenient.</p></li>
+</ul>
+</li>
+</ul>
+<p>For clarity, we will refer to these existing rules as “legacy indexing”.
+This is only a high-level summary; for more details, see NumPy’s documentation
+and <cite>Examples</cite> below.</p>
+</section>
+<section id="outer-indexing">
+<h3>Outer indexing<a class="headerlink" href="#outer-indexing" title="Link to this heading">#</a></h3>
+<p>One broadly useful class of indexing operations is not supported:</p>
+<ul class="simple">
+<li><p>“Outer” or orthogonal indexing treats one-dimensional arrays equivalently to
+slices for determining output shapes. The rule for outer indexing is that the
+result should be equivalent to independently indexing along each dimension
+with integer or boolean arrays as if both the indexed and indexing arrays
+were one-dimensional. This form of indexing is familiar to many users of other
+programming languages such as MATLAB, Fortran and R.</p></li>
+</ul>
+<p>The reason why NumPy omits support for outer indexing is that the rules for
+outer and vectorized conflict. Consider indexing a 2D array by two 1D integer
+arrays, e.g., <code class="docutils literal notranslate"><span class="pre">x[[0,</span> <span class="pre">1],</span> <span class="pre">[0,</span> <span class="pre">1]]</span></code>:</p>
+<ul class="simple">
+<li><p>Outer indexing is equivalent to combining multiple integer indices with
+<code class="docutils literal notranslate"><span class="pre">itertools.product()</span></code>. The result in this case is another 2D array with
+all combinations of indexed elements, e.g.,
+<code class="docutils literal notranslate"><span class="pre">np.array([[x[0,</span> <span class="pre">0],</span> <span class="pre">x[0,</span> <span class="pre">1]],</span> <span class="pre">[x[1,</span> <span class="pre">0],</span> <span class="pre">x[1,</span> <span class="pre">1]]])</span></code></p></li>
+<li><p>Vectorized indexing is equivalent to combining multiple integer indices with
+<code class="docutils literal notranslate"><span class="pre">zip()</span></code>. The result in this case is a 1D array containing the diagonal
+elements, e.g., <code class="docutils literal notranslate"><span class="pre">np.array([x[0,</span> <span class="pre">0],</span> <span class="pre">x[1,</span> <span class="pre">1]])</span></code>.</p></li>
+</ul>
+<p>This difference is a frequent stumbling block for new NumPy users. The outer
+indexing model is easier to understand, and is a natural generalization of
+slicing rules. But NumPy instead chose to support vectorized indexing, because
+it is strictly more powerful.</p>
+<p>It is always possible to emulate outer indexing by vectorized indexing with
+the right indices. To make this easier, NumPy includes utility objects and
+functions such as <code class="docutils literal notranslate"><span class="pre">np.ogrid</span></code> and <code class="docutils literal notranslate"><span class="pre">np.ix_</span></code>, e.g.,
+<code class="docutils literal notranslate"><span class="pre">x[np.ix_([0,</span> <span class="pre">1],</span> <span class="pre">[0,</span> <span class="pre">1])]</span></code>. However, there are no utilities for emulating
+fully general/mixed outer indexing, which could unambiguously allow for slices,
+integers, and 1D boolean and integer arrays.</p>
+</section>
+<section id="mixed-indexing">
+<h3>Mixed indexing<a class="headerlink" href="#mixed-indexing" title="Link to this heading">#</a></h3>
+<p>NumPy’s existing rules for combining multiple types of indexing in the same
+operation are quite complex, involving a number of edge cases.</p>
+<p>One reason why mixed indexing is particularly confusing is that at first glance
+the result works deceptively like outer indexing. Returning to our example of a
+2D array, both <code class="docutils literal notranslate"><span class="pre">x[:2,</span> <span class="pre">[0,</span> <span class="pre">1]]</span></code> and <code class="docutils literal notranslate"><span class="pre">x[[0,</span> <span class="pre">1],</span> <span class="pre">:2]</span></code> return 2D arrays with
+axes in the same order as the original array.</p>
+<p>However, as soon as two or more non-slice objects (including integers) are
+introduced, vectorized indexing rules apply. The axes introduced by the array
+indices are at the front, unless all array indices are consecutive, in which
+case NumPy deduces where the user “expects” them to be. Consider indexing a 3D
+array <code class="docutils literal notranslate"><span class="pre">arr</span></code> with shape <code class="docutils literal notranslate"><span class="pre">(X,</span> <span class="pre">Y,</span> <span class="pre">Z)</span></code>:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">arr[:,</span> <span class="pre">[0,</span> <span class="pre">1],</span> <span class="pre">0]</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(X,</span> <span class="pre">2)</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">arr[[0,</span> <span class="pre">1],</span> <span class="pre">0,</span> <span class="pre">:]</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">Z)</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">arr[0,</span> <span class="pre">:,</span> <span class="pre">[0,</span> <span class="pre">1]]</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">Y)</span></code>, not <code class="docutils literal notranslate"><span class="pre">(Y,</span> <span class="pre">2)</span></code>!</p></li>
+</ol>
+<p>These first two cases are intuitive and consistent with outer indexing, but
+this last case is quite surprising, even to many highly experienced NumPy users.</p>
+<p>Mixed cases involving multiple array indices are also surprising, and only
+less problematic because the current behavior is so useless that it is rarely
+encountered in practice. When a boolean array index is mixed with another boolean or
+integer array, boolean array is converted to integer array indices (equivalent
+to <code class="docutils literal notranslate"><span class="pre">np.nonzero()</span></code>) and then broadcast. For example, indexing a 2D array of
+size <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code> like <code class="docutils literal notranslate"><span class="pre">x[[True,</span> <span class="pre">False],</span> <span class="pre">[True,</span> <span class="pre">False]]</span></code> produces a 1D vector
+with shape <code class="docutils literal notranslate"><span class="pre">(1,)</span></code>, not a 2D sub-matrix with shape <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">1)</span></code>.</p>
+<p>Mixed indexing seems so tricky that it is tempting to say that it never should
+be used. However, it is not easy to avoid, because NumPy implicitly adds full
+slices if there are fewer indices than the full dimensionality of the indexed
+array. This means that indexing a 2D array like <cite>x[[0, 1]]`</cite> is equivalent to
+<code class="docutils literal notranslate"><span class="pre">x[[0,</span> <span class="pre">1],</span> <span class="pre">:]</span></code>. These cases are not surprising, but they constrain the
+behavior of mixed indexing.</p>
+</section>
+<section id="indexing-in-other-python-array-libraries">
+<h3>Indexing in other Python array libraries<a class="headerlink" href="#indexing-in-other-python-array-libraries" title="Link to this heading">#</a></h3>
+<p>Indexing is a useful and widely recognized mechanism for accessing
+multi-dimensional array data, so it is no surprise that many other libraries in
+the scientific Python ecosystem also support array indexing.</p>
+<p>Unfortunately, the full complexity of NumPy’s indexing rules mean that it is
+both challenging and undesirable for other libraries to copy its behavior in all
+of its nuance. The only full implementation of NumPy-style indexing is NumPy
+itself. This includes projects like dask.array and h5py, which support <em>most</em>
+types of array indexing in some form, and otherwise attempt to copy NumPy’s API
+exactly.</p>
+<p>Vectorized indexing in particular can be challenging to implement with array
+storage backends not based on NumPy. In contrast, indexing by 1D arrays along
+at least one dimension in the style of outer indexing is much more achievable.
+This has led many libraries (including dask and h5py) to attempt to define a
+safe subset of NumPy-style indexing that is equivalent to outer indexing, e.g.,
+by only allowing indexing with an array along at most one dimension. However,
+this is quite challenging to do correctly in a general enough way to be useful.
+For example, the current versions of dask and h5py both handle mixed indexing
+in case 3 above inconsistently with NumPy. This is quite likely to lead to
+bugs.</p>
+<p>These inconsistencies, in addition to the broader challenge of implementing
+every type of indexing logic, make it challenging to write high-level array
+libraries like xarray or dask.array that can interchangeably index many types of
+array storage. In contrast, explicit APIs for outer and vectorized indexing in
+NumPy would provide a model that external libraries could reliably emulate, even
+if they don’t support every type of indexing.</p>
+</section>
+</section>
+<section id="high-level-changes">
+<h2>High level changes<a class="headerlink" href="#high-level-changes" title="Link to this heading">#</a></h2>
+<p>Inspired by multiple “indexer” attributes for controlling different types
+of indexing behavior in pandas, we propose to:</p>
+<ol class="arabic simple">
+<li><p>Introduce <code class="docutils literal notranslate"><span class="pre">arr.oindex[indices]</span></code> which allows array indices, but
+uses outer indexing logic.</p></li>
+<li><p>Introduce <code class="docutils literal notranslate"><span class="pre">arr.vindex[indices]</span></code> which use the current
+“vectorized”/broadcasted logic but with two differences from
+legacy indexing:</p>
+<ul class="simple">
+<li><p>Boolean indices are not supported. All indices must be integers,
+integer arrays or slices.</p></li>
+<li><p>The integer index result dimensions are always the first axes
+of the result array. No transpose is done, even for a single
+integer array index.</p></li>
+</ul>
+</li>
+<li><p>Plain indexing on arrays will start to give warnings and eventually
+errors in cases where one of the explicit indexers should be preferred:</p>
+<ul class="simple">
+<li><p>First, in all cases where legacy and outer indexing would give
+different results.</p></li>
+<li><p>Later, potentially in all cases involving an integer array.</p></li>
+</ul>
+</li>
+</ol>
+<p>These constraints are sufficient for making indexing generally consistent
+with expectations and providing a less surprising learning curve with
+<code class="docutils literal notranslate"><span class="pre">oindex</span></code>.</p>
+<p>Note that all things mentioned here apply both for assignment as well as
+subscription.</p>
+<p>Understanding these details is <em>not</em> easy. The <cite>Examples</cite> section in the
+discussion gives code examples.
+And the hopefully easier <cite>Motivational Example</cite> provides some
+motivational use-cases for the general ideas and is likely a good start for
+anyone not intimately familiar with advanced indexing.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<section id="proposed-rules">
+<h3>Proposed rules<a class="headerlink" href="#proposed-rules" title="Link to this heading">#</a></h3>
+<p>From the three problems noted above some expectations for NumPy can
+be deduced:</p>
+<ol class="arabic simple">
+<li><p>There should be a prominent outer/orthogonal indexing method such as
+<code class="docutils literal notranslate"><span class="pre">arr.oindex[indices]</span></code>.</p></li>
+<li><p>Considering how confusing vectorized/fancy indexing can be, it should
+be possible to be made more explicitly (e.g. <code class="docutils literal notranslate"><span class="pre">arr.vindex[indices]</span></code>).</p></li>
+<li><p>A new <code class="docutils literal notranslate"><span class="pre">arr.vindex[indices]</span></code> method, would not be tied to the
+confusing transpose rules of fancy indexing, which is for example
+needed for the simple case of a single advanced index. Thus,
+no transposing should be done. The axes created by the integer array
+indices are always inserted at the front, even for a single index.</p></li>
+<li><p>Boolean indexing is conceptionally outer indexing. Broadcasting
+together with other advanced indices in the manner of legacy
+indexing is generally not helpful or well defined.
+A user who wishes the “<code class="docutils literal notranslate"><span class="pre">nonzero</span></code>” plus broadcast behaviour can thus
+be expected to do this manually. Thus, <code class="docutils literal notranslate"><span class="pre">vindex</span></code> does not need to
+support boolean index arrays.</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">arr.legacy_index</span></code> attribute should be implemented to support
+legacy indexing. This gives a simple way to update existing codebases
+using legacy indexing, which will make the deprecation of plain indexing
+behavior easier. The longer name <code class="docutils literal notranslate"><span class="pre">legacy_index</span></code> is intentionally chosen
+to be explicit and discourage its use in new code.</p></li>
+<li><p>Plain indexing <code class="docutils literal notranslate"><span class="pre">arr[...]</span></code> should return an error for ambiguous cases.
+For the beginning, this probably means cases where <code class="docutils literal notranslate"><span class="pre">arr[ind]</span></code> and
+<code class="docutils literal notranslate"><span class="pre">arr.oindex[ind]</span></code> return different results give deprecation warnings.
+This includes every use of vectorized indexing with multiple integer arrays.
+Due to the transposing behaviour, this means that``arr[0, :, index_arr]``
+will be deprecated, but <code class="docutils literal notranslate"><span class="pre">arr[:,</span> <span class="pre">0,</span> <span class="pre">index_arr]</span></code> will not for the time being.</p></li>
+<li><p>To ensure that existing subclasses of <cite>ndarray</cite> that override indexing
+do not inadvertently revert to default behavior for indexing attributes,
+these attribute should have explicit checks that disable them if
+<code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> or <code class="docutils literal notranslate"><span class="pre">__setitem__</span></code> has been overridden.</p></li>
+</ol>
+<p>Unlike plain indexing, the new indexing attributes are explicitly aimed
+at higher dimensional indexing, several additional changes should be implemented:</p>
+<ul class="simple">
+<li><p>The indexing attributes will enforce exact dimension and indexing match.
+This means that no implicit ellipsis (<code class="docutils literal notranslate"><span class="pre">...</span></code>) will be added. Unless
+an ellipsis is present the indexing expression will thus only work for
+an array with a specific number of dimensions.
+This makes the expression more explicit and safeguards against wrong
+dimensionality of arrays.
+There should be no implications for “duck typing” compatibility with
+builtin Python sequences, because Python sequences only support a limited
+form of “basic indexing” with integers and slices.</p></li>
+<li><p>The current plain indexing allows for the use of non-tuples for
+multi-dimensional indexing such as <code class="docutils literal notranslate"><span class="pre">arr[[slice(None),</span> <span class="pre">2]]</span></code>.
+This creates some inconsistencies and thus the indexing attributes
+should only allow plain python tuples for this purpose.
+(Whether or not this should be the case for plain indexing is a
+different issue.)</p></li>
+<li><p>The new attributes should not use getitem to implement setitem,
+since it is a cludge and not useful for vectorized
+indexing. (not implemented yet)</p></li>
+</ul>
+</section>
+<section id="open-questions">
+<h3>Open Questions<a class="headerlink" href="#open-questions" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The names <code class="docutils literal notranslate"><span class="pre">oindex</span></code>, <code class="docutils literal notranslate"><span class="pre">vindex</span></code> and <code class="docutils literal notranslate"><span class="pre">legacy_index</span></code> are just suggestions at
+the time of writing this, another name NumPy has used for something like
+<code class="docutils literal notranslate"><span class="pre">oindex</span></code> is <code class="docutils literal notranslate"><span class="pre">np.ix_</span></code>. See also below.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">oindex</span></code> and <code class="docutils literal notranslate"><span class="pre">vindex</span></code> could always return copies, even when no array
+operation occurs. One argument for allowing a view return is that this way
+<code class="docutils literal notranslate"><span class="pre">oindex</span></code> can be used as a general index replacement.
+However, there is one argument for returning copies. It is possible for
+<code class="docutils literal notranslate"><span class="pre">arr.vindex[array_scalar,</span> <span class="pre">...]</span></code>, where <code class="docutils literal notranslate"><span class="pre">array_scalar</span></code> should be
+a 0-D array but is not, since 0-D arrays tend to be converted.
+Copying always “fixes” this possible inconsistency.</p></li>
+<li><p>The final state to morph plain indexing in is not fixed in this PEP.
+It is for example possible that <cite>arr[index]`</cite> will be equivalent to
+<code class="docutils literal notranslate"><span class="pre">arr.oindex</span></code> at some point in the future.
+Since such a change will take years, it seems unnecessary to make
+specific decisions at this time.</p></li>
+<li><p>The proposed changes to plain indexing could be postponed indefinitely or
+not taken in order to not break or force major fixes to existing code bases.</p></li>
+</ul>
+</section>
+<section id="alternative-names">
+<h3>Alternative Names<a class="headerlink" href="#alternative-names" title="Link to this heading">#</a></h3>
+<p>Possible names suggested (more suggestions will be added).</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p><strong>Orthogonal</strong></p></td>
+<td><p>oindex</p></td>
+<td><p>oix</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Vectorized</strong></p></td>
+<td><p>vindex</p></td>
+<td><p>vix</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Legacy</strong></p></td>
+<td><p>legacy_index</p></td>
+<td><p>l/findex</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="subclasses">
+<h3>Subclasses<a class="headerlink" href="#subclasses" title="Link to this heading">#</a></h3>
+<p>Subclasses are a bit problematic in the light of these changes. There are
+some possible solutions for this. For most subclasses (those which do not
+provide <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> or <code class="docutils literal notranslate"><span class="pre">__setitem__</span></code>) the special attributes should
+just work. Subclasses that <em>do</em> provide it must be updated accordingly
+and should preferably not subclass <code class="docutils literal notranslate"><span class="pre">oindex</span></code> and <code class="docutils literal notranslate"><span class="pre">vindex</span></code>.</p>
+<p>All subclasses will inherit the attributes, however, the implementation
+of <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> on these attributes should test
+<code class="docutils literal notranslate"><span class="pre">subclass.__getitem__</span> <span class="pre">is</span> <span class="pre">ndarray.__getitem__</span></code>. If not, the
+subclass has special handling for indexing and <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code>
+should be raised, requiring that the indexing attributes is also explicitly
+overwritten. Likewise, implementations of <code class="docutils literal notranslate"><span class="pre">__setitem__</span></code> should check to see
+if <code class="docutils literal notranslate"><span class="pre">__setitem__</span></code> is overridden.</p>
+<p>A further question is how to facilitate implementing the special attributes.
+Also there is the weird functionality where <code class="docutils literal notranslate"><span class="pre">__setitem__</span></code> calls
+<code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> for non-advanced indices. It might be good to avoid it for
+the new attributes, but on the other hand, that may make it even more
+confusing.</p>
+<p>To facilitate implementations we could provide functions similar to
+<code class="docutils literal notranslate"><span class="pre">operator.itemgetter</span></code> and <code class="docutils literal notranslate"><span class="pre">operator.setitem</span></code> for the attributes.
+Possibly a mixin could be provided to help implementation. These improvements
+are not essential to the initial implementation, so they are saved for
+future work.</p>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>Implementation would start with writing special indexing objects available
+through <code class="docutils literal notranslate"><span class="pre">arr.oindex</span></code>, <code class="docutils literal notranslate"><span class="pre">arr.vindex</span></code>, and <code class="docutils literal notranslate"><span class="pre">arr.legacy_index</span></code> to allow these
+indexing operations. Also, we would need to start to deprecate those plain index
+operations which are not ambiguous.
+Furthermore, the NumPy code base will need to use the new attributes and
+tests will have to be adapted.</p>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>As a new feature, no backward compatibility issues with the new <code class="docutils literal notranslate"><span class="pre">vindex</span></code>
+and <code class="docutils literal notranslate"><span class="pre">oindex</span></code> attributes would arise.</p>
+<p>To facilitate backwards compatibility as much as possible, we expect a long
+deprecation cycle for legacy indexing behavior and propose the new
+<code class="docutils literal notranslate"><span class="pre">legacy_index</span></code> attribute.</p>
+<p>Some forward compatibility issues with subclasses that do not specifically
+implement the new methods may arise.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>NumPy may not choose to offer these different type of indexing methods, or
+choose to only offer them through specific functions instead of the proposed
+notation above.</p>
+<p>We don’t think that new functions are a good alternative, because indexing
+notation <code class="docutils literal notranslate"><span class="pre">[]</span></code> offer some syntactic advantages in Python (i.e., direct
+creation of slice objects) compared to functions.</p>
+<p>A more reasonable alternative would be write new wrapper objects for alternative
+indexing with functions rather than methods (e.g., <code class="docutils literal notranslate"><span class="pre">np.oindex(arr)[indices]</span></code>
+instead of <code class="docutils literal notranslate"><span class="pre">arr.oindex[indices]</span></code>). Functionally, this would be equivalent,
+but indexing is such a common operation that we think it is important to
+minimize syntax and worth implementing it directly on <cite>ndarray</cite> objects
+themselves. Indexing attributes also define a clear interface that is easier
+for alternative array implementations to copy, notwithstanding ongoing
+efforts to make it easier to override NumPy functions <a class="footnote-reference brackets" href="#id5" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<p>The original discussion about vectorized vs outer/orthogonal indexing arose
+on the NumPy mailing list:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2015-April/072550.html">https://mail.python.org/pipermail/numpy-discussion/2015-April/072550.html</a></p></li>
+</ul>
+</div></blockquote>
+<p>Some discussion can be found on the original pull request for this NEP:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="github reference external" href="https://github.com/numpy/numpy/pull/6256">numpy/numpy#6256</a></p></li>
+</ul>
+</div></blockquote>
+<p>Python implementations of the indexing operations can be found at:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="github reference external" href="https://github.com/numpy/numpy/pull/5749">numpy/numpy#5749</a></p></li>
+<li><p><a class="reference external" href="https://gist.github.com/shoyer/c700193625347eb68fee4d1f0dc8c0c8">https://gist.github.com/shoyer/c700193625347eb68fee4d1f0dc8c0c8</a></p></li>
+</ul>
+</div></blockquote>
+<section id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h3>
+<p>Since the various kinds of indexing is hard to grasp in many cases, these
+examples hopefully give some more insights. Note that they are all in terms
+of shape.
+In the examples, all original dimensions have 5 or more elements,
+advanced indexing inserts smaller dimensions.
+These examples may be hard to grasp without working knowledge of advanced
+indexing as of NumPy 1.9.</p>
+<p>Example array:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="legacy-fancy-indexing">
+<h2>Legacy fancy indexing<a class="headerlink" href="#legacy-fancy-indexing" title="Link to this heading">#</a></h2>
+<p>Note that the same result can be achieved with <code class="docutils literal notranslate"><span class="pre">arr.legacy_index</span></code>, but the
+“future error” will still work in this case.</p>
+<p>Single index is transposed (this is the same for all indexing types):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 6, 7, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1, 7, 8)</span>
+</pre></div>
+</div>
+<p>Multiple indices are transposed <em>if</em> consecutive:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># future error</span>
+<span class="go">(5, 1, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># future error</span>
+<span class="go">(1, 5, 7)</span>
+</pre></div>
+</div>
+<p>It is important to note that a scalar <em>is</em> integer array index in this sense
+(and gets broadcasted with the other advanced index):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># future error (scalar is &quot;fancy&quot;)</span>
+<span class="go">(1, 5, 7)</span>
+</pre></div>
+</div>
+<p>Single boolean index can act on multiple dimensions (especially the whole
+array). It has to match (as of 1.10. a deprecation warning) the dimensions.
+The boolean index is otherwise identical to (multiple consecutive) integer
+array indices:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create boolean index with one True value for the last two dimensions:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bindx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bindx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 6)</span>
+</pre></div>
+</div>
+<p>The combination with anything that is not a scalar is confusing, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># bindx result broadcasts with [0]</span>
+<span class="go">(1, 6)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># IndexError</span>
+</pre></div>
+</div>
+</section>
+<section id="id2">
+<h2>Outer indexing<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>Multiple indices are “orthogonal” and their result axes are inserted
+at the same place (they are not broadcasted):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1, 2, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1, 7, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1, 7)</span>
+</pre></div>
+</div>
+<p>Boolean indices results are always inserted where the index is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create boolean index with one True value for the last two dimensions:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bindx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bindx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(6, 1)</span>
+</pre></div>
+</div>
+<p>Nothing changed in the presence of other advanced indices since:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 6, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 2, 1)</span>
+</pre></div>
+</div>
+</section>
+<section id="vectorized-inner-indexing">
+<h2>Vectorized/inner indexing<a class="headerlink" href="#vectorized-inner-indexing" title="Link to this heading">#</a></h2>
+<p>Multiple indices are broadcasted and iterated as one like fancy indexing,
+but the new axes are always inserted at the front:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(2, 5, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(2, 5, 7)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 5, 8)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 5, 7)</span>
+</pre></div>
+</div>
+<p>Boolean indices results are always inserted where the index is, exactly
+as in <code class="docutils literal notranslate"><span class="pre">oindex</span></code> given how specific they are to the axes they operate on:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create boolean index with one True value for the last two dimensions:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bindx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bindx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(5, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(6, 1)</span>
+</pre></div>
+</div>
+<p>But other advanced indices are again transposed to the front:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:,</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(1, 6, 1)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bindx</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(2, 5, 1)</span>
+</pre></div>
+</div>
+<section id="motivational-example">
+<h3>Motivational Example<a class="headerlink" href="#motivational-example" title="Link to this heading">#</a></h3>
+<p>Imagine having a data acquisition software storing <code class="docutils literal notranslate"><span class="pre">D</span></code> channels and
+<code class="docutils literal notranslate"><span class="pre">N</span></code> datapoints along the time. She stores this into an <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">D)</span></code> shaped
+array. During data analysis, we needs to fetch a pool of channels, for example
+to calculate a mean over them.</p>
+<p>This data can be faked using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now one may remember indexing with an integer array and find the correct code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">group</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mean_value</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>However, assume that there were some specific time points (first dimension
+of the data) that need to be specially considered. These time points are
+already known and given by:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">interesting_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now to fetch them, we may try to modify the previous code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">group_at_it</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">interesting_times</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
+<span class="go">IndexError: Ambiguous index, use `.oindex` or `.vindex`</span>
+</pre></div>
+</div>
+<p>An error such as this will point to read up the indexing documentation.
+This should make it clear, that <code class="docutils literal notranslate"><span class="pre">oindex</span></code> behaves more like slicing.
+So, out of the different methods it is the obvious choice
+(for now, this is a shape mismatch, but that could possibly also mention
+<code class="docutils literal notranslate"><span class="pre">oindex</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">group_at_it</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">interesting_times</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Now of course one could also have used <code class="docutils literal notranslate"><span class="pre">vindex</span></code>, but it is much less
+obvious how to achieve the right thing!:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reshaped_times</span> <span class="o">=</span> <span class="n">interesting_times</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">group_at_it</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[</span><span class="n">reshaped_times</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>One may find, that for example our data is corrupt in some places.
+So, we need to replace these values by zero (or anything else) for these
+times. The first column may for example give the necessary information,
+so that changing the values becomes easy remembering boolean indexing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bad_data</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="n">bad_data</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># (corrupts further examples)</span>
+</pre></div>
+</div>
+<p>Again, however, the columns may need to be handled more individually (but in
+groups), and the <code class="docutils literal notranslate"><span class="pre">oindex</span></code> attribute works well:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="o">.</span><span class="n">oindex</span><span class="p">[</span><span class="n">bad_data</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>Note that it would be very hard to do this using legacy fancy indexing.
+The only way would be to create an integer array first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bad_data_indx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">bad_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bad_data_indx_reshaped</span> <span class="o">=</span> <span class="n">bad_data_indx</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">arr</span><span class="p">[</span><span class="n">bad_data_indx_reshaped</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>In any case we can use only <code class="docutils literal notranslate"><span class="pre">oindex</span></code> to do all of this without getting
+into any trouble or confused by the whole complexity of advanced indexing.</p>
+<p>But, some new features are added to the data acquisition. Different sensors
+have to be used depending on the times. Let us assume we already have
+created an array of indices:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">correct_sensors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Which lists for each time the two correct sensors in an <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">2)</span></code> array.</p>
+<p>A first try to achieve this may be <code class="docutils literal notranslate"><span class="pre">arr[:,</span> <span class="pre">correct_sensors]</span></code> and this does
+not work. It should be clear quickly that slicing cannot achieve the desired
+thing. But hopefully users will remember that there is <code class="docutils literal notranslate"><span class="pre">vindex</span></code> as a more
+powerful and flexible approach to advanced indexing.
+One may, if trying <code class="docutils literal notranslate"><span class="pre">vindex</span></code> randomly, be confused about:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[:,</span> <span class="n">correct_sensors</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>which is neither the same, nor the correct result (see transposing rules)!
+This is because slicing works still the same in <code class="docutils literal notranslate"><span class="pre">vindex</span></code>. However, reading
+the documentation and examples, one can hopefully quickly find the desired
+solution:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rows</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>  <span class="c1"># make shape fit with correct_sensors</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">vindex</span><span class="p">[</span><span class="n">rows</span><span class="p">,</span> <span class="n">correct_sensors</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>At this point we have left the straight forward world of <code class="docutils literal notranslate"><span class="pre">oindex</span></code> but can
+do random picking of any element from the array. Note that in the last example
+a method such as mentioned in the <code class="docutils literal notranslate"><span class="pre">Related</span> <span class="pre">Questions</span></code> section could be more
+straight forward. But this approach is even more flexible, since <code class="docutils literal notranslate"><span class="pre">rows</span></code>
+does not have to be a simple <code class="docutils literal notranslate"><span class="pre">arange</span></code>, but could be <code class="docutils literal notranslate"><span class="pre">interesting_times</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">interesting_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">correct_sensors_at_it</span> <span class="o">=</span> <span class="n">correct_sensors</span><span class="p">[</span><span class="n">interesting_times</span><span class="p">,</span> <span class="p">:]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">interesting_times_reshaped</span> <span class="o">=</span> <span class="n">interesting_times</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_arr_it</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">interesting_times_reshaped</span><span class="p">,</span> <span class="n">correct_sensors_at_it</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Truly complex situation would arise now if you would for example pool <code class="docutils literal notranslate"><span class="pre">L</span></code>
+experiments into an array shaped <code class="docutils literal notranslate"><span class="pre">(L,</span> <span class="pre">N,</span> <span class="pre">D)</span></code>. But for <code class="docutils literal notranslate"><span class="pre">oindex</span></code> this should
+not result into surprises. <code class="docutils literal notranslate"><span class="pre">vindex</span></code>, being more powerful, will quite
+certainly create some confusion in this case but also cover pretty much all
+eventualities.</p>
+</section>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document is placed under the CC0 1.0 Universal (CC0 1.0) Public Domain Dedication <a class="footnote-reference brackets" href="#id4" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">1</a><span class="fn-bracket">]</span></span>
+<p>To the extent possible under law, the person who associated CC0
+with this work has waived all copyright and related or neighboring
+rights to this work. The CC0 license may be found at
+<a class="reference external" href="https://creativecommons.org/publicdomain/zero/1.0/">https://creativecommons.org/publicdomain/zero/1.0/</a></p>
+</aside>
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">2</a><span class="fn-bracket">]</span></span>
+<p>e.g., see <a class="reference internal" href="nep-0018-array-function-protocol.html"><span class="doc">NEP 18 — A dispatch mechanism for NumPy’s high level array functions</span></a></p>
+</aside>
+</aside>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existing-indexing-operations">Existing indexing operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#outer-indexing">Outer indexing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mixed-indexing">Mixed indexing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#indexing-in-other-python-array-libraries">Indexing in other Python array libraries</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#high-level-changes">High level changes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proposed-rules">Proposed rules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-questions">Open Questions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternative-names">Alternative Names</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#subclasses">Subclasses</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#legacy-fancy-indexing">Legacy fancy indexing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Outer indexing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vectorized-inner-indexing">Vectorized/inner indexing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#motivational-example">Motivational Example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2025, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
