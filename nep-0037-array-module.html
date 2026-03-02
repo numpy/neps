@@ -1,0 +1,1107 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 37 — A dispatch protocol for NumPy-like modules &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0037-array-module';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 47 — Adopting the array API standard" href="nep-0047-array-api-standard.html" />
+    <link rel="prev" title="NEP 31 — Context-local and global overrides of the NumPy API" href="nep-0031-uarray.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="deferred.html" class="nav-link">Deferred and Superseded NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 37 — A dispatch protocol for NumPy-like modules</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-37-a-dispatch-protocol-for-numpy-like-modules">
+<span id="nep37"></span><h1>NEP 37 — A dispatch protocol for NumPy-like modules<a class="headerlink" href="#nep-37-a-dispatch-protocol-for-numpy-like-modules" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Stephan Hoyer &lt;<a class="reference external" href="mailto:shoyer&#37;&#52;&#48;google&#46;com">shoyer<span>&#64;</span>google<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Hameer Abbasi</p>
+</dd>
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sebastian Berg</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Superseded</p>
+</dd>
+<dt class="field-odd">Replaced-By<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="nep-0056-array-api-main-namespace.html#nep56"><span class="std std-ref">NEP 56 — Array API standard support in NumPy’s main namespace</span></a></p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Standards Track</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2019-12-29</p>
+</dd>
+<dt class="field-even">Resolution<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/Z6AA5CL47NHBNEPTFWYOTSUVSRDGHYPN/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/Z6AA5CL47NHBNEPTFWYOTSUVSRDGHYPN/</a></p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>NEP-18’s <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> has been a mixed success. Some projects (e.g.,
+dask, CuPy, xarray, sparse, Pint, MXNet) have enthusiastically adopted it.
+Others (e.g., JAX) have been more reluctant. Here we propose a new
+protocol, <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>, that we expect could eventually subsume most
+use-cases for <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>. The protocol requires explicit adoption
+by both users and library authors, which ensures backwards compatibility, and
+is also significantly simpler than <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>, both of which we
+expect will make it easier to adopt.</p>
+</section>
+<section id="why-array-function-hasn-t-been-enough">
+<h2>Why <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> hasn’t been enough<a class="headerlink" href="#why-array-function-hasn-t-been-enough" title="Link to this heading">#</a></h2>
+<p>There are two broad ways in which <a class="reference internal" href="nep-0018-array-function-protocol.html#nep18"><span class="std std-ref">NEP-18</span></a> has fallen short of its goals:</p>
+<ol class="arabic">
+<li><p><strong>Backwards compatibility concerns</strong>. <cite>__array_function__</cite> has significant
+implications for libraries that use it:</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/google/jax/issues/1565">JAX</a> has been reluctant
+to implement <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> in part because it is concerned about
+breaking existing code: users expect NumPy functions like
+<code class="docutils literal notranslate"><span class="pre">np.concatenate</span></code> to return NumPy arrays. This is a fundamental
+limitation of the <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> design, which we chose to allow
+overriding the existing <code class="docutils literal notranslate"><span class="pre">numpy</span></code> namespace.
+Libraries like Dask and CuPy have looked at and accepted the backwards
+incompatibility impact of <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>; it would still have been
+better for them if that impact didn’t exist.</p>
+<p>Note that projects like <a class="reference external" href="https://github.com/pytorch/pytorch/issues/22402">PyTorch</a> and <a class="reference external" href="https://github.com/scipy/scipy/issues/10362">scipy.sparse</a> have also not
+adopted <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> yet, because they don’t have a
+NumPy-compatible API or semantics. In the case of PyTorch, that is likely
+to be added in the future. <code class="docutils literal notranslate"><span class="pre">scipy.sparse</span></code> is in the same situation as
+<code class="docutils literal notranslate"><span class="pre">numpy.matrix</span></code>: its semantics are not compatible with <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>
+and therefore adding <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> (except to return <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code>
+perhaps) is not a healthy idea.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> currently requires an “all or nothing” approach to
+implementing NumPy’s API. There is no good pathway for <strong>incremental
+adoption</strong>, which is particularly problematic for established projects
+for which adopting <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> would result in breaking
+changes.</p></li>
+</ul>
+</li>
+<li><p><strong>Limitations on what can be overridden.</strong> <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> has some
+important gaps, most notably array creation and coercion functions:</p>
+<ul class="simple">
+<li><p><strong>Array creation</strong> routines (e.g., <code class="docutils literal notranslate"><span class="pre">np.arange</span></code> and those in
+<code class="docutils literal notranslate"><span class="pre">np.random</span></code>) need some other mechanism for indicating what type of
+arrays to create. <a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html#nep35"><span class="std std-ref">NEP 35</span></a>
+proposed adding optional <code class="docutils literal notranslate"><span class="pre">like=</span></code> arguments to functions without
+existing array arguments. However, we still lack any mechanism to
+override methods on objects, such as those needed by
+<code class="docutils literal notranslate"><span class="pre">np.random.RandomState</span></code>.</p></li>
+<li><p><strong>Array conversion</strong> can’t reuse the existing coercion functions like
+<code class="docutils literal notranslate"><span class="pre">np.asarray</span></code>, because <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code> sometimes means “convert to an
+exact <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code>” and other times means “convert to something _like_
+a NumPy array.” This led to the <a class="reference internal" href="nep-0030-duck-array-protocol.html#nep30"><span class="std std-ref">NEP 30</span></a> proposal for
+a separate <code class="docutils literal notranslate"><span class="pre">np.duckarray</span></code> function, but this still does not resolve how
+to cast one duck array into a type matching another duck array.</p></li>
+</ul>
+</li>
+</ol>
+<p>Other maintainability concerns that were raised include:</p>
+<ul class="simple">
+<li><p>It is no longer possible to use <strong>aliases to NumPy functions</strong> within
+modules that support overrides. For example, both CuPy and JAX set
+<code class="docutils literal notranslate"><span class="pre">result_type</span> <span class="pre">=</span> <span class="pre">np.result_type</span></code> and now have to wrap use of
+<code class="docutils literal notranslate"><span class="pre">np.result_type</span></code> in their own <code class="docutils literal notranslate"><span class="pre">result_type</span></code> function instead.</p></li>
+<li><p>Implementing <strong>fall-back mechanisms</strong> for unimplemented NumPy functions
+by using NumPy’s implementation is hard to get right (but see the
+<a class="reference external" href="https://github.com/dask/dask/pull/5043">version from dask</a>), because
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> does not present a consistent interface.
+Converting all arguments of array type requires recursing into generic
+arguments of the form <code class="docutils literal notranslate"><span class="pre">*args,</span> <span class="pre">**kwargs</span></code>.</p></li>
+</ul>
+</section>
+<section id="get-array-module-and-the-array-module-protocol">
+<h2><code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> and the <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> protocol<a class="headerlink" href="#get-array-module-and-the-array-module-protocol" title="Link to this heading">#</a></h2>
+<p>We propose a new user-facing mechanism for dispatching to a duck-array
+implementation, <code class="docutils literal notranslate"><span class="pre">numpy.get_array_module</span></code>. <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> performs the
+same type resolution as <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> and returns a module with an API
+promised to match the standard interface of <code class="docutils literal notranslate"><span class="pre">numpy</span></code> that can implement
+operations on all provided array types.</p>
+<p>The protocol itself is both simpler and more powerful than
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>, because it doesn’t need to worry about actually
+implementing functions. We believe it resolves most of the maintainability and
+functionality limitations of <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>.</p>
+<p>The new protocol is opt-in, explicit and with local control; see
+<a class="reference internal" href="#appendix-design-choices"><span class="std std-ref">Appendix: design choices for API overrides</span></a> for discussion on the importance of these design
+features.</p>
+<section id="the-array-module-contract">
+<h3>The array module contract<a class="headerlink" href="#the-array-module-contract" title="Link to this heading">#</a></h3>
+<p>Modules returned by <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code>/<code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> should make a
+best effort to implement NumPy’s core functionality on new array types(s).
+Unimplemented functionality should simply be omitted (e.g., accessing an
+unimplemented function should raise <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code>). In the future, we
+anticipate codifying a protocol for requesting restricted subsets of <code class="docutils literal notranslate"><span class="pre">numpy</span></code>;
+see <a class="reference internal" href="#requesting-restricted-subsets"><span class="std std-ref">Requesting restricted subsets of NumPy’s API</span></a> for more details.</p>
+</section>
+<section id="how-to-use-get-array-module">
+<h3>How to use <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code><a class="headerlink" href="#how-to-use-get-array-module" title="Link to this heading">#</a></h3>
+<p>Code that wants to support generic duck arrays should explicitly call
+<code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> to determine an appropriate array module from which to
+call functions, rather than using the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> namespace directly. For
+example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># calls the appropriate version of np.something for x and y</span>
+<span class="n">module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">get_array_module</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">module</span><span class="o">.</span><span class="n">something</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Both array creation and array conversion are supported, because dispatching is
+handled by <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> rather than via the types of function
+arguments. For example, to use random number generation functions or methods,
+we can simply pull out the appropriate submodule:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">duckarray_add_random</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">get_array_module</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">array</span> <span class="o">+</span> <span class="n">noise</span>
+</pre></div>
+</div>
+<p>We can also write the duck-array <code class="docutils literal notranslate"><span class="pre">stack</span></code> function from
+<a class="reference internal" href="nep-0030-duck-array-protocol.html#nep30"><span class="std std-ref">NEP 30</span></a>, without the need
+for a new <code class="docutils literal notranslate"><span class="pre">np.duckarray</span></code> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">duckarray_stack</span><span class="p">(</span><span class="n">arrays</span><span class="p">):</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">get_array_module</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">)</span>
+    <span class="n">arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">]</span>
+    <span class="n">shapes</span> <span class="o">=</span> <span class="p">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;all input arrays must have the same shape&#39;</span><span class="p">)</span>
+    <span class="n">expanded_arrays</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">arrays</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">module</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">expanded_arrays</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> will return the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> module if no
+arguments are arrays. This fall-back can be explicitly controlled by providing
+the <code class="docutils literal notranslate"><span class="pre">module</span></code> keyword-only argument. It is also possible to indicate that an
+exception should be raised instead of returning a default array module by
+setting <code class="docutils literal notranslate"><span class="pre">module=None</span></code>.</p>
+</section>
+<section id="how-to-implement-array-module">
+<h3>How to implement <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code><a class="headerlink" href="#how-to-implement-array-module" title="Link to this heading">#</a></h3>
+<p>Libraries implementing a duck array type that want to support
+<code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> need to implement the corresponding protocol,
+<code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>. This new protocol is based on Python’s dispatch protocol
+for arithmetic, and is essentially a simpler version of <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>.</p>
+<p>Only one argument is passed into <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>, a Python collection of
+unique array types passed into <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code>, i.e., all arguments with
+an <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> attribute.</p>
+<p>The special method should either return a namespace with an API matching
+<code class="docutils literal notranslate"><span class="pre">numpy</span></code>, or <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code>, indicating that it does not know how to
+handle the operation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyArray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_module__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">MyArray</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="n">my_array_module</span>
+</pre></div>
+</div>
+<section id="returning-custom-objects-from-array-module">
+<h4>Returning custom objects from <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code><a class="headerlink" href="#returning-custom-objects-from-array-module" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">my_array_module</span></code> will typically, but need not always, be a Python module.
+Returning a custom objects (e.g., with functions implemented via
+<code class="docutils literal notranslate"><span class="pre">__getattr__</span></code>) may be useful for some advanced use cases.</p>
+<p>For example, custom objects could allow for partial implementations of duck
+array modules that fall-back to NumPy (although this is not recommended in
+general because such fall-back behavior can be error prone):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyArray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_module__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">MyArray</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ArrayModule</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayModule</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">base_module</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base_module</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">numpy</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="subclassing-from-numpy-ndarray">
+<h4>Subclassing from <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code><a class="headerlink" href="#subclassing-from-numpy-ndarray" title="Link to this heading">#</a></h4>
+<p>All of the same guidance about well-defined type casting hierarchies from
+NEP-18 still applies. <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> itself contains a matching
+implementation of <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>,  which is convenient for subclasses:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ndarray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_module__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">numpy</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="numpy-s-internal-machinery">
+<h3>NumPy’s internal machinery<a class="headerlink" href="#numpy-s-internal-machinery" title="Link to this heading">#</a></h3>
+<p>The type resolution rules of <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> follow the same model as
+Python and NumPy’s existing dispatch protocols: subclasses are called before
+super-classes, and otherwise left to right. <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> is guaranteed
+to be called only  a single time on each unique type.</p>
+<p>The actual implementation of <cite>get_array_module</cite> will be in C, but should be
+equivalent to this Python code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_array_module</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">numpy</span><span class="p">):</span>
+    <span class="n">implementing_arrays</span><span class="p">,</span> <span class="n">types</span> <span class="o">=</span> <span class="n">_implementing_arrays_and_types</span><span class="p">(</span><span class="n">arrays</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">implementing_arrays</span> <span class="ow">and</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">default</span>
+    <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">implementing_arrays</span><span class="p">:</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">__array_module__</span><span class="p">(</span><span class="n">types</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">module</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;no common array module found&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_implementing_arrays_and_types</span><span class="p">(</span><span class="n">relevant_arrays</span><span class="p">):</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">implementing_arrays</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">relevant_arrays</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">types</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s1">&#39;__array_module__&#39;</span><span class="p">):</span>
+            <span class="n">types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="c1"># Subclasses before superclasses, otherwise left to right</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">implementing_arrays</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">old_array</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">implementing_arrays</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">old_array</span><span class="p">)):</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+            <span class="n">implementing_arrays</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">implementing_arrays</span><span class="p">,</span> <span class="n">types</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="relationship-with-array-ufunc-and-array-function">
+<h2>Relationship with <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code><a class="headerlink" href="#relationship-with-array-ufunc-and-array-function" title="Link to this heading">#</a></h2>
+<section id="these-older-protocols-have-distinct-use-cases-and-should-remain">
+<h3>These older protocols have distinct use-cases and should remain<a class="headerlink" href="#these-older-protocols-have-distinct-use-cases-and-should-remain" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> is intended to resolve limitations of
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>, so it is natural to consider whether it could entirely
+replace <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>. This would offer dual benefits: (1) simplifying
+the user-story about how to override NumPy and (2) removing the slowdown
+associated with checking for dispatch when calling every NumPy function.</p>
+<p>However, <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> are pretty different
+from a user perspective: it requires explicit calls to <code class="docutils literal notranslate"><span class="pre">get_array_function</span></code>,
+rather than simply reusing original <code class="docutils literal notranslate"><span class="pre">numpy</span></code> functions. This is probably fine
+for <em>libraries</em> that rely on duck-arrays, but may be frustratingly verbose for
+interactive use.</p>
+<p>Some of the dispatching use-cases for <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> are also solved by
+<code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>, but not all of them. For example, it is still useful to
+be able to define non-NumPy ufuncs (e.g., from Numba or SciPy) in a generic way
+on non-NumPy arrays (e.g., with dask.array).</p>
+<p>Given their existing adoption and distinct use cases, we don’t think it makes
+sense to remove or deprecate <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> at
+this time.</p>
+</section>
+<section id="mixin-classes-to-implement-array-function-and-array-ufunc">
+<h3>Mixin classes to implement <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code><a class="headerlink" href="#mixin-classes-to-implement-array-function-and-array-ufunc" title="Link to this heading">#</a></h3>
+<p>Despite the user-facing differences, <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> and a module
+implementing NumPy’s API still contain sufficient functionality needed to
+implement dispatching with the existing duck array protocols.</p>
+<p>For example, the following mixin classes would provide sensible defaults for
+these special methods in terms of <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> and
+<code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ArrayUfuncFromModuleMixin</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_ufunc__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">arrays</span> <span class="o">=</span> <span class="n">inputs</span> <span class="o">+</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;out&#39;</span><span class="p">,</span> <span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">array_module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">get_array_module</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Note this may have false positive matches, if ufunc.__name__</span>
+            <span class="c1"># matches the name of a ufunc defined by NumPy. Unfortunately</span>
+            <span class="c1"># there is no way to determine in which module a ufunc was</span>
+            <span class="c1"># defined.</span>
+            <span class="n">new_ufunc</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">array_module</span><span class="p">,</span> <span class="n">ufunc</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">callable</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">new_ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="k">return</span> <span class="nb">callable</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayFunctionFromModuleMixin</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_function__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">array_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__array_module__</span><span class="p">(</span><span class="n">types</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">array_module</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="c1"># Traverse submodules to find the appropriate function</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">modules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;numpy&#39;</span>
+        <span class="k">for</span> <span class="n">submodule</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">submodule</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">new_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">new_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="k">return</span> <span class="n">new_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To make it easier to write duck arrays, we could also add these mixin classes
+into <code class="docutils literal notranslate"><span class="pre">numpy.lib.mixins</span></code> (but the examples above may suffice).</p>
+</section>
+</section>
+<section id="alternatives-considered">
+<h2>Alternatives considered<a class="headerlink" href="#alternatives-considered" title="Link to this heading">#</a></h2>
+<section id="naming">
+<h3>Naming<a class="headerlink" href="#naming" title="Link to this heading">#</a></h3>
+<p>We like the name <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> because it mirrors the existing
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> protocols. Another reasonable
+choice could be <code class="docutils literal notranslate"><span class="pre">__array_namespace__</span></code>.</p>
+<p>It is less clear what the NumPy function that calls this protocol should be
+called (<code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> in this proposal). Some possible alternatives:
+<code class="docutils literal notranslate"><span class="pre">array_module</span></code>, <code class="docutils literal notranslate"><span class="pre">common_array_module</span></code>, <code class="docutils literal notranslate"><span class="pre">resolve_array_module</span></code>,
+<code class="docutils literal notranslate"><span class="pre">get_namespace</span></code>, <code class="docutils literal notranslate"><span class="pre">get_numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">get_numpylike_module</span></code>,
+<code class="docutils literal notranslate"><span class="pre">get_duck_array_module</span></code>.</p>
+</section>
+<section id="requesting-restricted-subsets-of-numpy-s-api">
+<span id="requesting-restricted-subsets"></span><h3>Requesting restricted subsets of NumPy’s API<a class="headerlink" href="#requesting-restricted-subsets-of-numpy-s-api" title="Link to this heading">#</a></h3>
+<p>Over time, NumPy has accumulated a very large API surface, with over 600
+attributes in the top level <code class="docutils literal notranslate"><span class="pre">numpy</span></code> module alone. It is unlikely that any
+duck array library could or would want to implement all of these functions and
+classes, because the frequently used subset of NumPy is much smaller.</p>
+<p>We think it would be useful exercise to define “minimal” subset(s) of NumPy’s
+API, omitting rarely used or non-recommended functionality. For example,
+minimal NumPy might include <code class="docutils literal notranslate"><span class="pre">stack</span></code>, but not the other stacking functions
+<code class="docutils literal notranslate"><span class="pre">column_stack</span></code>, <code class="docutils literal notranslate"><span class="pre">dstack</span></code>, <code class="docutils literal notranslate"><span class="pre">hstack</span></code> and <code class="docutils literal notranslate"><span class="pre">vstack</span></code>. This could clearly
+indicate to duck array authors and users what functionality is core and what
+functionality they can skip.</p>
+<p>Support for requesting a restricted subset of NumPy’s API would be a natural
+feature to include in  <code class="docutils literal notranslate"><span class="pre">get_array_function</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>, e.g.,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># array_module is only guaranteed to contain &quot;minimal&quot; NumPy</span>
+<span class="n">array_module</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">get_array_module</span><span class="p">(</span><span class="o">*</span><span class="n">arrays</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="s1">&#39;minimal&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To facilitate testing with NumPy and use with any valid duck array library,
+NumPy itself would return restricted versions of the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> module when
+<code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> is called only on NumPy arrays. Omitted functions would
+simply not exist.</p>
+<p>Unfortunately, we have not yet figured out what these restricted subsets should
+be, so it doesn’t make sense to do this yet. When/if we do, we could either add
+new keyword arguments to <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> or add new top level functions,
+e.g., <code class="docutils literal notranslate"><span class="pre">get_minimal_array_module</span></code>. We would also need to add either a new
+protocol patterned off of <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> (e.g.,
+<code class="docutils literal notranslate"><span class="pre">__array_module_minimal__</span></code>), or could add an optional second argument to
+<code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> (catching errors with <code class="docutils literal notranslate"><span class="pre">try</span></code>/<code class="docutils literal notranslate"><span class="pre">except</span></code>).</p>
+</section>
+<section id="a-new-namespace-for-implicit-dispatch">
+<h3>A new namespace for implicit dispatch<a class="headerlink" href="#a-new-namespace-for-implicit-dispatch" title="Link to this heading">#</a></h3>
+<p>Instead of supporting overrides in the main <cite>numpy</cite> namespace with
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>, we could create a new opt-in namespace, e.g.,
+<code class="docutils literal notranslate"><span class="pre">numpy.api</span></code>, with versions of NumPy functions that support dispatching. These
+overrides would need new opt-in protocols, e.g., <code class="docutils literal notranslate"><span class="pre">__array_function_api__</span></code>
+patterned off of <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>.</p>
+<p>This would resolve the biggest limitations of <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> by being
+opt-in and would also allow for unambiguously overriding functions like
+<code class="docutils literal notranslate"><span class="pre">asarray</span></code>, because <code class="docutils literal notranslate"><span class="pre">np.api.asarray</span></code> would always mean “convert an
+array-like object.”  But it wouldn’t solve all the dispatching needs met by
+<code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>, and would leave us with supporting a considerably more
+complex protocol both for array users and implementers.</p>
+<p>We could potentially implement such a new namespace <em>via</em> the
+<code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> protocol. Certainly some users would find this convenient,
+because it is slightly less boilerplate. But this would leave users with a
+confusing choice: when should they use <cite>get_array_module</cite> vs.
+<cite>np.api.something</cite>. Also, we would have to add and maintain a whole new module,
+which is considerably more expensive than merely adding a function.</p>
+</section>
+<section id="dispatching-on-both-types-and-arrays-instead-of-only-types">
+<h3>Dispatching on both types and arrays instead of only types<a class="headerlink" href="#dispatching-on-both-types-and-arrays-instead-of-only-types" title="Link to this heading">#</a></h3>
+<p>Instead of supporting dispatch only via unique array types, we could also
+support dispatch via array objects, e.g., by passing an <code class="docutils literal notranslate"><span class="pre">arrays</span></code> argument as
+part of the <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> protocol. This could potentially be useful for
+dispatch for arrays with metadata, such provided by Dask and Pint, but would
+impose costs in terms of type safety and complexity.</p>
+<p>For example, a library that supports arrays on both CPUs and GPUs might decide
+on which device to create a new arrays from functions like <code class="docutils literal notranslate"><span class="pre">ones</span></code> based on
+input arguments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Array</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__array_module__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="n">arrays</span><span class="p">):</span>
+        <span class="n">useful_arrays</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">a</span> <span class="ow">in</span> <span class="n">arrays</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">Array</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">useful_arrays</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="n">prefer_gpu</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">prefer_gpu</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">useful_arrays</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ArrayModule</span><span class="p">(</span><span class="n">prefer_gpu</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayModule</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefer_gpu</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prefer_gpu</span> <span class="o">=</span> <span class="n">prefer_gpu</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">base_module</span>
+        <span class="n">base_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base_module</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">base_func</span><span class="p">,</span> <span class="n">prefer_gpu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prefer_gpu</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This might be useful, but it’s not clear if we really need it. Pint seems to
+get along OK without any explicit array creation routines (favoring
+multiplication by units, e.g., <code class="docutils literal notranslate"><span class="pre">np.ones(5)</span> <span class="pre">*</span> <span class="pre">ureg.m</span></code>), and for the most part
+Dask is also OK with existing <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> style overrides (e.g.,
+favoring <code class="docutils literal notranslate"><span class="pre">np.ones_like</span></code> over <code class="docutils literal notranslate"><span class="pre">np.ones</span></code>). Choosing whether to place an array
+on the CPU or GPU could be solved by <a class="reference external" href="https://github.com/google/jax/pull/1668">making array creation lazy</a>.</p>
+</section>
+</section>
+<section id="appendix-design-choices-for-api-overrides">
+<span id="appendix-design-choices"></span><h2>Appendix: design choices for API overrides<a class="headerlink" href="#appendix-design-choices-for-api-overrides" title="Link to this heading">#</a></h2>
+<p>There is a large range of possible design choices for overriding NumPy’s API.
+Here we discuss three major axes of the design decision that guided our design
+for <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code>.</p>
+<section id="opt-in-vs-opt-out-for-users">
+<h3>Opt-in vs. opt-out for users<a class="headerlink" href="#opt-in-vs-opt-out-for-users" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> protocols provide a
+mechanism for overriding NumPy functions <em>within NumPy’s existing namespace</em>.
+This means that users need to explicitly opt-out if they do not want any
+overridden behavior, e.g., by casting arrays with <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>.</p>
+<p>In theory, this approach lowers the barrier for adopting these protocols in
+user code and libraries, because code that uses the standard NumPy namespace is
+automatically compatible. But in practice, this hasn’t worked out. For example,
+most well-maintained libraries that use NumPy follow the best practice of
+casting all inputs with <code class="docutils literal notranslate"><span class="pre">np.asarray()</span></code>, which they would have to explicitly
+relax to use <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>. Our experience has been that making a
+library compatible with a new duck array type typically requires at least a
+small amount of work to accommodate differences in the data model and operations
+that can be implemented efficiently.</p>
+<p>These opt-out approaches also considerably complicate backwards compatibility
+for libraries that adopt these protocols, because by opting in as a library
+they also opt-in their users, whether they expect it or not. For winning over
+libraries that have been unable to adopt <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>, an opt-in
+approach seems like a must.</p>
+</section>
+<section id="explicit-vs-implicit-choice-of-implementation">
+<h3>Explicit vs. implicit choice of implementation<a class="headerlink" href="#explicit-vs-implicit-choice-of-implementation" title="Link to this heading">#</a></h3>
+<p>Both <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> have implicit control over
+dispatching: the dispatched functions are determined via the appropriate
+protocols in every function call. This generalizes well to handling many
+different types of objects, as evidenced by its use for implementing arithmetic
+operators in Python, but it has an important downside for <strong>readability</strong>:
+it is not longer immediately evident to readers of code what happens when a
+function is called, because the function’s implementation could be overridden
+by any of its arguments.</p>
+<p>The <strong>speed</strong> implications are:</p>
+<ul class="simple">
+<li><p>When using a <em>duck-array type</em>, <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> means type checking only
+needs to happen once inside each function that supports duck typing, whereas
+with <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> it happens every time a NumPy function is called.
+Obvious it’s going to depend on the function, but if a typical duck-array
+supporting function calls into other NumPy functions 3-5 times this is a factor
+of 3-5x more overhead.</p></li>
+<li><p>When using <em>NumPy arrays</em>, <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> is one extra call per
+function (<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> overhead remains the same), which means a
+small amount of extra overhead.</p></li>
+</ul>
+<p>Explicit and implicit choice of implementations are not mutually exclusive
+options. Indeed, most implementations of NumPy API overrides via
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> that we are familiar with (namely, Dask, CuPy and
+Sparse, but not Pint) also include an explicit way to use their version of
+NumPy’s API by importing a module directly (<code class="docutils literal notranslate"><span class="pre">dask.array</span></code>, <code class="docutils literal notranslate"><span class="pre">cupy</span></code> or
+<code class="docutils literal notranslate"><span class="pre">sparse</span></code>, respectively).</p>
+</section>
+<section id="local-vs-non-local-vs-global-control">
+<h3>Local vs. non-local vs. global control<a class="headerlink" href="#local-vs-non-local-vs-global-control" title="Link to this heading">#</a></h3>
+<p>The final design axis is how users control the choice of API:</p>
+<ul class="simple">
+<li><p><strong>Local control</strong>, as exemplified by multiple dispatch and Python protocols for
+arithmetic, determines which implementation to use either by checking types
+or calling methods on the direct arguments of a function.</p></li>
+<li><p><strong>Non-local control</strong> such as <a class="reference external" href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.errstate.html">np.errstate</a>
+overrides behavior with global-state via function decorators or
+context-managers. Control is determined hierarchically, via the inner-most
+context.</p></li>
+<li><p><strong>Global control</strong> provides a mechanism for users to set default behavior,
+either via function calls or configuration files. For example, matplotlib
+allows setting a global choice of plotting backend.</p></li>
+</ul>
+<p>Local control is generally considered a best practice for API design, because
+control flow is entirely explicit, which makes it the easiest to understand.
+Non-local and global control are occasionally used, but generally either due to
+ignorance or a lack of better alternatives.</p>
+<p>In the case of duck typing for NumPy’s public API, we think non-local or global
+control would be mistakes, mostly because they <strong>don’t compose well</strong>. If one
+library sets/needs one set of overrides and then internally calls a routine
+that expects another set of overrides, the resulting behavior may be very
+surprising. Higher order functions are especially problematic, because the
+context in which functions are evaluated may not be the context in which they
+are defined.</p>
+<p>One class of override use cases where we think non-local and global control are
+appropriate is for choosing a backend system that is guaranteed to have an
+entirely consistent interface, such as a faster alternative implementation of
+<code class="docutils literal notranslate"><span class="pre">numpy.fft</span></code> on NumPy arrays. However, these are out of scope for the current
+proposal, which is focused on duck arrays.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-array-function-hasn-t-been-enough">Why <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> hasn’t been enough</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#get-array-module-and-the-array-module-protocol"><code class="docutils literal notranslate"><span class="pre">get_array_module</span></code> and the <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code> protocol</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-array-module-contract">The array module contract</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-use-get-array-module">How to use <code class="docutils literal notranslate"><span class="pre">get_array_module</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-implement-array-module">How to implement <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#returning-custom-objects-from-array-module">Returning custom objects from <code class="docutils literal notranslate"><span class="pre">__array_module__</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#subclassing-from-numpy-ndarray">Subclassing from <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-s-internal-machinery">NumPy’s internal machinery</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#relationship-with-array-ufunc-and-array-function">Relationship with <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#these-older-protocols-have-distinct-use-cases-and-should-remain">These older protocols have distinct use-cases and should remain</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mixin-classes-to-implement-array-function-and-array-ufunc">Mixin classes to implement <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> and <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives-considered">Alternatives considered</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#naming">Naming</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requesting-restricted-subsets-of-numpy-s-api">Requesting restricted subsets of NumPy’s API</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-new-namespace-for-implicit-dispatch">A new namespace for implicit dispatch</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dispatching-on-both-types-and-arrays-instead-of-only-types">Dispatching on both types and arrays instead of only types</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#appendix-design-choices-for-api-overrides">Appendix: design choices for API overrides</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#opt-in-vs-opt-out-for-users">Opt-in vs. opt-out for users</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#explicit-vs-implicit-choice-of-implementation">Explicit vs. implicit choice of implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#local-vs-non-local-vs-global-control">Local vs. non-local vs. global control</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

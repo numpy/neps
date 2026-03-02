@@ -1,0 +1,998 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 25 — NA support via special dtypes &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0025-missing-data-3';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 26 — Summary of missing data NEPs and discussion" href="nep-0026-missing-data-summary.html" />
+    <link rel="prev" title="NEP 24 — Missing data functionality - alternative 1 to NEP 12" href="nep-0024-missing-data-2.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="deferred.html" class="nav-link">Deferred and Superseded NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 25 — NA support via special dtypes</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-25-na-support-via-special-dtypes">
+<span id="nep25"></span><h1>NEP 25 — NA support via special dtypes<a class="headerlink" href="#nep-25-na-support-via-special-dtypes" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nathaniel J. Smith &lt;<a class="reference external" href="mailto:njs&#37;&#52;&#48;pobox&#46;com">njs<span>&#64;</span>pobox<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Deferred</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2011-07-08</p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p><em>Context: this NEP was written as an additional alternative to NEP 12 (NEP 24
+is another alternative), which at the time of writing had an implementation
+that was merged into the NumPy main branch.</em></p>
+<p>To try and make more progress on the whole missing values/masked arrays/…
+debate, it seems useful to have a more technical discussion of the pieces
+which we <em>can</em> agree on. This is the second, which attempts to nail down the
+details of how NAs can be implemented using special dtype’s.</p>
+<section id="rationale">
+<h3>Rationale<a class="headerlink" href="#rationale" title="Link to this heading">#</a></h3>
+<p>An ordinary value is something like an integer or a floating point number. A
+missing value is a placeholder for an ordinary value that is for some reason
+unavailable. For example, in working with statistical data, we often build
+tables in which each row represents one item, and each column represents
+properties of that item. For instance, we might take a group of people and
+for each one record height, age, education level, and income, and then stick
+these values into a table. But then we discover that our research assistant
+screwed up and forgot to record the age of one of our individuals. We could
+throw out the rest of their data as well, but this would be wasteful; even
+such an incomplete row is still perfectly usable for some analyses (e.g., we
+can compute the correlation of height and income). The traditional way to
+handle this would be to stick some particular meaningless value in for the
+missing data,e.g., recording this person’s age as 0. But this is very error
+prone; we may later forget about these special values while running other
+analyses, and discover to our surprise that babies have higher incomes than
+teenagers. (In this case, the solution would be to just leave out all the
+items where we have no age recorded, but this isn’t a general solution; many
+analyses require something more clever to handle missing values.) So instead
+of using an ordinary value like 0, we define a special “missing” value,
+written “NA” for “not available”.</p>
+<p>There are several possible ways to represent such a value in memory. For
+instance, we could reserve a specific value (like 0, or a particular NaN, or
+the smallest negative integer) and then ensure that this value is treated
+specially by all arithmetic and other operations on our array. Another option
+would be to add an additional mask array next to our main array, use this to
+indicate which values should be treated as NA, and then extend our array
+operations to check this mask array whenever performing computations. Each
+implementation approach has various strengths and weaknesses, but here we focus
+on the former (value-based) approach exclusively and leave the possible
+addition of the latter to future discussion. The core advantages of this
+approach are (1) it adds no additional memory overhead, (2) it is
+straightforward to store and retrieve such arrays to disk using existing file
+storage formats, (3) it allows binary compatibility with R arrays including NA
+values, (4) it is compatible with the common practice of using NaN to indicate
+missingness when working with floating point numbers, (5) the dtype is already
+a place where “weird things can happen” – there are a wide variety of dtypes
+that don’t act like ordinary numbers (including structs, Python objects,
+fixed-length strings, …), so code that accepts arbitrary NumPy arrays already
+has to be prepared to handle these (even if only by checking for them and
+raising an error). Therefore adding yet more new dtypes has less impact on
+extension authors than if we change the ndarray object itself.</p>
+<p>The basic semantics of NA values are as follows. Like any other value, they
+must be supported by your array’s dtype – you can’t store a floating point
+number in an array with dtype=int32, and you can’t store an NA in it either.
+You need an array with dtype=NAint32 or something (exact syntax to be
+determined). Otherwise, NA values act exactly like any other values. In
+particular, you can apply arithmetic functions and so forth to them. By
+default, any function which takes an NA as an argument always returns an NA as
+well, regardless of the values of the other arguments. This ensures that if we
+try to compute the correlation of income with age, we will get “NA”, meaning
+“given that some of the entries could be anything, the answer could be anything
+as well”. This reminds us to spend a moment thinking about how we should
+rephrase our question to be more meaningful. And as a convenience for those
+times when you do decide that you just want the correlation between the known
+ages and income, then you can enable this behavior by adding a single argument
+to your function call.</p>
+<p>For floating point computations, NAs and NaNs have (almost?) identical
+behavior. But they represent different things – NaN an invalid computation
+like 0/0, NA a value that is not available – and distinguishing between these
+things is useful because in some situations they should be treated differently.
+(For example, an imputation procedure should replace NAs with imputed values,
+but probably should leave NaNs alone.) And anyway, we can’t use NaNs for
+integers, or strings, or booleans, so we need NA anyway, and once we have NA
+support for all these types, we might as well support it for floating point too
+for consistency.</p>
+</section>
+</section>
+<section id="general-strategy">
+<h2>General strategy<a class="headerlink" href="#general-strategy" title="Link to this heading">#</a></h2>
+<p>NumPy already has a general mechanism for defining new dtypes and slotting them
+in so that they’re supported by ndarrays, by the casting machinery, by ufuncs,
+and so on. In principle, we could implement NA-dtypes just using these existing
+interfaces. But we don’t want to do that, because defining all those new ufunc
+loops etc. from scratch would be a huge hassle, especially since the basic
+functionality needed is the same in all cases. So we need some generic
+functionality for NAs – but it would be better not to bake this in as a single
+set of special “NA types”, since users may well want to define new custom
+dtypes that have their own NA values, and have them integrate well the rest of
+the NA machinery. Our strategy, therefore, is to avoid the <a class="reference external" href="https://lwn.net/Articles/336262/">mid-layer mistake</a>
+by exposing some code for generic NA handling in different situations, which
+dtypes can selectively use or not as they choose.</p>
+<dl class="simple">
+<dt>Some example use cases:</dt><dd><ol class="arabic simple">
+<li><p>We want to define a dtype that acts exactly like an int32, except that the
+most negative value is treated as NA.</p></li>
+<li><p>We want to define a parametrized dtype to represent <a class="reference external" href="http://mail.scipy.org/pipermail/numpy-discussion/2010-August/052401.html">categorical data</a>,
+and the bit-pattern to be used for NA depends on the number of categories
+defined, so our code needs to play an active role handling it rather than
+simply deferring to the standard machinery.</p></li>
+<li><p>We want to define a dtype that acts like an length-10 string and supports
+NAs. Since our string may hold arbitrary binary values, we want to actually
+allocate 11 bytes for it, with the first byte a flag indicating whether this
+string is NA and the rest containing the string content.</p></li>
+<li><p>We want to define a dtype that allows multiple different types of NA data,
+which print differently and can be distinguished by the new ufunc that we
+define called <code class="docutils literal notranslate"><span class="pre">is_na_of_type(...)</span></code>, but otherwise takes advantage of the
+generic NA machinery for most operations.</p></li>
+</ol>
+</dd>
+</dl>
+</section>
+<section id="dtype-c-level-api-extensions">
+<h2>dtype C-level API extensions<a class="headerlink" href="#dtype-c-level-api-extensions" title="Link to this heading">#</a></h2>
+<p>The <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/c-api.types-and-structures.html#PyArray_Descr">PyArray_Descr</a> struct gains the following new fields:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">NA_value</span><span class="p">;</span>
+<span class="n">PyArray_Descr</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">NA_extends</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">NA_extends_offset</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The following new flag values are defined:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">NPY_NA_AUTO_ARRFUNCS</span>
+<span class="n">NPY_NA_AUTO_CAST</span>
+<span class="n">NPY_NA_AUTO_UFUNC</span>
+<span class="n">NPY_NA_AUTO_UFUNC_CHECKED</span>
+<span class="n">NPY_NA_AUTO_ALL</span><span class="w"> </span><span class="cm">/* the above flags OR&#39;ed together */</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/c-api.types-and-structures.html#PyArray_ArrFuncs">PyArray_ArrFuncs</a> struct gains the following new fields:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">isna</span><span class="p">)(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dst</span><span class="p">,</span><span class="w"> </span><span class="n">npy_intp</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">arr</span><span class="p">);</span>
+<span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">clearna</span><span class="p">)(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">npy_intp</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">arr</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>We add at least one new convenience macro:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define NPY_NA_SUPPORTED(dtype) ((dtype)-&gt;f-&gt;isna != NULL)</span>
+</pre></div>
+</div>
+<p>The general idea is that anywhere where we used to call a dtype-specific
+function pointer, the code will be modified to instead:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Check for whether the relevant <code class="docutils literal notranslate"><span class="pre">NPY_NA_AUTO_...</span></code> bit is enabled, the
+NA_extends field is non-NULL, and the function pointer we wanted to call
+is NULL.</p></li>
+<li><p>If these conditions are met, then use <code class="docutils literal notranslate"><span class="pre">isna</span></code> to identify which entries
+in the array are NA, and handle them appropriately. Then look up whatever
+function we were <em>going</em> to call using this dtype on the <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code>
+dtype instead, and use that to handle the non-NA elements.</p></li>
+</ol>
+</div></blockquote>
+<p>For more specifics, see following sections.</p>
+<p>Note that if <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code> points to a parametrized dtype, then the dtype
+object it points to must be fully specified. For example, if it is a string
+dtype, it must have a non-zero <code class="docutils literal notranslate"><span class="pre">elsize</span></code> field.</p>
+<p>In order to handle the case where the NA information is stored in a field next
+to the <cite>real’ data, the ``NA_extends_offset`</cite> field is set to a non-zero value;
+it must point to the location within each element of this dtype where some data
+of the <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code> dtype is found. For example, if we have are storing
+10-byte strings with an NA indicator byte at the beginning, then we have:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">elsize</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">11</span>
+<span class="n">NA_extends_offset</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">NA_extends</span><span class="o">-&gt;</span><span class="n">elsize</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">10</span>
+</pre></div>
+</div>
+<p>When delegating to the <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code> dtype, we offset our data pointer by
+<code class="docutils literal notranslate"><span class="pre">NA_extends_offset</span></code> (while keeping our strides the same) so that it sees an
+array of data of the expected type (plus some superfluous padding). This is
+basically the same mechanism that record dtypes use, IIUC, so it should be
+pretty well-tested.</p>
+<p>When delegating to a function that cannot handle “misbehaved” source data (see
+the <code class="docutils literal notranslate"><span class="pre">PyArray_ArrFuncs</span></code> documentation for details), then we need to check for
+alignment issues before delegating (especially with a non-zero
+<code class="docutils literal notranslate"><span class="pre">NA_extends_offset</span></code>). If there’s a problem, when we need to “clean up” the
+source data first, using the usual mechanisms for handling misaligned data. (Of
+course, we should usually set up our dtypes so that there aren’t any alignment
+issues, but someone screws that up, or decides that reduced memory usage is
+more important to them then fast inner loops, then we should still handle that
+gracefully, as we do now.)</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">NA_value</span></code> and <code class="docutils literal notranslate"><span class="pre">clearna</span></code> fields are used for various sorts of casting.
+<code class="docutils literal notranslate"><span class="pre">NA_value</span></code> is a bit-pattern to be used when, for example, assigning from
+np.NA. <code class="docutils literal notranslate"><span class="pre">clearna</span></code> can be a no-op if <code class="docutils literal notranslate"><span class="pre">elsize</span></code> and <code class="docutils literal notranslate"><span class="pre">NA_extends-&gt;elsize</span></code> are
+the same, but if they aren’t then it should clear whatever auxiliary NA storage
+this dtype uses, so that none of the specified array elements are NA.</p>
+<section id="core-dtype-functions">
+<h3>Core dtype functions<a class="headerlink" href="#core-dtype-functions" title="Link to this heading">#</a></h3>
+<p>The following functions are defined in <code class="docutils literal notranslate"><span class="pre">PyArray_ArrFuncs</span></code>. The special
+behavior described here is enabled by the NPY_NA_AUTO_ARRFUNCS bit in the dtype
+flags, and only enabled if the given function field is <em>not</em> filled in.</p>
+<p><code class="docutils literal notranslate"><span class="pre">getitem</span></code>: Calls <code class="docutils literal notranslate"><span class="pre">isna</span></code>. If <code class="docutils literal notranslate"><span class="pre">isna</span></code> returns true, returns np.NA.
+Otherwise, delegates to the <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code> dtype.</p>
+<p><code class="docutils literal notranslate"><span class="pre">setitem</span></code>: If the input object is <code class="docutils literal notranslate"><span class="pre">np.NA</span></code>, then runs
+<code class="docutils literal notranslate"><span class="pre">memcpy(self-&gt;NA_value,</span> <span class="pre">data,</span> <span class="pre">arr-&gt;dtype-&gt;elsize);</span></code>. Otherwise, calls
+<code class="docutils literal notranslate"><span class="pre">clearna</span></code>, and then delegates to the <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code> dtype.</p>
+<p><code class="docutils literal notranslate"><span class="pre">copyswapn</span></code>, <code class="docutils literal notranslate"><span class="pre">copyswap</span></code>: FIXME: Not sure whether there’s any special
+handling to use for these?</p>
+<p><code class="docutils literal notranslate"><span class="pre">compare</span></code>: FIXME: how should this handle NAs? R’s sort function <em>discards</em>
+NAs, which doesn’t seem like a good option.</p>
+<p><code class="docutils literal notranslate"><span class="pre">argmax</span></code>: FIXME: what is this used for? If it’s the underlying implementation
+for np.max, then it really needs some way to get a skipna argument. If not,
+then the appropriate semantics depends on what it’s supposed to accomplish…</p>
+<p><code class="docutils literal notranslate"><span class="pre">dotfunc</span></code>: QUESTION: is it actually guaranteed that everything has the same
+dtype? FIXME: same issues as for <code class="docutils literal notranslate"><span class="pre">argmax</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">scanfunc</span></code>: This one’s ugly. We may have to explicitly override it in all of
+our special dtypes, because assuming that we want the option of, say, having
+the token “NA” represent an NA value in a text file, we need some way to check
+whether that’s there before delegating. But <code class="docutils literal notranslate"><span class="pre">ungetc</span></code> is only guaranteed to
+let us put back 1 character, and we need 2 (or maybe 3 if we actually check for
+“NA “). The other option would be to read to the next delimiter, check whether
+we have an NA, and if not then delegate to <code class="docutils literal notranslate"><span class="pre">fromstr</span></code> instead of <code class="docutils literal notranslate"><span class="pre">scanfunc</span></code>,
+but according to the current API, each dtype might in principle use a totally
+different rule for defining “the next delimiter”. So… any ideas? (FIXME)</p>
+<p><code class="docutils literal notranslate"><span class="pre">fromstr</span></code>: Easy – check for “NA “, if present then assign <code class="docutils literal notranslate"><span class="pre">NA_value</span></code>,
+otherwise call <code class="docutils literal notranslate"><span class="pre">clearna</span></code> and delegate.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nonzero</span></code>: FIXME: again, what is this used for? (It seems redundant with
+using the casting machinery to cast to bool.) Probably it needs to be modified
+so that it can return NA, though…</p>
+<p><code class="docutils literal notranslate"><span class="pre">fill</span></code>: Use <code class="docutils literal notranslate"><span class="pre">isna</span></code> to check if either of the first two values is NA. If so,
+then fill the rest of the array with <code class="docutils literal notranslate"><span class="pre">NA_value</span></code>. Otherwise, call <code class="docutils literal notranslate"><span class="pre">clearna</span></code>
+and then delegate.</p>
+<p><code class="docutils literal notranslate"><span class="pre">fillwithvalue</span></code>: Guess this can just delegate?</p>
+<p><code class="docutils literal notranslate"><span class="pre">sort</span></code>, <code class="docutils literal notranslate"><span class="pre">argsort</span></code>: These should probably arrange to sort NAs to a
+particular place in the array (either the front or the back – any opinions?)</p>
+<p><code class="docutils literal notranslate"><span class="pre">scalarkind</span></code>: FIXME: I have no idea what this does.</p>
+<p><code class="docutils literal notranslate"><span class="pre">castdict</span></code>, <code class="docutils literal notranslate"><span class="pre">cancastscalarkindto</span></code>, <code class="docutils literal notranslate"><span class="pre">cancastto</span></code>: See section on casting
+below.</p>
+</section>
+<section id="casting">
+<h3>Casting<a class="headerlink" href="#casting" title="Link to this heading">#</a></h3>
+<p>FIXME: this really needs attention from an expert on NumPy’s casting rules. But
+I can’t seem to find the docs that explain how casting loops are looked up and
+decided between (e.g., if you’re casting from dtype A to dtype B, which dtype’s
+loops are used?), so I can’t go into details. But those details are tricky and
+they matter…</p>
+<p>But the general idea is, if you have a dtype with <code class="docutils literal notranslate"><span class="pre">NPY_NA_AUTO_CAST</span></code> set,
+then the following conversions are automatically allowed:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Casting from the underlying type to the NA-type: this is performed by the</p></li>
+<li><p>usual <code class="docutils literal notranslate"><span class="pre">clearna</span></code> + potentially-strided copy dance. Also, <code class="docutils literal notranslate"><span class="pre">isna</span></code> is</p></li>
+<li><p>called to check that none of the regular values have been accidentally</p></li>
+<li><p>converted into NA; if so, then an error is raised.</p></li>
+<li><p>Casting from the NA-type to the underlying type: allowed in principle, but
+if <code class="docutils literal notranslate"><span class="pre">isna</span></code> returns true for any of the values that are to be converted,
+then again, an error is raised. (If you want to get around this, use
+<code class="docutils literal notranslate"><span class="pre">np.view(array_with_NAs,</span> <span class="pre">dtype=float)</span></code>.)</p></li>
+<li><p>Casting between the NA-type and other types that do not support NA: this is
+allowed if the underlying type is allowed to cast to the other type, and is
+performed by combining a cast to or from the underlying type (using the
+above rules) with a cast to or from the other type (using the underlying
+type’s rules).</p></li>
+<li><p>Casting between the NA-type and other types that do support NA: if the
+other type has NPY_NA_AUTO_CAST set, then we use the above rules plus the
+usual dance with <code class="docutils literal notranslate"><span class="pre">isna</span></code> on one array being converted to <code class="docutils literal notranslate"><span class="pre">NA_value</span></code>
+elements in the other. If only one of the arrays has NPY_NA_AUTO_CAST set,
+then it’s assumed that that dtype knows what it’s doing, and we don’t do
+any magic. (But this is one of the things that I’m not sure makes sense, as
+per my caveat above.)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="ufuncs">
+<h3>Ufuncs<a class="headerlink" href="#ufuncs" title="Link to this heading">#</a></h3>
+<p>All ufuncs gain an additional optional keyword argument, <code class="docutils literal notranslate"><span class="pre">skipNA=</span></code>, which
+defaults to False.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">skipNA</span> <span class="pre">==</span> <span class="pre">True</span></code>, then the ufunc machinery <em>unconditionally</em> calls
+<code class="docutils literal notranslate"><span class="pre">isna</span></code> for any dtype where NPY_NA_SUPPORTED(dtype) is true, and then acts as
+if any values for which isna returns True were masked out in the <code class="docutils literal notranslate"><span class="pre">where=</span></code>
+argument (see miniNEP 1 for the behavior of <code class="docutils literal notranslate"><span class="pre">where=</span></code>). If a <code class="docutils literal notranslate"><span class="pre">where=</span></code>
+argument is also given, then it acts as if the <code class="docutils literal notranslate"><span class="pre">isna</span></code> values had be ANDed out
+of the <code class="docutils literal notranslate"><span class="pre">where=</span></code> mask, though it does not actually modify the mask. Unlike the
+other changes below, this is performed <em>unconditionally</em> for any dtype which
+has an <code class="docutils literal notranslate"><span class="pre">isna</span></code> function defined; the NPY_NA_AUTO_UFUNC flag is <em>not</em> checked.</p>
+<p>If NPY_NA_AUTO_UFUNC is set, then ufunc loop lookup is modified so that
+whenever it checks for the existence of a loop on the current dtype, and does
+not find one, then it also checks for a loop on the <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code> dtype. If
+that loop is found, then it uses it in the normal way, with the exceptions that
+(1) it is only called for values which are not NA according to <code class="docutils literal notranslate"><span class="pre">isna</span></code>, (2) if
+the output array has NPY_NA_AUTO_UFUNC set, then <code class="docutils literal notranslate"><span class="pre">clearna</span></code> is called on it
+before calling the ufunc loop, (3) pointer offsets are adjusted by
+<code class="docutils literal notranslate"><span class="pre">NA_extends_offset</span></code> before calling the ufunc loop. In addition, if
+NPY_NA_AUTO_UFUNC_CHECK is set, then after evaluating the ufunc loop we call
+<code class="docutils literal notranslate"><span class="pre">isna</span></code> on the <em>output</em> array, and if there are any NAs in the output which
+were not in the input, then we raise an error. (The intention of this is to
+catch cases where, say, we represent NA using the most-negative integer, and
+then someone’s arithmetic overflows to create such a value by accident.)</p>
+<p>FIXME: We should go into more detail here about how NPY_NA_AUTO_UFUNC works
+when there are multiple input arrays, of which potentially some have the flag
+set and some do not.</p>
+</section>
+<section id="printing">
+<h3>Printing<a class="headerlink" href="#printing" title="Link to this heading">#</a></h3>
+<p>FIXME: There should be some sort of mechanism by which values which are NA are
+automatically repr’ed as NA, but I don’t really understand how NumPy printing
+works, so I’ll let someone else fill in this section.</p>
+</section>
+<section id="indexing">
+<h3>Indexing<a class="headerlink" href="#indexing" title="Link to this heading">#</a></h3>
+<p>Scalar indexing like <code class="docutils literal notranslate"><span class="pre">a[12]</span></code> goes via the <code class="docutils literal notranslate"><span class="pre">getitem</span></code> function, so according
+to the proposal as described above, if a dtype delegates <code class="docutils literal notranslate"><span class="pre">getitem</span></code>, then
+scalar indexing on NAs will return the object <code class="docutils literal notranslate"><span class="pre">np.NA</span></code>. (If it doesn’t
+delegate <code class="docutils literal notranslate"><span class="pre">getitem</span></code>, of course, then it can return whatever it wants.)</p>
+<p>This seems like the simplest approach, but an alternative would be to add a
+special case to scalar indexing, where if an <code class="docutils literal notranslate"><span class="pre">NPY_NA_AUTO_INDEX</span></code> flag were
+set, then it would call <code class="docutils literal notranslate"><span class="pre">isna</span></code> on the specified element. If this returned
+false, it would call <code class="docutils literal notranslate"><span class="pre">getitem</span></code> as usual; otherwise, it would return a 0-d
+array containing the specified element. The problem with this is that it breaks
+expressions like <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">a[i]</span> <span class="pre">is</span> <span class="pre">np.NA:</span> <span class="pre">...</span></code>. (Of course, there is nothing nearly
+so convenient as that for NaN values now, but then, NaN values don’t have their
+own global singleton.) So for now we stick to scalar indexing just returning
+<code class="docutils literal notranslate"><span class="pre">np.NA</span></code>, but this can be revisited if anyone objects.</p>
+</section>
+</section>
+<section id="python-api-for-generic-na-support">
+<h2>Python API for generic NA support<a class="headerlink" href="#python-api-for-generic-na-support" title="Link to this heading">#</a></h2>
+<p>NumPy will gain a global singleton called <code class="docutils literal notranslate"><span class="pre">numpy.NA</span></code>, similar to None, but with
+semantics reflecting its status as a missing value. In particular, trying to
+treat it as a boolean will raise an exception, and comparisons with it will
+produce <code class="docutils literal notranslate"><span class="pre">numpy.NA</span></code> instead of True or False. These basics are adopted from the
+behavior of the NA value in the R project. To dig deeper into the ideas,
+<a class="reference external" href="http://en.wikipedia.org/wiki/Ternary_logic#Kleene_logic">http://en.wikipedia.org/wiki/Ternary_logic#Kleene_logic</a> provides a starting
+point.</p>
+<p>Most operations on <code class="docutils literal notranslate"><span class="pre">np.NA</span></code> (e.g., <code class="docutils literal notranslate"><span class="pre">__add__</span></code>, <code class="docutils literal notranslate"><span class="pre">__mul__</span></code>) are overridden to
+unconditionally return <code class="docutils literal notranslate"><span class="pre">np.NA</span></code>.</p>
+<p>The automagic dtype detection used for expressions like <code class="docutils literal notranslate"><span class="pre">np.asarray([1,</span> <span class="pre">2,</span>
+<span class="pre">3])</span></code>, <code class="docutils literal notranslate"><span class="pre">np.asarray([1.0,</span> <span class="pre">2.0.</span> <span class="pre">3.0])</span></code> will be extended to recognize the
+<code class="docutils literal notranslate"><span class="pre">np.NA</span></code> value, and use it to automatically switch to a built-in NA-enabled
+dtype (which one being determined by the other elements in the array). A simple
+<code class="docutils literal notranslate"><span class="pre">np.asarray([np.NA])</span></code> will use an NA-enabled float64 dtype (which is
+analogous to what you get from <code class="docutils literal notranslate"><span class="pre">np.asarray([])</span></code>). Note that this means that
+expressions like <code class="docutils literal notranslate"><span class="pre">np.log(np.NA)</span></code> will work: first <code class="docutils literal notranslate"><span class="pre">np.NA</span></code> will be coerced
+to a 0-d NA-float array, and then <code class="docutils literal notranslate"><span class="pre">np.log</span></code> will be called on that.</p>
+<p>Python-level dtype objects gain the following new fields:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">NA_supported</span>
+<span class="n">NA_value</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">NA_supported</span></code> is a boolean which simply exposes the value of the
+<code class="docutils literal notranslate"><span class="pre">NPY_NA_SUPPORTED</span></code> flag; it should be true if this dtype allows for NAs,
+false otherwise. [FIXME: would it be better to just key this off the existence
+of the <code class="docutils literal notranslate"><span class="pre">isna</span></code> function? Even if a dtype decides to implement all other NA
+handling itself, it still has to define <code class="docutils literal notranslate"><span class="pre">isna</span></code> in order to make <code class="docutils literal notranslate"><span class="pre">skipNA=</span></code>
+work correctly.]</p>
+<p><code class="docutils literal notranslate"><span class="pre">NA_value</span></code> is a 0-d array of the given dtype, and its sole element contains
+the same bit-pattern as the dtype’s underlying <code class="docutils literal notranslate"><span class="pre">NA_value</span></code> field. This makes
+it possible to determine the default bit-pattern for NA values for this type
+(e.g., with <code class="docutils literal notranslate"><span class="pre">np.view(mydtype.NA_value,</span> <span class="pre">dtype=int8)</span></code>).</p>
+<p>We <em>do not</em> expose the <code class="docutils literal notranslate"><span class="pre">NA_extends</span></code> and <code class="docutils literal notranslate"><span class="pre">NA_extends_offset</span></code> values at the
+Python level, at least for now; they’re considered an implementation detail
+(and it’s easier to expose them later if they’re needed then unexpose them if
+they aren’t).</p>
+<p>Two new ufuncs are defined: <code class="docutils literal notranslate"><span class="pre">np.isNA</span></code> returns a logical array, with true
+values where-ever the dtype’s <code class="docutils literal notranslate"><span class="pre">isna</span></code> function returned true. <code class="docutils literal notranslate"><span class="pre">np.isnumber</span></code>
+is only defined for numeric dtypes, and returns True for all elements which are
+not NA, and for which <code class="docutils literal notranslate"><span class="pre">np.isfinite</span></code> would return True.</p>
+</section>
+<section id="builtin-na-dtypes">
+<h2>Builtin NA dtypes<a class="headerlink" href="#builtin-na-dtypes" title="Link to this heading">#</a></h2>
+<p>The above describes the generic machinery for NA support in dtypes. It’s
+flexible enough to handle all sorts of situations, but we also want to define a
+few generally useful NA-supporting dtypes that are available by default.</p>
+<p>For each built-in dtype, we define an associated NA-supporting dtype, as
+follows:</p>
+<ul class="simple">
+<li><p>floats: the associated dtype uses a specific NaN bit-pattern to indicate NA
+(chosen for R compatibility)</p></li>
+<li><p>complex: we do whatever R does (FIXME: look this up – two NA floats,
+probably?)</p></li>
+<li><p>signed integers: the most-negative signed value is used as NA (chosen for R
+compatibility)</p></li>
+<li><p>unsigned integers: the most-positive value is used as NA (no R compatibility
+possible).</p></li>
+<li><p>strings: the first byte (or, in the case of unicode strings, first 4 bytes)
+is used as a flag to indicate NA, and the rest of the data gives the actual
+string. (no R compatibility possible)</p></li>
+<li><p>objects: Two options (FIXME): either we don’t include an NA-ful version, or
+we use np.NA as the NA bit pattern.</p></li>
+<li><p>boolean: we do whatever R does (FIXME: look this up – 0 == FALSE, 1 == TRUE,
+2 == NA?)</p></li>
+</ul>
+<p>Each of these dtypes is trivially defined using the above machinery, and are
+what are automatically used by the automagic type inference machinery (for
+<code class="docutils literal notranslate"><span class="pre">np.asarray([True,</span> <span class="pre">np.NA,</span> <span class="pre">False])</span></code>, etc.).</p>
+<p>They can also be accessed via a new function <code class="docutils literal notranslate"><span class="pre">np.withNA</span></code>, which takes a
+regular dtype (or an object that can be coerced to a dtype, like ‘float’) and
+returns one of the above dtypes. Ideally <code class="docutils literal notranslate"><span class="pre">withNA</span></code> should also take some
+optional arguments that let you describe which values you want to count as NA,
+etc., but I’ll leave that for a future draft (FIXME).</p>
+<p>FIXME: If <code class="docutils literal notranslate"><span class="pre">d</span></code> is one of the above dtypes, then should <code class="docutils literal notranslate"><span class="pre">d.type</span></code> return?</p>
+<p>The NEP also contains a proposal for a somewhat elaborate
+domain-specific-language for describing NA dtypes. I’m not sure how great an
+idea that is. (I have a bias against using strings as data structures, and find
+the already existing strings confusing enough as it is – also, apparently the
+NEP version of NumPy uses strings like ‘f8’ when printing dtypes, while my
+NumPy uses object names like ‘float64’, so I’m not sure what’s going on there.
+<code class="docutils literal notranslate"><span class="pre">withNA(float64,</span> <span class="pre">arg1=value1)</span></code> seems like a more pleasant way to print a
+dtype than “NA[f8,value1]”, at least to me.) But if people want it, then cool.</p>
+<section id="type-hierarchy">
+<h3>Type hierarchy<a class="headerlink" href="#type-hierarchy" title="Link to this heading">#</a></h3>
+<p>FIXME: how should we do subtype checks, etc., for NA dtypes? What does
+<code class="docutils literal notranslate"><span class="pre">issubdtype(withNA(float),</span> <span class="pre">float)</span></code> return? How about
+<code class="docutils literal notranslate"><span class="pre">issubdtype(withNA(float),</span> <span class="pre">np.floating)</span></code>?</p>
+</section>
+<section id="serialization">
+<h3>Serialization<a class="headerlink" href="#serialization" title="Link to this heading">#</a></h3>
+</section>
+<section id="copyright">
+<h3>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h3>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rationale">Rationale</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#general-strategy">General strategy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dtype-c-level-api-extensions">dtype C-level API extensions</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#core-dtype-functions">Core dtype functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#casting">Casting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ufuncs">Ufuncs</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#printing">Printing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#indexing">Indexing</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-api-for-generic-na-support">Python API for generic NA support</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#builtin-na-dtypes">Builtin NA dtypes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#type-hierarchy">Type hierarchy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#serialization">Serialization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

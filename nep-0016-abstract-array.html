@@ -1,0 +1,908 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 16 — An abstract base class for identifying “duck arrays” &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0016-abstract-array';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 17 — Split out masked arrays" href="nep-0017-split-out-maskedarray.html" />
+    <link rel="prev" title="Rejected and Withdrawn NEPs" href="rejected.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="rejected.html" class="nav-link">Rejected and Withdrawn NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 16 — An abstract base class for identifying “duck arrays”</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-16-an-abstract-base-class-for-identifying-duck-arrays">
+<span id="nep16"></span><h1>NEP 16 — An abstract base class for identifying “duck arrays”<a class="headerlink" href="#nep-16-an-abstract-base-class-for-identifying-duck-arrays" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nathaniel J. Smith &lt;<a class="reference external" href="mailto:njs&#37;&#52;&#48;pobox&#46;com">njs<span>&#64;</span>pobox<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Withdrawn</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2018-03-06</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="github reference external" href="https://github.com/numpy/numpy/pull/12174">numpy/numpy#12174</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This NEP has been withdrawn in favor of the protocol based approach
+described in <a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html"><span class="doc">NEP 22 — Duck typing for NumPy arrays – high level overview</span></a></p>
+</div>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>We propose to add an abstract base class <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> so that
+third-party classes can declare their ability to “quack like” an
+<code class="docutils literal notranslate"><span class="pre">ndarray</span></code>, and an <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code> function that performs
+similarly to <code class="docutils literal notranslate"><span class="pre">asarray</span></code> except that it passes through
+<code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> instances unchanged.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<p>Many functions, in NumPy and in third-party packages, start with some
+code like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">myfunc</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>This ensures that <code class="docutils literal notranslate"><span class="pre">a</span></code> and <code class="docutils literal notranslate"><span class="pre">b</span></code> are <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> objects, so
+<code class="docutils literal notranslate"><span class="pre">myfunc</span></code> can carry on assuming that they’ll act like ndarrays both
+semantically (at the Python level), and also in terms of how they’re
+stored in memory (at the C level). But many of these functions only
+work with arrays at the Python level, which means that they don’t
+actually need <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> objects <em>per se</em>: they could work just as
+well with any Python object that “quacks like” an ndarray, such as
+sparse arrays, dask’s lazy arrays, or xarray’s labeled arrays.</p>
+<p>However, currently, there’s no way for these libraries to express that
+their objects can quack like an ndarray, and there’s no way for
+functions like <code class="docutils literal notranslate"><span class="pre">myfunc</span></code> to express that they’d be happy with
+anything that quacks like an ndarray. The purpose of this NEP is to
+provide those two features.</p>
+<p>Sometimes people suggest using <code class="docutils literal notranslate"><span class="pre">np.asanyarray</span></code> for this purpose, but
+unfortunately its semantics are exactly backwards: it guarantees that
+the object it returns uses the same memory layout as an <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>,
+but tells you nothing at all about its semantics, which makes it
+essentially impossible to use safely in practice. Indeed, the two
+<code class="docutils literal notranslate"><span class="pre">ndarray</span></code> subclasses distributed with NumPy – <code class="docutils literal notranslate"><span class="pre">np.matrix</span></code> and
+<code class="docutils literal notranslate"><span class="pre">np.ma.masked_array</span></code> – do have incompatible semantics, and if they
+were passed to a function like <code class="docutils literal notranslate"><span class="pre">myfunc</span></code> that doesn’t check for them
+as a special-case, then it may silently return incorrect results.</p>
+<section id="declaring-that-an-object-can-quack-like-an-array">
+<h3>Declaring that an object can quack like an array<a class="headerlink" href="#declaring-that-an-object-can-quack-like-an-array" title="Link to this heading">#</a></h3>
+<p>There are two basic approaches we could use for checking whether an
+object quacks like an array. We could check for a special attribute on
+the class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">quacks_like_array</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="s2">&quot;__quacks_like_array__&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Or, we could define an <a class="reference external" href="https://docs.python.org/3/library/collections.abc.html">abstract base class (ABC)</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">quacks_like_array</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">AbstractArray</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you look at how ABCs work, this is essentially equivalent to
+keeping a global set of types that have been declared to implement the
+<code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> interface, and then checking it for membership.</p>
+<p>Between these, the ABC approach seems to have a number of advantages:</p>
+<ul class="simple">
+<li><p>It’s Python’s standard, “one obvious way” of doing this.</p></li>
+<li><p>ABCs can be introspected (e.g. <code class="docutils literal notranslate"><span class="pre">help(np.AbstractArray)</span></code> does
+something useful).</p></li>
+<li><p>ABCs can provide useful mixin methods.</p></li>
+<li><p>ABCs integrate with other features like mypy type-checking,
+<code class="docutils literal notranslate"><span class="pre">functools.singledispatch</span></code>, etc.</p></li>
+</ul>
+<p>One obvious thing to check is whether this choice affects speed. Using
+the attached benchmark script on a CPython 3.7 prerelease (revision
+c4d77a661138d, self-compiled, no PGO), on a Thinkpad T450s running
+Linux, we find:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ndarray_obj</span><span class="p">)</span>      <span class="mi">330</span> <span class="n">ns</span>
+<span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([])</span>              <span class="mi">1400</span> <span class="n">ns</span>
+
+<span class="n">Attribute</span> <span class="n">check</span><span class="p">,</span> <span class="n">success</span>      <span class="mi">80</span> <span class="n">ns</span>
+<span class="n">Attribute</span> <span class="n">check</span><span class="p">,</span> <span class="n">failure</span>      <span class="mi">80</span> <span class="n">ns</span>
+
+<span class="n">ABC</span><span class="p">,</span> <span class="n">success</span> <span class="n">via</span> <span class="n">subclass</span>    <span class="mi">340</span> <span class="n">ns</span>
+<span class="n">ABC</span><span class="p">,</span> <span class="n">success</span> <span class="n">via</span> <span class="n">register</span><span class="p">()</span>  <span class="mi">700</span> <span class="n">ns</span>
+<span class="n">ABC</span><span class="p">,</span> <span class="n">failure</span>                 <span class="mi">370</span> <span class="n">ns</span>
+</pre></div>
+</div>
+<p>Notes:</p>
+<ul>
+<li><p>The first two lines are included to put the other lines in context.</p></li>
+<li><p>This used 3.7 because both <code class="docutils literal notranslate"><span class="pre">getattr</span></code> and ABCs are receiving
+substantial optimizations in this release, and it’s more
+representative of the long-term future of Python. (Failed
+<code class="docutils literal notranslate"><span class="pre">getattr</span></code> doesn’t necessarily construct an exception object
+anymore, and ABCs were reimplemented in C.)</p></li>
+<li><p>The “success” lines refer to cases where <code class="docutils literal notranslate"><span class="pre">quacks_like_array</span></code> would
+return True. The “failure” lines are cases where it would return
+False.</p></li>
+<li><p>The first measurement for ABCs is subclasses defined like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyArray</span><span class="p">(</span><span class="n">AbstractArray</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>The second is for subclasses defined like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyArray</span><span class="p">:</span>
+    <span class="o">...</span>
+
+<span class="n">AbstractArray</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">MyArray</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>I don’t know why there’s such a large difference between these.</p>
+</li>
+</ul>
+<p>In practice, either way we’d only do the full test after first
+checking for well-known types like <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="docutils literal notranslate"><span class="pre">list</span></code>, etc. <a class="reference external" href="https://github.com/numpy/numpy/blob/main/numpy/core/src/private/get_attr_string.h">This
+is how NumPy currently checks for other double-underscore attributes</a>
+and the same idea applies here to either approach. So these numbers
+won’t affect the common case, just the case where we actually have an
+<code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code>, or else another third-party object that will end up
+going through <code class="docutils literal notranslate"><span class="pre">__array__</span></code> or <code class="docutils literal notranslate"><span class="pre">__array_interface__</span></code> or end up as an
+object array.</p>
+<p>So in summary, using an ABC will be slightly slower than using an
+attribute, but this doesn’t affect the most common paths, and the
+magnitude of slowdown is fairly small (~250 ns on an operation that
+already takes longer than that). Furthermore, we can potentially
+optimize this further (e.g. by keeping a tiny LRU cache of types that
+are known to be AbstractArray subclasses, on the assumption that most
+code will only use one or two of these types at a time), and it’s very
+unclear that this even matters – if the speed of <code class="docutils literal notranslate"><span class="pre">asarray</span></code> no-op
+pass-throughs were a bottleneck that showed up in profiles, then
+probably we would have made them faster already! (It would be trivial
+to fast-path this, but we don’t.)</p>
+<p>Given the semantic and usability advantages of ABCs, this seems like
+an acceptable trade-off.</p>
+</section>
+<section id="specification-of-asabstractarray">
+<h3>Specification of <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code><a class="headerlink" href="#specification-of-asabstractarray" title="Link to this heading">#</a></h3>
+<p>Given <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code>, the definition of <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code> is simple:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">asabstractarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">AbstractArray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dtype</span> <span class="o">!=</span> <span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">a</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">a</span>
+    <span class="k">return</span> <span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Things to note:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">asarray</span></code> also accepts an <code class="docutils literal notranslate"><span class="pre">order=</span></code> argument, but we don’t
+include that here because it’s about details of memory
+representation, and the whole point of this function is that you use
+it to declare that you don’t care about details of memory
+representation.</p></li>
+<li><p>Using the <code class="docutils literal notranslate"><span class="pre">astype</span></code> method allows the <code class="docutils literal notranslate"><span class="pre">a</span></code> object to decide how to
+implement casting for its particular type.</p></li>
+<li><p>For strict compatibility with <code class="docutils literal notranslate"><span class="pre">asarray</span></code>, we skip calling
+<code class="docutils literal notranslate"><span class="pre">astype</span></code> when the dtype is already correct. Compare:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="go"># astype() always returns a view:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">is</span> <span class="n">a</span>
+<span class="go">False</span>
+
+<span class="go"># asarray() returns the original object if possible:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">a</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="ow">is</span> <span class="n">a</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="what-exactly-are-you-promising-if-you-inherit-from-abstractarray">
+<h3>What exactly are you promising if you inherit from <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code>?<a class="headerlink" href="#what-exactly-are-you-promising-if-you-inherit-from-abstractarray" title="Link to this heading">#</a></h3>
+<p>This will presumably be refined over time. The ideal of course is that
+your class should be indistinguishable from a real <code class="docutils literal notranslate"><span class="pre">ndarray</span></code>, but
+nothing enforces that except the expectations of users. In practice,
+declaring that your class implements the <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> interface
+simply means that it will start passing through <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code>,
+and so by subclassing it you’re saying that if some code works for
+<code class="docutils literal notranslate"><span class="pre">ndarray</span></code>s but breaks for your class, then you’re willing to accept
+bug reports on that.</p>
+<p>To start with, we should declare <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> to be an abstract
+method, and add the <code class="docutils literal notranslate"><span class="pre">NDArrayOperatorsMixin</span></code> methods as mixin
+methods.</p>
+<p>Declaring <code class="docutils literal notranslate"><span class="pre">astype</span></code> as an <code class="docutils literal notranslate"><span class="pre">&#64;abstractmethod</span></code> probably makes sense as
+well, since it’s used by <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code>. We might also want to go
+ahead and add some basic attributes like <code class="docutils literal notranslate"><span class="pre">ndim</span></code>, <code class="docutils literal notranslate"><span class="pre">shape</span></code>,
+<code class="docutils literal notranslate"><span class="pre">dtype</span></code>.</p>
+<p>Adding new abstract methods will be a bit tricky, because ABCs enforce
+these at subclass time; therefore, simply adding a new
+<cite>&#64;abstractmethod</cite> will be a backwards compatibility break. If this
+becomes a problem then we can use some hacks to implement an
+<cite>&#64;upcoming_abstractmethod</cite> decorator that only issues a warning if the
+method is missing, and treat it like a regular deprecation cycle. (In
+this case, the thing we’d be deprecating is “support for abstract
+arrays that are missing feature X”.)</p>
+</section>
+<section id="naming">
+<h3>Naming<a class="headerlink" href="#naming" title="Link to this heading">#</a></h3>
+<p>The name of the ABC doesn’t matter too much, because it will only be
+referenced rarely and in relatively specialized situations. The name
+of the function matters a lot, because most existing instances of
+<code class="docutils literal notranslate"><span class="pre">asarray</span></code> should be replaced by this, and in the future it’s what
+everyone should be reaching for by default unless they have a specific
+reason to use <code class="docutils literal notranslate"><span class="pre">asarray</span></code> instead. This suggests that its name really
+should be <em>shorter</em> and <em>more memorable</em> than <code class="docutils literal notranslate"><span class="pre">asarray</span></code>… which
+is difficult. I’ve used <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code> in this draft, but I’m not
+really happy with it, because it’s too long and people are unlikely to
+start using it by habit without endless exhortations.</p>
+<p>One option would be to actually change <code class="docutils literal notranslate"><span class="pre">asarray</span></code>'s semantics so
+that <em>it</em> passes through <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> objects unchanged. But I’m
+worried that there may be a lot of code out there that calls
+<code class="docutils literal notranslate"><span class="pre">asarray</span></code> and then passes the result into some C function that
+doesn’t do any further type checking (because it knows that its caller
+has already used <code class="docutils literal notranslate"><span class="pre">asarray</span></code>). If we allow <code class="docutils literal notranslate"><span class="pre">asarray</span></code> to return
+<code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> objects, and then someone calls one of these C
+wrappers and passes it an <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> object like a sparse
+array, then they’ll get a segfault. Right now, in the same situation,
+<code class="docutils literal notranslate"><span class="pre">asarray</span></code> will instead invoke the object’s <code class="docutils literal notranslate"><span class="pre">__array__</span></code> method, or
+use the buffer interface to make a view, or pass through an array with
+object dtype, or raise an error, or similar. Probably none of these
+outcomes are actually desirable in most cases, so maybe making it a
+segfault instead would be OK? But it’s dangerous given that we don’t
+know how common such code is. OTOH, if we were starting from scratch
+then this would probably be the ideal solution.</p>
+<p>We can’t use <code class="docutils literal notranslate"><span class="pre">asanyarray</span></code> or <code class="docutils literal notranslate"><span class="pre">array</span></code>, since those are already
+taken.</p>
+<p>Any other ideas? <code class="docutils literal notranslate"><span class="pre">np.cast</span></code>, <code class="docutils literal notranslate"><span class="pre">np.coerce</span></code>?</p>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Rename <code class="docutils literal notranslate"><span class="pre">NDArrayOperatorsMixin</span></code> to <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code> (leaving
+behind an alias for backwards compatibility) and make it an ABC.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code> (or whatever we end up calling it), and
+probably a C API equivalent.</p></li>
+<li><p>Begin migrating NumPy internal functions to using
+<code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code> where appropriate.</p></li>
+</ol>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>This is purely a new feature, so there are no compatibility issues.
+(Unless we decide to change the semantics of <code class="docutils literal notranslate"><span class="pre">asarray</span></code> itself.)</p>
+</section>
+<section id="rejected-alternatives">
+<h2>Rejected alternatives<a class="headerlink" href="#rejected-alternatives" title="Link to this heading">#</a></h2>
+<p>One suggestion that has come up is to define multiple abstract classes
+for different subsets of the array interface. Nothing in this proposal
+stops either NumPy or third-parties from doing this in the future, but
+it’s very difficult to guess ahead of time which subsets would be
+useful. Also, “the full ndarray interface” is something that existing
+libraries are written to expect (because they work with actual
+ndarrays) and test (because they test with actual ndarrays), so it’s
+by far the easiest place to start.</p>
+</section>
+<section id="links-to-discussion">
+<h2>Links to discussion<a class="headerlink" href="#links-to-discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2018-March/077767.html">https://mail.python.org/pipermail/numpy-discussion/2018-March/077767.html</a></p></li>
+</ul>
+</section>
+<section id="appendix-benchmark-script">
+<h2>Appendix: benchmark script<a class="headerlink" href="#appendix-benchmark-script" title="Link to this heading">#</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">perf</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">NotArray</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AttrArray</span><span class="p">:</span>
+    <span class="n">__array_implementer__</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArrayBase</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>  <span class="c1"># noqa: B024</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ABCArray1</span><span class="p">(</span><span class="n">ArrayBase</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ABCArray2</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="n">ArrayBase</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ABCArray2</span><span class="p">)</span>
+
+<span class="n">not_array</span> <span class="o">=</span> <span class="n">NotArray</span><span class="p">()</span>
+<span class="n">attr_array</span> <span class="o">=</span> <span class="n">AttrArray</span><span class="p">()</span>
+<span class="n">abc_array_1</span> <span class="o">=</span> <span class="n">ABCArray1</span><span class="p">()</span>
+<span class="n">abc_array_2</span> <span class="o">=</span> <span class="n">ABCArray2</span><span class="p">()</span>
+
+<span class="c1"># Make sure ABC cache is primed</span>
+<span class="nb">isinstance</span><span class="p">(</span><span class="n">not_array</span><span class="p">,</span> <span class="n">ArrayBase</span><span class="p">)</span>
+<span class="nb">isinstance</span><span class="p">(</span><span class="n">abc_array_1</span><span class="p">,</span> <span class="n">ArrayBase</span><span class="p">)</span>
+<span class="nb">isinstance</span><span class="p">(</span><span class="n">abc_array_2</span><span class="p">,</span> <span class="n">ArrayBase</span><span class="p">)</span>
+
+<span class="n">runner</span> <span class="o">=</span> <span class="n">perf</span><span class="o">.</span><span class="n">Runner</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">t</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">statement</span><span class="p">):</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">timeit</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="nb">globals</span><span class="o">=</span><span class="nb">globals</span><span class="p">())</span>
+
+
+<span class="n">t</span><span class="p">(</span><span class="s2">&quot;np.asarray([])&quot;</span><span class="p">,</span> <span class="s2">&quot;np.asarray([])&quot;</span><span class="p">)</span>
+<span class="n">arrobj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+<span class="n">t</span><span class="p">(</span><span class="s2">&quot;np.asarray(arrobj)&quot;</span><span class="p">,</span> <span class="s2">&quot;np.asarray(arrobj)&quot;</span><span class="p">)</span>
+
+<span class="n">t</span><span class="p">(</span><span class="s2">&quot;attr, False&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;getattr(not_array, &#39;__array_implementer__&#39;, False)&quot;</span><span class="p">)</span>
+<span class="n">t</span><span class="p">(</span><span class="s2">&quot;attr, True&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;getattr(attr_array, &#39;__array_implementer__&#39;, False)&quot;</span><span class="p">)</span>
+
+<span class="n">t</span><span class="p">(</span><span class="s2">&quot;ABC, False&quot;</span><span class="p">,</span> <span class="s2">&quot;isinstance(not_array, ArrayBase)&quot;</span><span class="p">)</span>
+<span class="n">t</span><span class="p">(</span><span class="s2">&quot;ABC, True, via inheritance&quot;</span><span class="p">,</span> <span class="s2">&quot;isinstance(abc_array_1, ArrayBase)&quot;</span><span class="p">)</span>
+<span class="n">t</span><span class="p">(</span><span class="s2">&quot;ABC, True, via register&quot;</span><span class="p">,</span> <span class="s2">&quot;isinstance(abc_array_2, ArrayBase)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#declaring-that-an-object-can-quack-like-an-array">Declaring that an object can quack like an array</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#specification-of-asabstractarray">Specification of <code class="docutils literal notranslate"><span class="pre">asabstractarray</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-exactly-are-you-promising-if-you-inherit-from-abstractarray">What exactly are you promising if you inherit from <code class="docutils literal notranslate"><span class="pre">AbstractArray</span></code>?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#naming">Naming</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rejected-alternatives">Rejected alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#links-to-discussion">Links to discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#appendix-benchmark-script">Appendix: benchmark script</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,936 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 57 — NumPy platform support &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0057-numpy-platform-support';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Finished NEPs" href="finished.html" />
+    <link rel="prev" title="NEP 53 — Evolving the NumPy C-API for NumPy 2.0" href="nep-0053-c-abi-evolution.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="open.html" class="nav-link">Open NEPs (under consideration)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 57 — NumPy platform support</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-57-numpy-platform-support">
+<span id="nep57"></span><h1>NEP 57 — NumPy platform support<a class="headerlink" href="#nep-57-numpy-platform-support" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ralf Gommers &lt;<a class="reference external" href="mailto:ralf&#46;gommers&#37;&#52;&#48;gmail&#46;com">ralf<span>&#46;</span>gommers<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Draft</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Process</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2026-01-30</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li></li>
+</ul>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>This NEP documents how a platform - i.e., a specific operating system, CPU
+architecture and CPython interpreter - becomes supported in NumPy, what
+platforms are currently supported, and were supported in the (recent) past.</p>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>This policy is drafted now (early 2026) because there is a lot of interest in
+extending the number of platforms NumPy supports through wheels in particular.
+It is a policy specific to NumPy - even though other projects may possibly want
+to refer to it - for several reasons:</p>
+<ul class="simple">
+<li><p>It involves committing to a nontrivial amount of maintainer effort,</p></li>
+<li><p>Personal commitment from a maintainer may make the difference between a
+yes and a no of supporting a platform (e.g., NumPy supported PyPy for a
+long time because of the efforts of one maintainer)</p></li>
+<li><p>Support for a platform being possible at all may depend on features of the
+code base (e.g., NumPy supports 32-bit Python on Windows while SciPy does
+not because there’s no suitable compiler toolchain for it).</p></li>
+<li><p>The number of wheels depends on whether the Stable ABI can be used (NumPy
+is more performance-sensitive for small arrays, so can’t use it)</p></li>
+</ul>
+<p>The scope of this NEP includes:</p>
+<ul class="simple">
+<li><p>The definition of tiers of support for platforms by NumPy</p></li>
+<li><p>Policies and decision making for moving a platform to a different tier</p></li>
+</ul>
+<p>Out of scope for this NEP are:</p>
+<ul class="simple">
+<li><p>Binary distributions of NumPy outside of PyPI</p></li>
+<li><p>Partial testing in CI (e.g., testing only SIMD-specific code under QEMU)</p></li>
+<li><p>More detailed breakdowns of wheels and support matrices, like compiler flavor
+and minimum version, or the BLAS library that is used in the build.</p></li>
+</ul>
+</section>
+<section id="support-tiers">
+<h2>Support tiers<a class="headerlink" href="#support-tiers" title="Link to this heading">#</a></h2>
+<p><em>This section is inspired by PEP 11 (CPython platform support), although
+definitions are not matching, because NumPy is not nearly as large a project as
+CPython.</em></p>
+<p>Platform support is broken down into tiers. Each tier comes with different
+requirements which lead to different promises being made about support.</p>
+<p>To be promoted to a tier,
+<a class="reference external" href="https://numpy.org/doc/stable/dev/governance/governance.html#steering-council">Steering council</a>
+support is required and is expected to be driven by team consensus. Demotion to
+a lower tier occurs when the requirements of the current tier are no longer met
+for a platform for an extended period of time based on the judgment of the
+Steering Council. For platforms which no longer meet the requirements of any
+tier by the middle of a new feature release cycle, an announcement will be made
+to warn the community of the pending removal of support for the platform. If
+the platform is not brought into line for at least one of the tiers by the
+first release candidate, it will be listed as unsupported in this NEP.</p>
+<section id="general-principles">
+<h3>General principles<a class="headerlink" href="#general-principles" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Maintainer effort is expensive, and we collectively have limited bandwidth -
+hence platform support is strongly influenced by the willingness of one or
+more maintainers to put in that effort.</p>
+<ul>
+<li><p>Maintainers are trusted by the whole team. We generally do not question
+<em>why</em> a maintainer is motivated to put in the effort. If they are being
+paid for their effort or doing it as part of their job, that is fine -
+however they should disclose this to the Steering Council, and indicate
+whether long-term support is conditional on their employment or contractor
+status for the support tiers that include releasing wheels to PyPI.</p>
+<p><em>Rationale: releasing wheels to PyPI is a long-term commitment by the
+project as a whole, see the backwards compatibility section below.</em></p>
+</li>
+</ul>
+</li>
+<li><p>CI support for the platform is required, preferably with native runners.
+Free is best, however decisions on paid CI are up to the Steering Council.
+Emulation for running the test suite (e.g., under QEMU) or self-hosted
+buildbots are slower and less reliable, hence not preferred.</p></li>
+<li><p>There should be broad enough demand for support for the platform for the
+tiers that include releasing wheels to PyPI.</p>
+<ul>
+<li><p>A previously used rule of thumb: &gt;=0.5% of the user base should be on this
+platform. There may be reasons to deviate from this rule of thumb.</p>
+<p><em>Note: finding clean data sources isn’t always easy. If wheels are already
+being shipped, for NumPy or for a comparable project, then download data
+from PyPI may be obtained through BigQuery. For new platforms, sources
+like the</em>
+<a class="reference external" href="https://store.steampowered.com/hwsurvey/?platform=combined">Steam Hardware &amp; Software Survey</a>
+<em>may have to be used.</em></p>
+</li>
+</ul>
+</li>
+<li><p>Adding a regular CI job (i.e., not aimed at uploading wheels to PyPI) for a
+platform to the NumPy CI matrix is much cheaper, and easily reverted in case
+of problems. The bar for adding such jobs is low, and assessed on a
+case-by-case basis.</p></li>
+<li><p>For all platforms in any supported tier: the relevant prerequisites in our
+dependencies must be met. E.g., build tools have support, and for wheels
+there is support in CPython, PyPI, cibuildwheel, manylinux, and
+<code class="docutils literal notranslate"><span class="pre">scipy-openblas64</span></code> or another easily-integrated BLAS library.</p></li>
+<li><p>Decision making:</p>
+<ul class="simple">
+<li><p>Moving a platform to a lower support tier must be discussed on the mailing list.
+The circumstances for each platform are unique so the community will
+evaluate each proposal to demote a platform on a case-by-case basis.</p></li>
+<li><p>Moving a platform to a higher support tier, if that higher tier includes
+releasing wheels on PyPI for that platform, must be discussed on the
+mailing list.</p></li>
+<li><p>Adding an entry to a support tier in this NEP for (a) an unsupported
+platform or (b) a tier which does not include uploading wheels to PyPI can
+be done on GitHub through a regular pull request (assuming it’s clear from
+the discussion that the relevant maintainers agree it doesn’t need to hit
+the mailing list).</p></li>
+</ul>
+</li>
+</ol>
+<section id="releasing-wheels-to-pypi">
+<h4>Releasing wheels to PyPI<a class="headerlink" href="#releasing-wheels-to-pypi" title="Link to this heading">#</a></h4>
+<p>The wheels that the NumPy team releases on PyPI for the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> package get
+hundreds of millions of downloads a month. We therefore highly value both
+reliability and supply chain security of those release artifacts. Compromising
+on those aspects is unlikely to be acceptable for the NumPy team.</p>
+<p>The details of how wheels are produced, tested and distributed can be found in
+the <a class="reference external" href="https://github.com/numpy/numpy-release">numpy/numpy-release</a>
+repository. Some key requirements of the current setup, which aren’t likely to
+change soon, are:</p>
+<ol class="arabic simple">
+<li><p>Must be buildable on publicly-visible CI infrastructure (i.e., GitHub).</p></li>
+<li><p>Must be tested well enough (meaning native runners are preferred; QEMU is quite slow).</p></li>
+<li><p>Must be publishable to PyPI automatically, through PyPI’s trusted publishing
+mechanism.</p></li>
+</ol>
+</section>
+</section>
+<section id="tier-1">
+<h3>Tier 1<a class="headerlink" href="#tier-1" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Must have regular CI support on GitHub or (exceptionally) through another
+well-integrated CI platform that the release team and Steering Council deem
+acceptable.</p></li>
+<li><p>The NumPy team releases wheels on PyPI for this platform.</p></li>
+<li><p>CI failures (either regular CI or wheel build CI) block releases.</p></li>
+<li><p>All maintainers are responsible to keep the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch and wheel builds
+working.</p></li>
+</ul>
+<p>Tier 1 platforms:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Windows x86-64</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Windows arm64</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Windows x86</p></td>
+<td><p>32-bit Python: note this is shipped without BLAS, it’s legacy</p></td>
+</tr>
+<tr class="row-odd"><td><p>Linux x86-64 (manylinux)</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Linux aarch64 (manylinux)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>macOS arm64</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>macOS x86-64</p></td>
+<td><p>Expected to move to unsupported by 2027/28 once the platform is dropped
+by GitHub</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="tier-2">
+<h3>Tier 2<a class="headerlink" href="#tier-2" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Must have regular CI support, either as defined for Tier 1 or through a
+reliable self-hosted service.</p></li>
+<li><p>The NumPy team releases wheels on PyPI for this platform.</p></li>
+<li><p>CI failures block releases.</p></li>
+<li><p>Must have at least one maintainer who commits to take primary and long-term
+responsibility for keeping the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch and wheel builds working.</p></li>
+</ul>
+<p>Tier 2 platforms:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Notes</p></th>
+<th class="head"><p>Contacts</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Linux x86-64 (musllinux)</p></td>
+<td></td>
+<td><p>Ralf Gommers</p></td>
+</tr>
+<tr class="row-odd"><td><p>Linux aarch64 (musllinux)</p></td>
+<td></td>
+<td><p>Ralf Gommers</p></td>
+</tr>
+<tr class="row-even"><td><p>Free-threaded CPython</p></td>
+<td></td>
+<td><p>Nathan Goldbaum, Kumar Aditya,
+Ralf Gommers</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="tier-3">
+<h3>Tier 3<a class="headerlink" href="#tier-3" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Is supported as part of NumPy’s regular CI setup for the <code class="docutils literal notranslate"><span class="pre">main</span></code> branch. CI
+support as defined for Tier 2.</p></li>
+<li><p>No wheels are released on PyPI for this platform.</p></li>
+<li><p>CI failures block releases (skips may be applied when the failure is clearly
+platform-specific and does not indicate a regression in core functionality).</p></li>
+<li><p>Must have at least one maintainer or a regular contributor trusted by the
+NumPy maintainers who commits to take responsibility for CI on the <code class="docutils literal notranslate"><span class="pre">main</span></code>
+branch working.</p></li>
+</ul>
+<p>Tier 3 platforms:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Notes</p></th>
+<th class="head"><p>Contacts</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>FreeBSD</p></td>
+<td><p>Runs on Cirrus CI</p></td>
+<td><p>Ralf Gommers</p></td>
+</tr>
+<tr class="row-odd"><td><p>Linux ppc64le</p></td>
+<td><p>Runs on IBM-provided self-hosted
+runners, see <a class="reference external" href="https://github.com/numpy/numpy/issues/22318">gh-22318</a></p></td>
+<td><p>Sandeep Gupta</p></td>
+</tr>
+<tr class="row-even"><td><p>Emscripten/Pyodide</p></td>
+<td><p>We currently provide nightly wheels,
+used for interactive docs</p></td>
+<td><p>Agriya Khetarpal, Gyeongjae Choi</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="unsupported-platforms">
+<h3>Unsupported platforms<a class="headerlink" href="#unsupported-platforms" title="Link to this heading">#</a></h3>
+<p>All platforms not listed in the above tiers are unsupported by the NumPy team.
+We do not develop and test on such platforms, and so cannot provide any
+promises that NumPy will work on them.</p>
+<p>However, the code base does include unsupported code – that is, code specific
+to unsupported platforms. Contributions in this area are welcome as long as
+they:</p>
+<ul class="simple">
+<li><p>pose a minimal maintenance burden to the core team, and</p></li>
+<li><p>benefit substantially more people than the contributor.</p></li>
+</ul>
+<p>Unsupported platforms (previously in a supported tier, may be an incomplete
+list):</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PyPy</p></td>
+<td><p>Was Tier 2 for releases &lt;=2.4.x, see <a class="reference external" href="https://github.com/numpy/numpy/issues/30416">gh-30416</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>macOS ppc64, universal, universal2</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Linux i686</p></td>
+<td><p>Dropped in 1.22.0, low demand</p></td>
+</tr>
+<tr class="row-odd"><td><p>Linux on IBM Z (s390x)</p></td>
+<td><p>CI jobs used to run on TravisCI</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Unsupported platforms (known interest in moving to a higher tier):</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Platform</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>iOS</p></td>
+<td><p>See <a class="reference external" href="https://github.com/numpy/numpy/pull/28759">gh-28759</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Android</p></td>
+<td><p>See <a class="reference external" href="https://github.com/numpy/numpy/pull/30412">gh-30412</a></p></td>
+</tr>
+<tr class="row-even"><td><p>RISC-V</p></td>
+<td><p>See <a class="reference external" href="https://github.com/numpy/numpy/issues/30216">gh-30216</a></p></td>
+</tr>
+<tr class="row-odd"><td><p>WASI</p></td>
+<td><p>See <a class="reference external" href="https://github.com/numpy/numpy/issues/25859">gh-25859</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>Moving a platform to a lower tier of support is generally backwards compatible.
+The exception is stopping to release wheels on PyPI for a platform. That causes
+significant disruption for existing users on that platform. Their install commands
+(e.g., <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">numpy</span></code>) may stop working because if a new release no longer
+has wheels for the platform, by default <code class="docutils literal notranslate"><span class="pre">pip</span></code> will try to build from source rather
+than using a wheel from an older version of <code class="docutils literal notranslate"><span class="pre">numpy</span></code>. Therefore, we should be very
+reluctant to drop wheels for any platform.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/22530">ENH: Provide Windows ARM64 wheels (numpy#22530)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/22318">Releasing PowerPC (ppc64le) wheels? (numpy#22318)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/30416">MAINT: drop support for PyPy (numpy#30416)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/30216">ENH: Build and distribute manylinux wheels for riscv64</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/28759">BLD: Add support for building iOS wheels (numpy#28759)</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/30412">BLD: Add Android support</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/issues/25859">ENH: WASI Build</a></p></li>
+<li><p><a class="reference external" href="https://peps.python.org/pep-0011/">PEP 11 - CPython platform support</a></p></li>
+<li><p><a class="reference external" href="https://wiki.debian.org/SupportedArchitectures">Debian’s supported architectures</a></p></li>
+<li><p><a class="reference external" href="https://github.com/scientific-python/summit-2025-nov/issues/4">Discussion about supported platforms for wheels (scientific-python issue/discussion (Nov 2025)</a></p></li>
+<li><p><a class="reference external" href="https://discuss.python.org/t/what-platforms-should-wheels-be-provided-for-by-default/105822">What platforms should wheels be provided for by default? (Packaging Discourse thread, 2026)</a></p></li>
+<li><p><a class="reference external" href="https://pypackaging-native.github.io/meta-topics/user_expectations_wheels/">Expectations that projects provide ever more wheels (pypackaging-native)</a></p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#support-tiers">Support tiers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#general-principles">General principles</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#releasing-wheels-to-pypi">Releasing wheels to PyPI</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tier-1">Tier 1</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tier-2">Tier 2</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tier-3">Tier 3</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unsupported-platforms">Unsupported platforms</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

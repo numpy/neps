@@ -1,0 +1,986 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 29 — Recommend Python and NumPy version support as a community policy standard &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0029-deprecation_policy';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 32 — Remove the financial functions from NumPy" href="nep-0032-remove-financial-functions.html" />
+    <link rel="prev" title="NEP 28 — numpy.org website redesign" href="nep-0028-website-redesign.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 29 — Recommend Python and NumPy version support as a community policy standard</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-29-recommend-python-and-numpy-version-support-as-a-community-policy-standard">
+<span id="nep29"></span><h1>NEP 29 — Recommend Python and NumPy version support as a community policy standard<a class="headerlink" href="#nep-29-recommend-python-and-numpy-version-support-as-a-community-policy-standard" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Thomas A Caswell &lt;<a class="reference external" href="mailto:tcaswell&#37;&#52;&#48;gmail&#46;com">tcaswell<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;, Andreas Mueller, Brian Granger, Madicken Munk, Ralf Gommers, Matt Haberland &lt;<a class="reference external" href="mailto:mhaberla&#37;&#52;&#48;calpoly&#46;edu">mhaberla<span>&#64;</span>calpoly<span>&#46;</span>edu</a>&gt;, Matthias Bussonnier &lt;<a class="reference external" href="mailto:bussonniermatthias&#37;&#52;&#48;gmail&#46;com">bussonniermatthias<span>&#64;</span>gmail<span>&#46;</span>com</a>&gt;, Stefan van der Walt &lt;<a class="reference external" href="mailto:stefanv&#37;&#52;&#48;berkeley&#46;edu">stefanv<span>&#64;</span>berkeley<span>&#46;</span>edu</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Informational</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2019-07-13</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2019-October/080128.html">https://mail.python.org/pipermail/numpy-discussion/2019-October/080128.html</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This NEP is superseded by the scientific python ecosystem coordination guideline
+<a class="reference external" href="https://scientific-python.org/specs/spec-0000/">SPEC 0 — Minimum Supported Versions</a>.</p>
+</div>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>This NEP recommends that all projects across the Scientific
+Python ecosystem adopt a common “time window-based” policy for
+support of Python and NumPy versions. Standardizing a recommendation
+for project support of minimum Python and NumPy versions will improve
+downstream project planning.</p>
+<p>This is an unusual NEP in that it offers recommendations for
+community-wide policy and not for changes to NumPy itself.  Since a
+common place for SPEEPs (Scientific Python Ecosystem Enhancement
+Proposals) does not exist and given NumPy’s central role in the
+ecosystem, a NEP provides a visible place to document the proposed
+policy.</p>
+<p>This NEP is being put forward by maintainers of Matplotlib, scikit-learn,
+IPython, Jupyter, yt, SciPy, NumPy, and scikit-image.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<p>For the purposes of this NEP we assume semantic versioning and define:</p>
+<dl class="simple">
+<dt><em>major version</em></dt><dd><p>A release that changes the first number (e.g. X.0.0)</p>
+</dd>
+<dt><em>minor version</em></dt><dd><p>A release that changes the second number (e.g 1.Y.0)</p>
+</dd>
+<dt><em>patch version</em></dt><dd><p>A release that changes the third number (e.g. 1.1.Z)</p>
+</dd>
+</dl>
+<p>When a project releases a new major or minor version, we recommend that
+they support at least all minor versions of Python
+introduced and released in the prior 42 months <em>from the
+anticipated release date</em> with a minimum of 2 minor versions of
+Python, and all minor versions of NumPy released in the prior 24
+months <em>from the anticipated release date</em> with a minimum of 3
+minor versions of NumPy.</p>
+<p>Consider the following timeline:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>     <span class="n">Jan</span> <span class="mi">16</span>      <span class="n">Jan</span> <span class="mi">17</span>      <span class="n">Jan</span> <span class="mi">18</span>      <span class="n">Jan</span> <span class="mi">19</span>      <span class="n">Jan</span> <span class="mi">20</span>
+     <span class="o">|</span>           <span class="o">|</span>           <span class="o">|</span>           <span class="o">|</span>           <span class="o">|</span>
+<span class="o">+++++|+++++++++++|+++++++++++|+++++++++++|+++++++++++|++++++++++++</span>
+ <span class="o">|</span>              <span class="o">|</span>                  <span class="o">|</span>               <span class="o">|</span>
+ <span class="n">py</span> <span class="mf">3.5.0</span>       <span class="n">py</span> <span class="mf">3.6.0</span>           <span class="n">py</span> <span class="mf">3.7.0</span>        <span class="n">py</span> <span class="mf">3.8.0</span>
+<span class="o">|-----------------------------------------&gt;</span> <span class="n">Feb19</span>
+          <span class="o">|-----------------------------------------&gt;</span> <span class="n">Dec19</span>
+                    <span class="o">|-----------------------------------------&gt;</span> <span class="n">Nov20</span>
+</pre></div>
+</div>
+<p>It shows the 42 month support windows for Python.  A project with a
+major or minor version release in February 2019 should support Python 3.5 and newer,
+a project with a major or minor version released in December 2019 should
+support Python 3.6 and newer, and a project with a major or minor version
+release in November 2020 should support Python 3.7 and newer.</p>
+<p>When this NEP was drafted the Python release cadence was 18 months so a 42
+month window ensured that there would always be at least two minor versions of
+Python in the window.  The window was extended 6 months beyond the anticipated
+two-release interval for Python to provide resilience against small
+fluctuations / delays in its release schedule.</p>
+<p>The Python release cadence increased in <a class="reference external" href="https://peps.python.org/pep-0602/">PEP 0602</a>,
+with releases now every 12 months, so there will be 3-4
+Python releases in the support window at any time.  However, PEP 0602 does not
+decrease the support window of Python (18 months of regular full bug-fix
+releases and 42 months of as-needed source-only releases).  Thus, we do not
+expect our users to upgrade Python faster, and our 42 month support window will
+cover the same portion of the upstream support of any given Python release.</p>
+<p>Because Python minor version support is based only on historical
+release dates, a 42 month time window, and a planned project release
+date, one can predict with high confidence when a project will be able
+to drop any given minor version of Python.  This, in turn, could save
+months of unnecessary maintenance burden.</p>
+<p>If a project releases immediately after a minor version of Python
+drops out of the support window, there will inevitably be some
+mismatch in supported versions—but this situation should only last
+until other projects in the ecosystem make releases.</p>
+<p>Otherwise, once a project does a minor or major release, it is
+guaranteed that there will be a stable release of all other projects
+that, at the source level, support the same set of Python versions
+supported by the new release.</p>
+<p>If there is a Python 4 or a NumPy 2 this policy will have to be
+reviewed in light of the community’s and projects’ best interests.</p>
+<section id="support-table">
+<h3>Support Table<a class="headerlink" href="#support-table" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<tbody>
+<tr class="row-odd"><td><p>Date</p></td>
+<td><p>Python</p></td>
+<td><p>NumPy</p></td>
+</tr>
+<tr class="row-even"><td><p>Jan 07, 2020</p></td>
+<td><p>3.6+</p></td>
+<td><p>1.15+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Jun 23, 2020</p></td>
+<td><p>3.7+</p></td>
+<td><p>1.15+</p></td>
+</tr>
+<tr class="row-even"><td><p>Jul 23, 2020</p></td>
+<td><p>3.7+</p></td>
+<td><p>1.16+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Jan 13, 2021</p></td>
+<td><p>3.7+</p></td>
+<td><p>1.17+</p></td>
+</tr>
+<tr class="row-even"><td><p>Jul 26, 2021</p></td>
+<td><p>3.7+</p></td>
+<td><p>1.18+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Dec 22, 2021</p></td>
+<td><p>3.7+</p></td>
+<td><p>1.19+</p></td>
+</tr>
+<tr class="row-even"><td><p>Dec 26, 2021</p></td>
+<td><p>3.8+</p></td>
+<td><p>1.19+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Jun 21, 2022</p></td>
+<td><p>3.8+</p></td>
+<td><p>1.20+</p></td>
+</tr>
+<tr class="row-even"><td><p>Jan 31, 2023</p></td>
+<td><p>3.8+</p></td>
+<td><p>1.21+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Apr 14, 2023</p></td>
+<td><p>3.9+</p></td>
+<td><p>1.21+</p></td>
+</tr>
+<tr class="row-even"><td><p>Jun 23, 2023</p></td>
+<td><p>3.9+</p></td>
+<td><p>1.22+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Jan 01, 2024</p></td>
+<td><p>3.9+</p></td>
+<td><p>1.23+</p></td>
+</tr>
+<tr class="row-even"><td><p>Apr 05, 2024</p></td>
+<td><p>3.10+</p></td>
+<td><p>1.23+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Jun 22, 2024</p></td>
+<td><p>3.10+</p></td>
+<td><p>1.24+</p></td>
+</tr>
+<tr class="row-even"><td><p>Dec 18, 2024</p></td>
+<td><p>3.10+</p></td>
+<td><p>1.25+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Apr 04, 2025</p></td>
+<td><p>3.11+</p></td>
+<td><p>1.25+</p></td>
+</tr>
+<tr class="row-even"><td><p>Jun 17, 2025</p></td>
+<td><p>3.11+</p></td>
+<td><p>1.26+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sep 16, 2025</p></td>
+<td><p>3.11+</p></td>
+<td><p>2.0+</p></td>
+</tr>
+<tr class="row-even"><td><p>Apr 24, 2026</p></td>
+<td><p>3.12+</p></td>
+<td><p>2.0+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Jun 16, 2026</p></td>
+<td><p>3.12+</p></td>
+<td><p>2.1+</p></td>
+</tr>
+<tr class="row-even"><td><p>Aug 19, 2026</p></td>
+<td><p>3.12+</p></td>
+<td><p>2.2+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Dec 09, 2026</p></td>
+<td><p>3.12+</p></td>
+<td><p>2.3+</p></td>
+</tr>
+<tr class="row-even"><td><p>Apr 02, 2027</p></td>
+<td><p>3.13+</p></td>
+<td><p>2.3+</p></td>
+</tr>
+<tr class="row-odd"><td><p>Apr 07, 2028</p></td>
+<td><p>3.14+</p></td>
+<td><p>2.3+</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="drop-schedule">
+<h3>Drop Schedule<a class="headerlink" href="#drop-schedule" title="Link to this heading">#</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">On</span> <span class="nb">next</span> <span class="n">release</span><span class="p">,</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.5</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Sep</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">2015</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jan</span> <span class="mi">07</span><span class="p">,</span> <span class="mi">2020</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.14</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jan</span> <span class="mi">06</span><span class="p">,</span> <span class="mi">2018</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jun</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2020</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.6</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Dec</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2016</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jul</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2020</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.15</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jul</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2018</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jan</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">2021</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.16</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jan</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">2019</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jul</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">2021</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.17</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jul</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">2019</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Dec</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">2021</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.18</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Dec</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">2019</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Dec</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">2021</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.7</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jun</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">2018</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jun</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">2022</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.19</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jun</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">2020</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jan</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">2023</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.20</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jan</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">2021</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Apr</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2023</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.8</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Oct</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">2019</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jun</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">2023</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.21</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jun</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">2021</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jan</span> <span class="mi">01</span><span class="p">,</span> <span class="mi">2024</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.22</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Dec</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">2021</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Apr</span> <span class="mi">05</span><span class="p">,</span> <span class="mi">2024</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.9</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Oct</span> <span class="mi">05</span><span class="p">,</span> <span class="mi">2020</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jun</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">2024</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.23</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jun</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">2022</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Dec</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">2024</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.24</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Dec</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">2022</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Apr</span> <span class="mi">04</span><span class="p">,</span> <span class="mi">2025</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.10</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Oct</span> <span class="mi">04</span><span class="p">,</span> <span class="mi">2021</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jun</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">2025</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.25</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jun</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">2023</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Sep</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2025</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">1.26</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Sep</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2023</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Apr</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">2026</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.11</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Oct</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">2022</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Jun</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">2026</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">2.0</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Jun</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">2024</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Aug</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">2026</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">2.1</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Aug</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">2024</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Dec</span> <span class="mi">09</span><span class="p">,</span> <span class="mi">2026</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">NumPy</span> <span class="mf">2.2</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Dec</span> <span class="mi">08</span><span class="p">,</span> <span class="mi">2024</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Apr</span> <span class="mi">02</span><span class="p">,</span> <span class="mi">2027</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.12</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Oct</span> <span class="mi">02</span><span class="p">,</span> <span class="mi">2023</span><span class="p">)</span>
+<span class="n">On</span> <span class="n">Apr</span> <span class="mi">07</span><span class="p">,</span> <span class="mi">2028</span> <span class="n">drop</span> <span class="n">support</span> <span class="k">for</span> <span class="n">Python</span> <span class="mf">3.13</span> <span class="p">(</span><span class="n">initially</span> <span class="n">released</span> <span class="n">on</span> <span class="n">Oct</span> <span class="mi">07</span><span class="p">,</span> <span class="mi">2024</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>We suggest that all projects adopt the following language into their
+development guidelines:</p>
+<blockquote>
+<div><p>This project supports:</p>
+<ul class="simple">
+<li><p>All minor versions of Python released 42 months prior to the
+project, and at minimum the two latest minor versions.</p></li>
+<li><p>All minor versions of <code class="docutils literal notranslate"><span class="pre">numpy</span></code> released in the 24 months prior
+to the project, and at minimum the last three minor versions.</p></li>
+</ul>
+<p>In <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>, the <code class="docutils literal notranslate"><span class="pre">python_requires</span></code> variable should be set to
+the minimum supported version of Python.  All supported minor
+versions of Python should be in the test matrix and have binary
+artifacts built for the release.</p>
+<p>Minimum Python and NumPy version support should be adjusted upward
+on every major and minor release, but never on a patch release.</p>
+</div></blockquote>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>No backward compatibility issues.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<section id="ad-hoc-version-support">
+<h3>Ad-Hoc version support<a class="headerlink" href="#ad-hoc-version-support" title="Link to this heading">#</a></h3>
+<p>A project could, on every release, evaluate whether to increase
+the minimum version of Python supported.
+As a major downside, an ad-hoc approach makes it hard for downstream users to predict what
+the future minimum versions will be.  As there is no objective threshold
+to when the minimum version should be dropped, it is easy for these
+version support discussions to devolve into <a class="reference external" href="https://en.wikipedia.org/wiki/Wikipedia:Avoid_Parkinson%27s_bicycle-shed_effect">bike shedding</a> and acrimony.</p>
+</section>
+<section id="all-cpython-supported-versions">
+<h3>All CPython supported versions<a class="headerlink" href="#all-cpython-supported-versions" title="Link to this heading">#</a></h3>
+<p>The CPython supported versions of Python are listed in the Python
+Developers Guide and the Python PEPs. Supporting these is a very clear
+and conservative approach.  However, it means that there exists a four
+year lag between when a new features is introduced into the language
+and when a project is able to use it.  Additionally, for projects with
+compiled extensions this requires building many binary artifacts for
+each release.</p>
+<p>For the case of NumPy, many projects carry workarounds to bugs that
+are fixed in subsequent versions of NumPy.  Being proactive about
+increasing the minimum version of NumPy allows downstream
+packages to carry fewer version-specific patches.</p>
+</section>
+<section id="default-version-on-linux-distribution">
+<h3>Default version on Linux distribution<a class="headerlink" href="#default-version-on-linux-distribution" title="Link to this heading">#</a></h3>
+<p>The policy could be to support the version of Python that ships by
+default in the latest Ubuntu LTS or CentOS/RHEL release.  However, we
+would still have to standardize across the community which
+distribution to follow.</p>
+<p>By following the versions supported by major Linux distributions, we
+are giving up technical control of our projects to external
+organizations that may have different motivations and concerns than we
+do.</p>
+</section>
+<section id="n-minor-versions-of-python">
+<h3>N minor versions of Python<a class="headerlink" href="#n-minor-versions-of-python" title="Link to this heading">#</a></h3>
+<p>Given the current release cadence of the Python, the proposed time (42
+months) is roughly equivalent to “the last two” Python minor versions.
+However, if Python changes their release cadence substantially, any
+rule based solely on the number of minor releases may need to be
+changed to remain sensible.</p>
+<p>A more fundamental problem with a policy based on number of Python
+releases is that it is hard to predict when support for a given minor
+version of Python will be dropped as that requires correctly
+predicting the release schedule of Python for the next 3-4 years.  A
+time-based rule, in contrast, only depends on past events
+and the length of the support window.</p>
+</section>
+<section id="time-window-from-the-x-y-1-python-release">
+<h3>Time window from the X.Y.1 Python release<a class="headerlink" href="#time-window-from-the-x-y-1-python-release" title="Link to this heading">#</a></h3>
+<p>This is equivalent to a few month longer support window from the X.Y.0
+release.  This is because X.Y.1 bug-fix release is typically a few
+months after the X.Y.0 release, thus a N month window from X.Y.1 is
+roughly equivalent to a N+3 month from X.Y.0.</p>
+<p>The X.Y.0 release is naturally a special release.  If we were to
+anchor the window on X.Y.1 we would then have the discussion of why
+not X.Y.M?</p>
+</section>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<p>Code to generate support and drop schedule tables</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;Jan 15, 2017: NumPy 1.12</span>
+<span class="s2">Sep 13, 2015: Python 3.5</span>
+<span class="s2">Dec 23, 2016: Python 3.6</span>
+<span class="s2">Jun 27, 2018: Python 3.7</span>
+<span class="s2">Jun 07, 2017: NumPy 1.13</span>
+<span class="s2">Jan 06, 2018: NumPy 1.14</span>
+<span class="s2">Jul 23, 2018: NumPy 1.15</span>
+<span class="s2">Jan 13, 2019: NumPy 1.16</span>
+<span class="s2">Jul 26, 2019: NumPy 1.17</span>
+<span class="s2">Oct 14, 2019: Python 3.8</span>
+<span class="s2">Dec 22, 2019: NumPy 1.18</span>
+<span class="s2">Jun 20, 2020: NumPy 1.19</span>
+<span class="s2">Oct 05, 2020: Python 3.9</span>
+<span class="s2">Jan 30, 2021: NumPy 1.20</span>
+<span class="s2">Jun 22, 2021: NumPy 1.21</span>
+<span class="s2">Oct 04, 2021: Python 3.10</span>
+<span class="s2">Dec 31, 2021: NumPy 1.22</span>
+<span class="s2">Jun 22, 2022: NumPy 1.23</span>
+<span class="s2">Oct 24, 2022: Python 3.11</span>
+<span class="s2">Dec 18, 2022: NumPy 1.24</span>
+<span class="s2">Jun 17, 2023: NumPy 1.25</span>
+<span class="s2">Sep 16, 2023: NumPy 1.26</span>
+<span class="s2">Oct 2, 2023: Python 3.12</span>
+<span class="s2">Jun 15, 2024: NumPy 2.0</span>
+<span class="s2">Aug 18, 2024: NumPy 2.1</span>
+<span class="s2">Oct 7, 2024: Python 3.13</span>
+<span class="s2">Dec 8, 2024: NumPy 2.2</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">releases</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">plus42</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mi">365</span><span class="o">*</span><span class="mf">3.5</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plus24</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mi">365</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+    <span class="n">date</span><span class="p">,</span> <span class="n">project_version</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+    <span class="n">project</span><span class="p">,</span> <span class="n">version</span> <span class="o">=</span> <span class="n">project_version</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+    <span class="n">release</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">project</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;numpy&#39;</span><span class="p">:</span>
+        <span class="n">drop</span> <span class="o">=</span> <span class="n">release</span> <span class="o">+</span> <span class="n">plus24</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">drop</span> <span class="o">=</span> <span class="n">release</span> <span class="o">+</span> <span class="n">plus42</span>
+    <span class="n">releases</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">drop</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">release</span><span class="p">))</span>
+
+<span class="n">releases</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">releases</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+
+<span class="n">py_major</span><span class="p">,</span><span class="n">py_minor</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">releases</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Python&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">minpy</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">py_major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">py_minor</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">+&quot;</span>
+
+<span class="n">num_major</span><span class="p">,</span><span class="n">num_minor</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">releases</span> <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NumPy&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">minnum</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">num_minor</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">+&quot;</span>
+
+<span class="n">toprint_drop_dates</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">toprint_support_table</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">releases</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y&#39;</span><span class="p">)</span>
+    <span class="n">toprint_drop_dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;On </span><span class="si">{</span><span class="n">df</span><span class="si">}</span><span class="s1"> drop support for </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1"> &#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;(initially released on </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%b </span><span class="si">%d</span><span class="s2">, %Y&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+    <span class="n">toprint_support_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">df</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">minpy</span><span class="si">:</span><span class="s1">&lt;6</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">minnum</span><span class="si">:</span><span class="s1">&lt;5</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;numpy&#39;</span><span class="p">:</span>
+        <span class="n">minnum</span> <span class="o">=</span> <span class="n">v</span><span class="o">+</span><span class="s1">&#39;+&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">minpy</span> <span class="o">=</span> <span class="n">v</span><span class="o">+</span><span class="s1">&#39;+&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;On next release, drop support for Python 3.5 (initially released on Sep 13, 2015)&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">toprint_drop_dates</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;============ ====== =====&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Date         Python NumPy&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;------------ ------ -----&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">toprint_support_table</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;============ ====== =====&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#support-table">Support Table</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drop-schedule">Drop Schedule</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ad-hoc-version-support">Ad-Hoc version support</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#all-cpython-supported-versions">All CPython supported versions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#default-version-on-linux-distribution">Default version on Linux distribution</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#n-minor-versions-of-python">N minor versions of Python</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#time-window-from-the-x-y-1-python-release">Time window from the X.Y.1 Python release</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

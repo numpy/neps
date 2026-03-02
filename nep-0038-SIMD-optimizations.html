@@ -1,0 +1,869 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 38 — Using SIMD optimization instructions for performance &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0038-SIMD-optimizations';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 40 — Legacy datatype implementation in NumPy" href="nep-0040-legacy-datatype-impl.html" />
+    <link rel="prev" title="NEP 35 — Array creation dispatching with __array_function__" href="nep-0035-array-creation-dispatch-with-array-function.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 38 — Using SIMD optimization instructions for performance</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-38-using-simd-optimization-instructions-for-performance">
+<span id="nep38"></span><h1>NEP 38 — Using SIMD optimization instructions for performance<a class="headerlink" href="#nep-38-using-simd-optimization-instructions-for-performance" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sayed Adel, Matti Picus, Ralf Gommers</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2019-11-25</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/PVWJ74UVBRZ5ZWF6MDU7EUSJXVNILAQB/#PVWJ74UVBRZ5ZWF6MDU7EUSJXVNILAQB">NumPy Discussion</a></p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>While compilers are getting better at using hardware-specific routines to
+optimize code, they sometimes do not produce optimal results. Also, we would
+like to be able to copy binary optimized C-extension modules from one machine
+to another with the same base architecture (x86, ARM, or PowerPC) but with
+different capabilities without recompiling.</p>
+<p>We have a mechanism in the ufunc machinery to <a class="reference external" href="https://github.com/numpy/numpy/blob/v1.17.4/numpy/core/code_generators/generate_umath.py#L50">build alternative loops</a>
+indexed by CPU feature name. At import (in <code class="docutils literal notranslate"><span class="pre">InitOperators</span></code>), the loop
+function that matches the run-time CPU info <a class="reference external" href="https://github.com/numpy/numpy/blob/v1.17.4/numpy/core/code_generators/generate_umath.py#L1038">is chosen</a> from the candidates.This
+NEP proposes a mechanism to build on that for many more features and
+architectures.  The steps proposed are to:</p>
+<ul class="simple">
+<li><p>Establish a set of well-defined, architecture-agnostic, universal intrinsics
+which capture features available across architectures.</p></li>
+<li><p>Capture these universal intrinsics in a set of C macros and use the macros
+to build code paths for sets of features from the baseline up to the maximum
+set of features available on that architecture. Offer these as a limited
+number of compiled alternative code paths.</p></li>
+<li><p>At runtime, discover which CPU features are available, and choose from among
+the possible code paths accordingly.</p></li>
+</ul>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>Traditionally NumPy has depended on compilers to generate optimal code
+specifically for the target architecture.
+However few users today compile NumPy locally for their machines. Most use the
+binary packages which must provide run-time support for the lowest-common
+denominator CPU architecture. Thus NumPy cannot take advantage of
+more advanced features of their CPU processors, since they may not be available
+on all users’ systems.</p>
+<p>Traditionally, CPU features have been exposed through <a class="reference external" href="https://software.intel.com/en-us/cpp-compiler-developer-guide-and-reference-intrinsics">intrinsics</a> which are
+compiler-specific instructions that map directly to assembly instructions.
+Recently there were discussions about the effectiveness of adding more
+intrinsics (e.g., <a class="reference external" href="https://github.com/numpy/numpy/pull/11113">gh-11113</a> for AVX optimizations for floats).  In the past,
+architecture-specific code was added to NumPy for <a class="reference external" href="https://github.com/numpy/numpy/pulls?q=is%3Apr+avx512+is%3Aclosed">fast avx512 routines</a> in
+various ufuncs, using the mechanism described above to choose the best loop
+for the architecture. However the code is not generic and does not generalize
+to other architectures.</p>
+<p>Recently, OpenCV moved to using <a class="reference external" href="https://docs.opencv.org/master/df/d91/group__core__hal__intrin.html">universal intrinsics</a> in the Hardware
+Abstraction Layer (HAL) which provided a nice abstraction for common shared
+Single Instruction Multiple Data (SIMD) constructs. This NEP proposes a similar
+mechanism for NumPy. There are three stages to using the mechanism:</p>
+<ul class="simple">
+<li><p>Infrastructure is provided in the code for abstract intrinsics. The ufunc
+machinery will be extended using sets of these abstract intrinsics, so that
+a single ufunc will be expressed as a set of loops, going from a minimal to
+a maximal set of possibly available intrinsics.</p></li>
+<li><p>At compile time, compiler macros and CPU detection are used to turn the
+abstract intrinsics into concrete intrinsic calls. Any intrinsics not
+available on the platform, either because the CPU does not support them
+(and so cannot be tested) or because the abstract intrinsic does not have a
+parallel concrete intrinsic on the platform will not error, rather the
+corresponding loop will not be produced and added to the set of
+possibilities.</p></li>
+<li><p>At runtime, the CPU detection code will further limit the set of loops
+available, and the optimal one will be chosen for the ufunc.</p></li>
+</ul>
+<p>The current NEP proposes only to use the runtime feature detection and optimal
+loop selection mechanism for ufuncs. Future NEPS may propose other uses for the
+proposed solution.</p>
+<p>The ufunc machinery already has the ability to select an optimal loop for
+specifically available CPU features at runtime, currently used for <code class="docutils literal notranslate"><span class="pre">avx2</span></code>,
+<code class="docutils literal notranslate"><span class="pre">fma</span></code> and <code class="docutils literal notranslate"><span class="pre">avx512f</span></code> loops (in the generated <code class="docutils literal notranslate"><span class="pre">__umath_generated.c</span></code> file);
+universal intrinsics would extend the generated code to include more loop
+variants.</p>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>The end user will be able to get a list of intrinsics available for their
+platform and compiler. Optionally,
+the user may be able to specify which of the loops available at runtime will be
+used, perhaps via an environment variable to enable benchmarking the impact of
+the different loops. There should be no direct impact to naive end users, the
+results of all the loops should be identical to within a small number (1-3?)
+ULPs. On the other hand, users with more powerful machines should notice a
+significant performance boost.</p>
+<section id="binary-releases-wheels-on-pypi-and-conda-packages">
+<h3>Binary releases - wheels on PyPI and conda packages<a class="headerlink" href="#binary-releases-wheels-on-pypi-and-conda-packages" title="Link to this heading">#</a></h3>
+<p>The binaries released by this process will be larger since they include all
+possible loops for the architecture. Some packagers may prefer to limit the
+number of loops in order to limit the size of the binaries, we would hope they
+would still support a wide range of families of architectures. Note this
+problem already exists in the Intel MKL offering, where the binary package
+includes an extensive set of alternative shared objects (DLLs) for various CPU
+alternatives.</p>
+</section>
+<section id="source-builds">
+<h3>Source builds<a class="headerlink" href="#source-builds" title="Link to this heading">#</a></h3>
+<p>See “Detailed Description” below. A source build where the packager knows
+details of the target machine could theoretically produce a smaller binary by
+choosing to compile only the loops needed by the target via command line
+arguments.</p>
+</section>
+<section id="how-to-run-benchmarks-to-assess-performance-benefits">
+<h3>How to run benchmarks to assess performance benefits<a class="headerlink" href="#how-to-run-benchmarks-to-assess-performance-benefits" title="Link to this heading">#</a></h3>
+<p>Adding more code which use intrinsics will make the code harder to maintain.
+Therefore, such code should only be added if it yields a significant
+performance benefit. Assessing this performance benefit can be nontrivial.
+To aid with this, the implementation for this NEP will add a way to select
+which instruction sets can be used at <em>runtime</em> via environment variables.
+(name TBD). This ability is critical for CI code verification.</p>
+</section>
+<section id="diagnostics">
+<h3>Diagnostics<a class="headerlink" href="#diagnostics" title="Link to this heading">#</a></h3>
+<p>A new dictionary <code class="docutils literal notranslate"><span class="pre">__cpu_features__</span></code> will be available to python. The keys are
+the available features, the value is a boolean whether the feature is available
+or not. Various new private
+C functions will be used internally to query available features. These
+might be exposed via specific c-extension modules for testing.</p>
+</section>
+<section id="workflow-for-adding-a-new-cpu-architecture-specific-optimization">
+<h3>Workflow for adding a new CPU architecture-specific optimization<a class="headerlink" href="#workflow-for-adding-a-new-cpu-architecture-specific-optimization" title="Link to this heading">#</a></h3>
+<p>NumPy will always have a baseline C implementation for any code that may be
+a candidate for SIMD vectorization.  If a contributor wants to add SIMD
+support for some architecture (typically the one of most interest to them),
+this comment is the beginning of a tutorial on how to do so:
+<a class="github reference external" href="https://github.com/numpy/numpy/pull/13516#issuecomment-558859638">numpy/numpy#13516</a></p>
+<p id="tradeoffs">As of this moment, NumPy has a number of <code class="docutils literal notranslate"><span class="pre">avx512f</span></code> and <code class="docutils literal notranslate"><span class="pre">avx2</span></code> and <code class="docutils literal notranslate"><span class="pre">fma</span></code>
+SIMD loops for many ufuncs. These would likely be the first candidates
+to be ported to universal intrinsics. The expectation is that the new
+implementation may cause a regression in benchmarks, but not increase the
+size of the binary. If the regression is not minimal, we may choose to keep
+the X86-specific code for that platform and use the universal intrinsic code
+for other platforms.</p>
+<p>Any new PRs to implement ufuncs using intrinsics will be expected to use the
+universal intrinsics. If it can be demonstrated that the use of universal
+intrinsics is too awkward or is not performant enough, platform specific code
+may be accepted as well. In rare cases, a single-platform only PR may be
+accepted, but it would have to be examined within the framework of preferring
+a solution using universal intrinsics.</p>
+<p>The subjective criteria for accepting new loops are:</p>
+<ul class="simple">
+<li><p>correctness: the new code must not decrease accuracy by more than 1-3 ULPs
+even at edge points in the algorithm.</p></li>
+<li><p>code bloat: both source code size and especially binary size of the compiled
+wheel.</p></li>
+<li><p>maintainability: how readable is the code</p></li>
+<li><p>performance: benchmarks must show a significant performance boost</p></li>
+</ul>
+<section id="adding-a-new-intrinsic">
+<span id="new-intrinsics"></span><h4>Adding a new intrinsic<a class="headerlink" href="#adding-a-new-intrinsic" title="Link to this heading">#</a></h4>
+<p>If a contributor wants to use a platform-specific SIMD instruction that is not
+yet supported as a universal intrinsic, then:</p>
+<ol class="arabic simple">
+<li><p>It should be added as a universal intrinsic for all platforms</p></li>
+<li><p>If it does not have an equivalent instruction on other platforms (e.g.
+<code class="docutils literal notranslate"><span class="pre">_mm512_mask_i32gather_ps</span></code> in <code class="docutils literal notranslate"><span class="pre">AVX512</span></code>), then no universal intrinsic
+should be added and a platform-specific <code class="docutils literal notranslate"><span class="pre">ufunc</span></code> or a short helper function
+should be written instead. If such a helper function is used, it must be
+wrapped with the feature macros, and a reasonable non-intrinsic fallback to
+be used by default.</p></li>
+</ol>
+<p>We expect (2) to be the exception. The contributor and maintainers should
+consider whether that single-platform intrinsic is worth it compared to using
+the best available universal intrinsic based implementation.</p>
+</section>
+</section>
+<section id="reuse-by-other-projects">
+<h3>Reuse by other projects<a class="headerlink" href="#reuse-by-other-projects" title="Link to this heading">#</a></h3>
+<p>It would be nice if the universal intrinsics would be available to other
+libraries like SciPy or Astropy that also build ufuncs, but that is not an
+explicit goal of the first implementation of this NEP.</p>
+</section>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>There should be no impact on backwards compatibility.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<p>The CPU-specific are mapped to universal intrinsics which are
+similar for all x86 SIMD variants, ARM SIMD variants etc. For example, the
+NumPy universal intrinsic <code class="docutils literal notranslate"><span class="pre">npyv_load_u32</span></code> maps to:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">vld1q_u32</span></code> for ARM based NEON</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_mm256_loadu_si256</span></code> for x86 based AVX2</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_mm512_loadu_si512</span></code> for x86 based AVX-512</p></li>
+</ul>
+<p>Anyone writing a SIMD loop will use the <code class="docutils literal notranslate"><span class="pre">npyv_load_u32</span></code> macro instead of the
+architecture specific intrinsic. The code also supplies guard macros for
+compilation and runtime, so that the proper loops can be chosen.</p>
+<p>Two new build options are available to <code class="docutils literal notranslate"><span class="pre">runtests.py</span></code> and <code class="docutils literal notranslate"><span class="pre">setup.py</span></code>:
+<code class="docutils literal notranslate"><span class="pre">--cpu-baseline</span></code> and <code class="docutils literal notranslate"><span class="pre">--cpu-dispatch</span></code>.
+The absolute minimum required features to compile are defined by
+<code class="docutils literal notranslate"><span class="pre">--cpu-baseline</span></code>.  For instance, on <code class="docutils literal notranslate"><span class="pre">x86_64</span></code> this defaults to <code class="docutils literal notranslate"><span class="pre">SSE3</span></code>. The
+minimum features will be enabled if the compiler support it. The
+set of additional intrinsics that can be detected and used as sets of
+requirements to dispatch on are set by <code class="docutils literal notranslate"><span class="pre">--cpu-dispatch</span></code>. For instance, on
+<code class="docutils literal notranslate"><span class="pre">x86_64</span></code> this defaults to <code class="docutils literal notranslate"><span class="pre">[SSSE3,</span> <span class="pre">SSE41,</span> <span class="pre">POPCNT,</span> <span class="pre">SSE42,</span> <span class="pre">AVX,</span> <span class="pre">F16C,</span> <span class="pre">XOP,</span>
+<span class="pre">FMA4,</span> <span class="pre">FMA3,</span> <span class="pre">AVX2,</span> <span class="pre">AVX512F,</span> <span class="pre">AVX512CD,</span> <span class="pre">AVX512_KNL,</span> <span class="pre">AVX512_KNM,</span> <span class="pre">AVX512_SKX,</span>
+<span class="pre">AVX512_CLX,</span> <span class="pre">AVX512_CNL,</span> <span class="pre">AVX512_ICL]</span></code>. These features are all mapped to a
+c-level boolean array <code class="docutils literal notranslate"><span class="pre">npy__cpu_have</span></code>, and a c-level convenience function
+<code class="docutils literal notranslate"><span class="pre">npy_cpu_have(int</span> <span class="pre">feature_id)</span></code> queries this array, and the results are stored
+in <code class="docutils literal notranslate"><span class="pre">__cpu_features__</span></code> at runtime.</p>
+<p>When importing the ufuncs, the available compiled loops’ required features are
+matched to the ones discovered. The loop with the best match is marked to be
+called by the ufunc.</p>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://gitlab.freedesktop.org/pixman">Pixman</a> is the library used by Cairo and X to manipulate pixels. It uses
+a technique like the one described here to fill a structure with function
+pointers at runtime. These functions are similar to ufunc loops.</p></li>
+<li><p><a class="reference external" href="http://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a> is a C++ template library for linear algebra: matrices, vectors,
+numerical solvers, and related algorithms. It is a higher level-abstraction
+than the intrinsics discussed here.</p></li>
+<li><p><a class="reference external" href="https://xsimd.readthedocs.io/en/latest/">xsimd</a> is a header-only C++ library for x86 and ARM that implements the
+mathematical functions used in the algorithms of <code class="docutils literal notranslate"><span class="pre">boost.SIMD</span></code>.</p></li>
+<li><p><a class="reference external" href="https://github.com/ermig1979/Simd">Simd</a> is a high-level image processing and machine learning library with
+optimizations for different platforms.</p></li>
+<li><p>OpenCV used to have the one-implementation-per-architecture design, but more
+recently moved to a design that is quite similar to what is proposed in this
+NEP. The top-level <a class="reference external" href="https://github.com/opencv/opencv/blob/4.1.2/modules/core/src/arithm.dispatch.cpp">dispatch code</a> includes a <a class="reference external" href="https://github.com/opencv/opencv/blob/4.1.2/modules/core/src/arithm.simd.hpp">generic header</a> that is
+<a class="reference external" href="https://github.com/opencv/opencv/blob/4.1.2/modules/core/CMakeLists.txt#L3-#L13">specialized at compile time</a> by the CMakefile system.</p></li>
+<li><p><a class="reference external" href="https://www.libvolk.org/doxygen/index.html">VOLK</a> is a GPL3 library used by gnuradio and others to abstract SIMD
+intrinsics. They offer a set of high-level operations which have been
+optimized for each architecture.</p></li>
+<li><p>The C++ Standards Committee has proposed <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0214r8.pdf">class templates</a> for portable
+SIMD programming via vector types, and <a class="reference external" href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2019/n4808.pdf">namespaces</a> for the templates.</p></li>
+</ul>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>Current PRs:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/13421">gh-13421 improve runtime detection of CPU features</a></p></li>
+<li><p><a class="reference external" href="https://github.com/numpy/numpy/pull/13516">gh-13516: enable multi-platform SIMD compiler optimizations</a></p></li>
+</ul>
+<p>The compile-time and runtime code infrastructure are supplied by the first PR.
+The second adds a demonstration of use of the infrastructure for a loop. Once
+the NEP is approved, more work is needed to write loops using the mechanisms
+provided by the NEP.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>A proposed alternative in <a class="reference external" href="https://github.com/numpy/numpy/pull/13516">gh-13516</a> is to implement loops for each CPU
+architecture separately by hand, without trying to abstract common patterns in
+the SIMD intrinsics (e.g., have <cite>loops.avx512.c.src</cite>, <cite>loops.avx2.c.src</cite>,
+<cite>loops.sse.c.src</cite>, <cite>loops.vsx.c.src</cite>, <cite>loops.neon.c.src</cite>, etc.). This is more
+similar to what PIXMAX does. There’s a lot of duplication here though, and the
+manual code duplication requires a champion who will be dedicated to
+implementing and maintaining that platform’s loop code.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<p>Most of the discussion took place on the PR <a class="reference external" href="https://github.com/numpy/numpy/pull/15228">gh-15228</a> to accept this NEP.
+Discussion on the mailing list mentioned <a class="reference external" href="https://www.libvolk.org/doxygen/index.html">VOLK</a> which was added to
+the section on related work. The question of maintainability also was raised
+both on the mailing list and in <a class="reference external" href="https://github.com/numpy/numpy/pull/15228">gh-15228</a> and resolved as follows:</p>
+<ul class="simple">
+<li><p>If contributors want to leverage a specific SIMD instruction, will they be
+expected to add software implementation of this instruction for all other
+architectures too? (see the <a class="reference internal" href="#new-intrinsics">new-intrinsics</a> part of the workflow).</p></li>
+<li><p>On whom does the burden lie to verify the code and benchmarks for all
+architectures? What happens if adding a universal ufunc in place of
+architecture-specific code helps one architecture but harms performance
+on another? (answered in the <a class="reference internal" href="#tradeoffs">tradeoffs</a> part of the workflow).</p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Each NEP must either be explicitly labeled as placed in the public domain (see
+this NEP as an example) or licensed under the <a class="reference external" href="https://www.opencontent.org/openpub/">Open Publication License</a>.</p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain. <a class="footnote-reference brackets" href="#id1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#binary-releases-wheels-on-pypi-and-conda-packages">Binary releases - wheels on PyPI and conda packages</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#source-builds">Source builds</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-run-benchmarks-to-assess-performance-benefits">How to run benchmarks to assess performance benefits</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#diagnostics">Diagnostics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#workflow-for-adding-a-new-cpu-architecture-specific-optimization">Workflow for adding a new CPU architecture-specific optimization</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-new-intrinsic">Adding a new intrinsic</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reuse-by-other-projects">Reuse by other projects</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

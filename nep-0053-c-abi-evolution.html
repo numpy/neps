@@ -1,0 +1,865 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 53 — Evolving the NumPy C-API for NumPy 2.0 &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0053-c-abi-evolution';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 57 — NumPy platform support" href="nep-0057-numpy-platform-support.html" />
+    <link rel="prev" title="NEP 43 — Enhancing the extensibility of UFuncs" href="nep-0043-extensible-ufuncs.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="open.html" class="nav-link">Open NEPs (under consideration)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-53-evolving-the-numpy-c-api-for-numpy-2-0">
+<span id="nep53"></span><h1>NEP 53 — Evolving the NumPy C-API for NumPy 2.0<a class="headerlink" href="#nep-53-evolving-the-numpy-c-api-for-numpy-2-0" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sebastian Berg &lt;<a class="reference external" href="mailto:sebastianb&#37;&#52;&#48;nvidia&#46;com">sebastianb<span>&#64;</span>nvidia<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Draft</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standard</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2022-04-10</p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>The NumPy C-API is used in downstream projects (often through Cython)
+to extend NumPy functionality.  Supporting these packages generally means
+that it is slow to evolve our C-API and some changes are not possible in a
+normal NumPy release because NumPy must guarantee backwards compatibility:
+A downstream package compiled against an old NumPy version (e.g. 1.17)
+will generally work with a new NumPy version (e.g. 1.25).</p>
+<p>A NumPy 2.0 release allows to <em>partially</em> break this promise:
+We can accept that a SciPy version compiled with NumPy 1.17 (e.g. SciPy 1.10)
+will <em>not</em> work with NumPy 2.0.
+However, it must still be easy to create a single SciPy binary that is
+compatible with both NumPy 1.x and NumPy 2.0.</p>
+<p>Given these constraints this NEP outlines a path forward to allow large changes
+to our C-API.  Similar to Python API changes proposed for NumPy 2.0 the NEP
+aims to allow changes to an extend that <em>most</em> downstream packages are expected
+to need no or only minor code changes.</p>
+<p>The implementation of this NEP consists would consist of two steps:</p>
+<ol class="arabic simple">
+<li><p>As part of a general improvement, starting with NumPy 1.25 building with
+NumPy will by default export an older API version to allow backwards
+compatible builds with the newest available NumPy version.
+(New API is not available unless opted-in.)</p></li>
+<li><p>The NumPy 2.0 will:</p>
+<ul class="simple">
+<li><p>require recompilation of downstream packages against NumPy 2.0 to be
+compatible with NumPy 2.0.</p></li>
+<li><p>need a <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code> as a dependency when running on NumPy 1.x.</p></li>
+<li><p>require some downstream code changes to adapt to changed API.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>The NumPy API conists of more than 300 functions and numerous macros.
+Many of these are outdated: some were only ever used within NumPy,
+exist only for compatibility with NumPy’s predecessors, or have no or only
+a single known downstream user (i.e. SciPy).</p>
+<p>Further, many structs used by NumPy have always been public making it
+impossible to change them outside of a major release.
+Some changes have been planned for years and were the reason for
+<code class="docutils literal notranslate"><span class="pre">NPY_NO_DEPRECATED_API</span></code> and further deprecations as explained in
+<a class="reference external" href="https://numpy.org/devdocs/reference/c-api/deprecations.html#c-api-deprecations" title="(in NumPy v2.5.dev0)"><span>C API deprecations</span></a>.</p>
+<p>While we probably have little reason to change the layout of the array struct
+(<code class="docutils literal notranslate"><span class="pre">PyArrayObject_fields</span></code>) for example the development and improvement of
+dtypes would be made easier by changing the <cite>PyArray_Descr</cite> struct.</p>
+<p>This NEP proposes a few concrete changes to our C-API mainly as examples.
+However, more changes will be handled on a case-by-case basis, and we do not
+aim to provide a full list of changes in this NEP.</p>
+<section id="adding-state-is-out-of-scope">
+<h3>Adding state is out of scope<a class="headerlink" href="#adding-state-is-out-of-scope" title="Link to this heading">#</a></h3>
+<p>New developments such as CPython’s support for subinterpreters and the
+HPy API may require the NumPy C-API to evolve in a way that may require
+(or at least prefer) state to be passed in.</p>
+<p>As of now, we do not aim to include changes for this here.  We cannot expect
+users to do large code updates to pass in for example an <code class="docutils literal notranslate"><span class="pre">HPy</span></code> context
+to many NumPy functions.</p>
+<p>While we could introduce a second API for this purpose in NumPy 2.0,
+we expect that this is unnecessary and that the provisions introduced here:</p>
+<ul class="simple">
+<li><p>the ability to compile with the newest NumPy version but be compatible with
+older versions,</p></li>
+<li><p>and the possibility of updating a <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code> package.</p></li>
+</ul>
+<p>should allow to add such an API also in a minor release.</p>
+</section>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<section id="backwards-compatible-builds">
+<h3>Backwards compatible builds<a class="headerlink" href="#backwards-compatible-builds" title="Link to this heading">#</a></h3>
+<p>Backwards compatible builds will be described in more details in the
+documentation.
+Briefly, we will allow users to use a definition like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#define NPY_TARGET_VERSION NPY_1_22_API_VERSION</span>
+</pre></div>
+</div>
+<p>to select the version they wish to compile for (lowest version to be
+compatible with).
+By default the backwards compatibility will be such that the resulting binary
+is compatible with the oldest NumPy version which supports the same
+version of Python: NumPy 1.19.x was the first to support Python 3.9 and
+NumPy 1.25 supports Python 3.9 or greater, so NumPy 1.25 defaults to 1.19
+compatibility.
+Thus, users of <em>new</em> API may be required to add the define,
+but users of who want to be compatible with older versions need not do
+anything unless they wish to have exceptionally long compatibility.</p>
+<p>The API additions in the past years were so limited that such a change
+should be necessary at most for a hand-full of users worldwide.</p>
+<p>This mechanism is much the same as the <a class="reference external" href="https://docs.python.org/3/c-api/stable.html">Python limited API</a> since NumPy’s
+C-API has a similar need for ABI stability.</p>
+</section>
+<section id="breaking-the-c-api-and-changing-the-abi">
+<h3>Breaking the C-API and changing the ABI<a class="headerlink" href="#breaking-the-c-api-and-changing-the-abi" title="Link to this heading">#</a></h3>
+<p>NumPy has too many functions, many of which are aliases.  The following
+lists <em>examples</em> of things we plan to remove and users will have to adapt
+to be compatible with NumPy 2.0:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">PyArray_Mean</span></code> and <code class="docutils literal notranslate"><span class="pre">PyArray_Std</span></code> are untested implementation similar to
+<code class="docutils literal notranslate"><span class="pre">arr.mean()</span></code> and  <code class="docutils literal notranslate"><span class="pre">arr.std()</span></code>.  We are planning on removing these as they
+can be replaced with method calls relatively easily.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">MapIter</span></code> set of API functions (and struct) allows to implement
+advanced indexing like semantics downstream.  There was a single <em>historic</em>
+known user of this (theano) and the use-case would be faster and easier to
+implement in a different way.  The API is complicated, requires reaching
+deep into NumPy to be useful and its exposure makes the implementation
+more difficult.  Unless new important use cases are found, we propose to
+remove it.</p></li>
+</ul>
+<p>An example for an ABI change is to change the layout of <code class="docutils literal notranslate"><span class="pre">PyArray_Descr</span></code>
+(the struct of <code class="docutils literal notranslate"><span class="pre">np.dtype</span></code> instances) to allow a larger maximum itemsize and
+new flags (useful for future custom user DTypes).
+For this specific change, users who access the structs fields directly
+will have to change their code.  A downstream search shows that this should
+not be very common, the main impacts are:</p>
+<ul class="simple">
+<li><p>Access of the <code class="docutils literal notranslate"><span class="pre">descr-&gt;elsize</span></code> field (and others) would have to be replaced
+with a macro’s like <code class="docutils literal notranslate"><span class="pre">PyDataType_ITEMSIZE(descr)</span></code> (NumPy may include a
+version check when needed).</p></li>
+<li><p>Implementers of user defined dtypes, will have to change a few lines of code
+and luckily, there are very few of such user defined dtypes.
+(The details are that we rename the struct to <code class="docutils literal notranslate"><span class="pre">PyArray_DescrProto</span></code> for the
+static definition and fetch the actual instance from NumPy explicitly.)</p></li>
+</ul>
+<p>A last example is increasing <code class="docutils literal notranslate"><span class="pre">NPY_MAXDIMS</span></code> to <code class="docutils literal notranslate"><span class="pre">64</span></code>.
+<code class="docutils literal notranslate"><span class="pre">NPY_MAXDIMS</span></code> is mainly used to statically allocate scratch space:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">func</span><span class="p">(</span><span class="n">PyArrayObject</span> <span class="o">*</span><span class="n">arr</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">npy_intp</span> <span class="n">shape</span><span class="p">[</span><span class="n">NPY_MAXDIMS</span><span class="p">];</span>
+    <span class="o">/*</span> <span class="n">Work</span> <span class="k">with</span> <span class="n">a</span> <span class="n">shape</span> <span class="ow">or</span> <span class="n">strides</span> <span class="kn">from</span><span class="w"> </span><span class="nn">the</span> <span class="n">array</span> <span class="o">*/</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If NumPy changed it to 64 in a minor release, this would lead to undefined
+behavior if the code was compiled with <code class="docutils literal notranslate"><span class="pre">NPY_MAXDIMS=32</span></code> but a 40 dimensional
+array is passed in.
+But the larger value is also a correct maximum on previous versions of NumPy
+making it generally safe for NumPy 2.0 change.
+(One can imagine code that wants to know the actual runtime value.
+We have not seen such code in practice, but it would need to be adjusted.)</p>
+</section>
+<section id="impact-on-cython-users">
+<h3>Impact on Cython users<a class="headerlink" href="#impact-on-cython-users" title="Link to this heading">#</a></h3>
+<p>Cython users may use the NumPy C-API via <code class="docutils literal notranslate"><span class="pre">cimport</span> <span class="pre">numpy</span> <span class="pre">as</span> <span class="pre">cnp</span></code>.
+Due to the uncertainty of Cython development, there are two scenarios for
+impact on Cython users.</p>
+<p>If Cython 3 can be relied on, Cython users would be impacted <em>less</em> than C-API
+users, because Cython 3 allows us to hide struct layout changes (i.e. changes
+to <code class="docutils literal notranslate"><span class="pre">PyArray_Descr</span></code>).
+If this is not the case and we must support Cython 0.29.x (which is the historic branch
+before Cython 3), then Cython users will also have to use a function/macro like
+<code class="docutils literal notranslate"><span class="pre">PyDataType_ITEMSIZE()</span></code> (or use the Python object).  This is unfortunately less
+typical in Cython code, but also unlikely to be a common pattern for dtype struct
+fields/attributes.</p>
+<p>A further impact is that some future API additions such as new classes may
+need to placed in a distinct <code class="docutils literal notranslate"><span class="pre">.pyd</span></code> file to avoid Cython generating code
+that would fail on older NumPy versions.</p>
+</section>
+<section id="end-user-and-packaging-impact">
+<h3>End-user and packaging impact<a class="headerlink" href="#end-user-and-packaging-impact" title="Link to this heading">#</a></h3>
+<p>Packaging in a way that is compatible with NumPy 2.0 will require a
+recompilation of downstream libraries that rely on the NumPy C-API.
+This may take some time, although hopefully the process will start before
+NumPy 2.0 is itself released.</p>
+<p>Further, to allow bigger changes more easily in NumPy 2.0, we expect to
+create a <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code> package.
+When a library is build with NumPy 2.0 but wants to support NumPy 1.x it will
+have to depend on <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code>.  End-users should not need to be aware
+of this dependency and an informative error can be raised when the module
+is missing.</p>
+</section>
+<section id="some-new-api-can-be-backported">
+<h3>Some new API can be backported<a class="headerlink" href="#some-new-api-can-be-backported" title="Link to this heading">#</a></h3>
+<p>One large advantage of allowing users to compile with the newest version of
+NumPy is that in some cases we will be able to backport new API.
+Some new API functions can be written in terms of old ones or included
+directly.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It may be possible to make functions public that were present but
+private in NumPy 1.x public via the compatible <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code> package.</p>
+</div>
+<p>This means that at some new API additions could be made available to
+downstreams users faster.  They would require a new NumPy version for
+<em>compilation</em> but their wheels can be backwards compatible with earlier
+versions.</p>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>The first part of implementation (allowing building for an earlier API version)
+is very straight forward since the NumPy C-API evolved slowly for
+many years.
+Some struct fields will be hidden by default and functions introduced in a
+more recent version will be marked and hidden unless the
+user opted in to a newer API version.
+An implementation can be found in the <a class="reference external" href="https://github.com/numpy/numpy/pull/23528">PR 23528</a>.</p>
+<p>The second part is mainly about identifying and implementing the desired
+changes in a way that backwards compatibility will not be broken and API
+breaks remain manageable for downstream libraries.
+Every change we do must have a brief note on how to adapt to the
+API change (i.e. alternative functions).</p>
+<section id="numpy-2-compatibility-and-api-table-changes">
+<h3>NumPy 2 compatibility and API table changes<a class="headerlink" href="#numpy-2-compatibility-and-api-table-changes" title="Link to this heading">#</a></h3>
+<p>To allow changing the API table, NumPy 2.0 would ship a different table than
+NumPy 1.x (a table is a list of functions and symbols).</p>
+<p>For compatibility we would need to translate the 1.x table to the 2.0 table.
+This could be done in headers only in theory, but this seems unwieldy.
+We thus propose to add a <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code> package.  This package’s main
+purpose would be to provide a translation of the 1.x table to the 2.x one
+in a single place (filling in any necessary blanks).</p>
+<p>Introducing this package solves the “transition” issue because it allows
+a user to:</p>
+<ul class="simple">
+<li><p>Install a SciPy version that is compatible with 2.0 and 1.x</p></li>
+<li><p>and keep using NumPy 1.x because of other packages they are using are not
+yet compatible.</p></li>
+</ul>
+<p>The import of <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code> (and an error when it is missing) will be
+inserted by the NumPy headers as part of the <code class="docutils literal notranslate"><span class="pre">import_array()</span></code> call.</p>
+</section>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>There are always possibilities to decide not to do certain changes (e.g. due
+to downstream users noting their continued need for it).  For example, the
+function <code class="docutils literal notranslate"><span class="pre">PyArray_Mean</span></code> could be replaced by one to call <code class="docutils literal notranslate"><span class="pre">array.mean()</span></code>
+if necessary.</p>
+<p>The NEP proposes to allow larger changes to our API table by introducing a
+compatibility package <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code>.
+We could do many changes without introducing such a package.</p>
+<p>The default API version could be chosen to be older or as the current one.
+An older version would be aimed at libraries who want a larger compatibility
+than NEP 29 suggests.
+Choosing the current would default to removing unnecessary compatibility shims
+for users who do not distribute wheels.
+The suggested default chooses to favors libraries that distribute wheels and
+wish a compatibility range similar to NEP 29.  This is because compatibility
+shims should be light-weight and we expect few libraries require a longer
+compatibility.</p>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>As mentioned above backwards compatibility is achieved by:</p>
+<ol class="arabic simple">
+<li><p>Forcing downstream to recompile with NumPy 2.0</p></li>
+<li><p>Providing a <code class="docutils literal notranslate"><span class="pre">numpy2_compat</span></code> library.</p></li>
+</ol>
+<p>But relies on users to adapt to changed C-API as described in the Usage and
+Impact section.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="github reference external" href="https://github.com/numpy/numpy/issues/5888">numpy/numpy#5888</a> brought up previously that it
+would be helpful to allow exporting of an older API version in our headers.
+This was never implemented, instead we relied on <a class="reference external" href="https://github.com/scipy/oldest-supported-numpy">oldest-support-numpy</a>.</p></li>
+<li><p>A first draft of this proposal was presented at the NumPy 2.0 planning
+meeting 2023-04-03.</p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>Each NEP must either be explicitly labeled as placed in the public domain (see
+this NEP as an example) or licensed under the <a class="reference external" href="https://www.opencontent.org/openpub/">Open Publication License</a>.</p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain. <a class="footnote-reference brackets" href="#id1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-state-is-out-of-scope">Adding state is out of scope</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backwards-compatible-builds">Backwards compatible builds</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breaking-the-c-api-and-changing-the-abi">Breaking the C-API and changing the ABI</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#impact-on-cython-users">Impact on Cython users</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#end-user-and-packaging-impact">End-user and packaging impact</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#some-new-api-can-be-backported">Some new API can be backported</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-2-compatibility-and-api-table-changes">NumPy 2 compatibility and API table changes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

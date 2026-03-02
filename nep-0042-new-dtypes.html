@@ -1,0 +1,1814 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 42 — New and extensible DTypes &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0042-new-dtypes';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 44 — Restructuring the NumPy documentation" href="nep-0044-restructuring-numpy-docs.html" />
+    <link rel="prev" title="NEP 41 — First step towards a new datatype system" href="nep-0041-improved-dtype-support.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="accepted.html" class="nav-link">Accepted NEPs (implementation in progress)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 42 — New and extensible DTypes</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-42-new-and-extensible-dtypes">
+<span id="nep42"></span><h1>NEP 42 — New and extensible DTypes<a class="headerlink" href="#nep-42-new-and-extensible-dtypes" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">title<span class="colon">:</span></dt>
+<dd class="field-odd"><p>New and extensible DTypes</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sebastian Berg</p>
+</dd>
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Ben Nathanson</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Marten van Kerkwijk</p>
+</dd>
+<dt class="field-odd">Status<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Accepted</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Standard</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2019-07-17</p>
+</dd>
+<dt class="field-even">Resolution<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://mail.python.org/pipermail/numpy-discussion/2020-October/081038.html">https://mail.python.org/pipermail/numpy-discussion/2020-October/081038.html</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This NEP is third in a series:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="nep-0040-legacy-datatype-impl.html#nep40"><span class="std std-ref">NEP 40</span></a> explains the shortcomings of NumPy’s dtype implementation.</p></li>
+<li><p><a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a> gives an overview of our proposed replacement.</p></li>
+<li><p>NEP 42 (this document) describes the new design’s datatype-related APIs.</p></li>
+<li><p><a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a> describes the new design’s API for universal functions.</p></li>
+</ul>
+</div>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>NumPy’s dtype architecture is monolithic – each dtype is an instance of  a
+single class. There’s no principled way to expand it for new dtypes, and the
+code is difficult to read and maintain.</p>
+<p>As <a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a> explains, we are proposing a new architecture that is
+modular and open to user additions. dtypes will derive from a new <code class="docutils literal notranslate"><span class="pre">DType</span></code>
+class serving as the extension point for new types. <code class="docutils literal notranslate"><span class="pre">np.dtype(&quot;float64&quot;)</span></code>
+will return an instance of a <code class="docutils literal notranslate"><span class="pre">Float64</span></code> class, a subclass of root class
+<code class="docutils literal notranslate"><span class="pre">np.dtype</span></code>.</p>
+<p>This NEP is one of two that lay out the design and API of this new
+architecture. This NEP addresses dtype implementation; <a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a> addresses
+universal functions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Details of the private and external APIs may change to reflect user
+comments and implementation constraints. The underlying principles and
+choices should not change significantly.</p>
+</div>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>Our goal is to allow user code to create fully featured dtypes for a broad
+variety of uses, from physical units (such as meters) to domain-specific
+representations of geometric objects. <a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a> describes a number
+of these new dtypes and their benefits.</p>
+<p>Any design supporting dtypes must consider:</p>
+<ul class="simple">
+<li><p>How shape and dtype are determined when an array is created</p></li>
+<li><p>How array elements are stored and accessed</p></li>
+<li><p>The rules for casting dtypes to other dtypes</p></li>
+</ul>
+<p>In addition:</p>
+<ul class="simple">
+<li><p>We want dtypes to comprise a class hierarchy open to new types and to
+subhierarchies, as motivated in <a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a>.</p></li>
+</ul>
+<p>And to provide this,</p>
+<ul class="simple">
+<li><p>We need to define a user API.</p></li>
+</ul>
+<p>All these are the subjects of this NEP.</p>
+<ul class="simple">
+<li><p>The class hierarchy, its relation to the Python scalar types, and its
+important attributes are described in <a class="reference internal" href="#nep42-dtype-class">nep42_DType class</a>.</p></li>
+<li><p>The functionality that will support dtype casting is described in <a class="reference internal" href="#casting">Casting</a>.</p></li>
+<li><p>The implementation of item access and storage, and the way shape and dtype
+are determined when creating an array, are described in <a class="reference internal" href="#nep42-array-coercion"><span class="std std-ref">Coercion to and from Python objects</span></a>.</p></li>
+<li><p>The functionality for users to define their own DTypes is described in
+<a class="reference internal" href="#public-c-api">Public C-API</a>.</p></li>
+</ul>
+<p>The API here and in <a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a> is entirely on the C side. A Python-side version
+will be proposed in a future NEP. A future Python API is expected to be
+similar, but provide a more convenient API to reuse the functionality of
+existing DTypes. It could also provide shorthands to create structured DTypes
+similar to Python’s
+<a class="reference external" href="https://docs.python.org/3.8/library/dataclasses.html">dataclasses</a>.</p>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>The disruption is expected to be no greater than that of a typical NumPy
+release.</p>
+<ul class="simple">
+<li><p>The main issues are noted in <a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a> and will mostly affect
+heavy users of the NumPy C-API.</p></li>
+<li><p>Eventually we will want to deprecate the API currently used for creating
+user-defined dtypes.</p></li>
+<li><p>Small, rarely noticed inconsistencies are likely to change. Examples:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">np.array(np.nan,</span> <span class="pre">dtype=np.int64)</span></code> behaves differently from
+<code class="docutils literal notranslate"><span class="pre">np.array([np.nan],</span> <span class="pre">dtype=np.int64)</span></code> with the latter raising an error.
+This may require identical results (either both error or both succeed).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">np.array([array_like])</span></code> sometimes behaves differently from
+<code class="docutils literal notranslate"><span class="pre">np.array([np.array(array_like)])</span></code></p></li>
+<li><p>array operations may or may not preserve dtype metadata</p></li>
+</ul>
+</li>
+<li><p>Documentation that describes the internal structure of dtypes will need
+to be updated.</p></li>
+</ul>
+<p>The new code must pass NumPy’s regular test suite, giving some assurance that
+the changes are compatible with existing code.</p>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>We believe the few structures in this section are sufficient to consolidate
+NumPy’s present functionality and also to support complex user-defined DTypes.</p>
+<p>The rest of the NEP fills in details and provides support for the claim.</p>
+<p>Again, though Python is used for illustration, the implementation is a C API only; a
+future NEP will tackle the Python API.</p>
+<p>After implementing this NEP, creating a DType will be possible by implementing
+the following outlined DType base class,
+that is further described in <a class="reference internal" href="#nep42-dtype-class">nep42_DType class</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DType</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+    <span class="nb">type</span> <span class="p">:</span> <span class="nb">type</span>        <span class="c1"># Python scalar type</span>
+    <span class="n">parametric</span> <span class="p">:</span> <span class="nb">bool</span>  <span class="c1"># (may be indicated by superclass)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">canonical</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ensure_canonical</span><span class="p">(</span><span class="bp">self</span> <span class="p">:</span> <span class="n">DType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</pre></div>
+</div>
+<p>For casting, a large part of the functionality is provided by the “methods” stored
+in <code class="docutils literal notranslate"><span class="pre">_castingimpl</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">common_dtype</span><span class="p">(</span><span class="bp">cls</span> <span class="p">:</span> <span class="n">DTypeMeta</span><span class="p">,</span> <span class="n">other</span> <span class="p">:</span> <span class="n">DTypeMeta</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DTypeMeta</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">common_instance</span><span class="p">(</span><span class="bp">self</span> <span class="p">:</span> <span class="n">DType</span><span class="p">,</span> <span class="n">other</span> <span class="p">:</span> <span class="n">DType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="c1"># A mapping of &quot;methods&quot; each detailing how to cast to another DType</span>
+    <span class="c1"># (further specified at the end of the section)</span>
+    <span class="n">_castingimpl</span> <span class="o">=</span> <span class="p">{}</span>
+</pre></div>
+</div>
+<p>For array-coercion, also part of casting:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">def</span><span class="w"> </span><span class="nf">__dtype_setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_pointer</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__dtype_getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_pointer</span><span class="p">,</span> <span class="n">base_obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__discover_descr_from_pyobject__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span> <span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DType</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="c1"># initially private:</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_known_scalar_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span> <span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</pre></div>
+</div>
+<p>Other elements of the casting implementation is the <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">casting</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;safe&quot;</span><span class="p">,</span> <span class="s2">&quot;same_kind&quot;</span><span class="p">,</span> <span class="s2">&quot;unsafe&quot;</span><span class="p">]</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CastingImpl</span><span class="p">:</span>
+    <span class="c1"># Object describing and performing the cast</span>
+    <span class="n">casting</span> <span class="p">:</span> <span class="n">casting</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DTypeMeta</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DType</span><span class="o">|</span><span class="kc">None</span><span class="p">]</span> <span class="p">:</span> <span class="nb">input</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="n">casting</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">DType</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="c1"># initially private:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_loop</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">lowlevel_C_loop</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</pre></div>
+</div>
+<p>which describes the casting from one DType to another. In
+<a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a> this <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> object is used unchanged to
+support universal functions.
+Note that the name <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> here will be generically called
+<code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> to accommodate both casting and universal functions.</p>
+</section>
+<section id="definitions">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Link to this heading">#</a></h2>
+<dl class="simple glossary">
+<dt id="term-dtype">dtype<a class="headerlink" href="#term-dtype" title="Link to this term">#</a></dt><dd><p>The dtype <em>instance</em>; this is the object attached to a numpy array.</p>
+</dd>
+<dt id="term-DType">DType<a class="headerlink" href="#term-DType" title="Link to this term">#</a></dt><dd><p>Any subclass of the base type <code class="docutils literal notranslate"><span class="pre">np.dtype</span></code>.</p>
+</dd>
+<dt id="term-coercion">coercion<a class="headerlink" href="#term-coercion" title="Link to this term">#</a></dt><dd><p>Conversion of Python types to NumPy arrays and values stored in a NumPy
+array.</p>
+</dd>
+<dt id="term-cast">cast<a class="headerlink" href="#term-cast" title="Link to this term">#</a></dt><dd><p>Conversion of an array to a different dtype.</p>
+</dd>
+<dt id="term-parametric-type">parametric type<a class="headerlink" href="#term-parametric-type" title="Link to this term">#</a></dt><dd><p>A dtype whose representation can change based on a parameter value,
+like a string dtype with a length parameter. All members of the current
+<code class="docutils literal notranslate"><span class="pre">flexible</span></code> dtype class are parametric. See
+<a class="reference internal" href="nep-0040-legacy-datatype-impl.html#parametric-datatype-discussion"><span class="std std-ref">NEP 40</span></a>.</p>
+</dd>
+<dt id="term-promotion">promotion<a class="headerlink" href="#term-promotion" title="Link to this term">#</a></dt><dd><p>Finding a dtype that can perform an operation on a mix of dtypes without
+loss of information.</p>
+</dd>
+<dt id="term-safe-cast">safe cast<a class="headerlink" href="#term-safe-cast" title="Link to this term">#</a></dt><dd><p>A cast is safe if no information is lost when changing type.</p>
+</dd>
+</dl>
+<p>On the C level we use <code class="docutils literal notranslate"><span class="pre">descriptor</span></code> or <code class="docutils literal notranslate"><span class="pre">descr</span></code> to mean
+<em>dtype instance</em>. In the proposed C-API, these terms will distinguish
+dtype instances from DType classes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>NumPy has an existing class hierarchy for scalar types, as
+seen <a class="reference internal" href="nep-0040-legacy-datatype-impl.html#nep-0040-dtype-hierarchy"><span class="std std-ref">in the figure</span></a> of
+<a class="reference internal" href="nep-0040-legacy-datatype-impl.html#nep40"><span class="std std-ref">NEP 40</span></a>, and the new DType hierarchy will resemble it. The
+types are used as an attribute of the single dtype class in the current
+NumPy; they’re not dtype classes. They neither harm nor help this work.</p>
+</div>
+</section>
+<section id="the-dtype-class">
+<span id="nep42-dtype-class"></span><h2>The DType class<a class="headerlink" href="#the-dtype-class" title="Link to this heading">#</a></h2>
+<p>This section reviews the structure underlying the proposed DType class,
+including the type hierarchy and the use of abstract DTypes.</p>
+<section id="class-getter">
+<h3>Class getter<a class="headerlink" href="#class-getter" title="Link to this heading">#</a></h3>
+<p>To create a DType instance from a scalar type users now call
+<code class="docutils literal notranslate"><span class="pre">np.dtype</span></code> (for instance, <code class="docutils literal notranslate"><span class="pre">np.dtype(np.int64)</span></code>). Sometimes it is
+also necessary to access the underlying DType class; this comes up in
+particular with type hinting because the “type” of a DType instance is
+the DType class. Taking inspiration from type hinting, we propose the
+following getter syntax:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>to get the DType class corresponding to a scalar type. The notation
+works equally well with built-in and user-defined DTypes.</p>
+<p>This getter eliminates the need to create an explicit name for every
+DType, crowding the <code class="docutils literal notranslate"><span class="pre">np</span></code> namespace; the getter itself signifies the
+type. It also opens the possibility of making <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> generic
+over DType class using annotations like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>The above is fairly verbose, so it is possible that we will include
+aliases like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Float64</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>in <code class="docutils literal notranslate"><span class="pre">numpy.typing</span></code>, thus keeping annotations concise but still
+avoiding crowding the <code class="docutils literal notranslate"><span class="pre">np</span></code> namespace as discussed above. For a
+user-defined DType:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">UserDtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>one can do <code class="docutils literal notranslate"><span class="pre">np.ndarray[UserDtype]</span></code>, keeping annotations concise in
+that case without introducing boilerplate in NumPy itself. For a
+user-defined scalar type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">UserScalar</span><span class="p">(</span><span class="n">generic</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>we would need to add a typing overload to <code class="docutils literal notranslate"><span class="pre">dtype</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@overload</span>
+<span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">UserScalar</span><span class="p">],</span> <span class="o">...</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserDtype</span>
+</pre></div>
+</div>
+<p>to allow <code class="docutils literal notranslate"><span class="pre">np.dtype[UserScalar]</span></code>.</p>
+<p>The initial implementation probably will return only concrete (not abstract)
+DTypes.</p>
+<p><em>This item is still under review.</em></p>
+</section>
+<section id="hierarchy-and-abstract-classes">
+<h3>Hierarchy and abstract classes<a class="headerlink" href="#hierarchy-and-abstract-classes" title="Link to this heading">#</a></h3>
+<p>We will use abstract classes as building blocks of our extensible DType class
+hierarchy.</p>
+<ol class="arabic simple">
+<li><p>Abstract classes are inherited cleanly, in principle allowing checks like
+<code class="docutils literal notranslate"><span class="pre">isinstance(np.dtype(&quot;float64&quot;),</span> <span class="pre">np.inexact)</span></code>.</p></li>
+<li><p>Abstract classes allow a single piece of code to handle a multiplicity of
+input types. Code written to accept Complex objects can work with numbers
+of any precision; the precision of the results is determined by the
+precision of the arguments.</p></li>
+<li><p>There’s room for user-created families of DTypes. We can envision an
+abstract <code class="docutils literal notranslate"><span class="pre">Unit</span></code> class for physical units, with a concrete subclass like
+<code class="docutils literal notranslate"><span class="pre">Float64Unit</span></code>. Calling <code class="docutils literal notranslate"><span class="pre">Unit(np.float64,</span> <span class="pre">&quot;m&quot;)</span></code> (<code class="docutils literal notranslate"><span class="pre">m</span></code> for meters) would
+be equivalent to <code class="docutils literal notranslate"><span class="pre">Float64Unit(&quot;m&quot;)</span></code>.</p></li>
+<li><p>The implementation of universal functions in <a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a> may require
+a class hierarchy.</p></li>
+</ol>
+<p><strong>Example:</strong> A NumPy <code class="docutils literal notranslate"><span class="pre">Categorical</span></code> class would be a match for pandas
+<code class="docutils literal notranslate"><span class="pre">Categorical</span></code> objects, which can contain integers or general Python objects.
+NumPy needs a DType that it can assign a Categorical to, but it also needs
+DTypes like <code class="docutils literal notranslate"><span class="pre">CategoricalInt64</span></code> and <code class="docutils literal notranslate"><span class="pre">CategoricalObject</span></code> such that
+<code class="docutils literal notranslate"><span class="pre">common_dtype(CategoricalInt64,</span> <span class="pre">String)</span></code> raises an error, but
+<code class="docutils literal notranslate"><span class="pre">common_dtype(CategoricalObject,</span> <span class="pre">String)</span></code> returns an <code class="docutils literal notranslate"><span class="pre">object</span></code> DType. In
+our scheme, <code class="docutils literal notranslate"><span class="pre">Categorical</span></code> is an abstract type with <code class="docutils literal notranslate"><span class="pre">CategoricalInt64</span></code> and
+<code class="docutils literal notranslate"><span class="pre">CategoricalObject</span></code> subclasses.</p>
+<p>Rules for the class structure, illustrated <a class="reference internal" href="#nep42-hierarchy-figure"><span class="std std-ref">below</span></a>:</p>
+<ol class="arabic simple">
+<li><p>Abstract DTypes cannot be instantiated. Instantiating an abstract DType
+raises an error, or perhaps returns an instance of a concrete subclass.
+Raising an error will be the default behavior and may be required initially.</p></li>
+<li><p>While abstract DTypes may be superclasses, they may also act like Python’s
+abstract base classes (ABC) allowing registration instead of subclassing.
+It may be possible to simply use or inherit from Python ABCs.</p></li>
+<li><p>Concrete DTypes may not be subclassed. In the future this might be relaxed
+to allow specialized implementations such as a GPU float64 subclassing a
+NumPy float64.</p></li>
+</ol>
+<p>The
+<a class="reference external" href="https://docs.julialang.org/en/v1/manual/types/#man-abstract-types-1">Julia language</a>
+has a similar prohibition against subclassing concrete types.
+For example methods such as the later <code class="docutils literal notranslate"><span class="pre">__common_instance__</span></code> or
+<code class="docutils literal notranslate"><span class="pre">__common_dtype__</span></code> cannot work for a subclass unless they were designed
+very carefully.
+It helps avoid unintended vulnerabilities to implementation changes that
+result from subclassing types that were not written to be subclassed.
+We believe that the DType API should rather be extended to simplify wrapping
+of existing functionality.</p>
+<p>The DType class requires C-side storage of methods and additional information,
+to be implemented by a <code class="docutils literal notranslate"><span class="pre">DTypeMeta</span></code> class. Each <code class="docutils literal notranslate"><span class="pre">DType</span></code> class is an
+instance of <code class="docutils literal notranslate"><span class="pre">DTypeMeta</span></code> with a well-defined and extensible interface;
+end users ignore it.</p>
+<figure class="align-center align-default" id="nep42-hierarchy-figure">
+<img alt="_images/dtype_hierarchy.svg" src="_images/dtype_hierarchy.svg" /></figure>
+</section>
+<section id="miscellaneous-methods-and-attributes">
+<h3>Miscellaneous methods and attributes<a class="headerlink" href="#miscellaneous-methods-and-attributes" title="Link to this heading">#</a></h3>
+<p>This section collects definitions in the DType class that are not used in
+casting and array coercion, which are described in detail below.</p>
+<ul class="simple">
+<li><p>Existing dtype methods (<a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.dtype.html#numpy.dtype" title="(in NumPy v2.5.dev0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code></a>) and C-side fields are preserved.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DType.type</span></code> replaces <code class="docutils literal notranslate"><span class="pre">dtype.type</span></code>. Unless a use case arises,
+<code class="docutils literal notranslate"><span class="pre">dtype.type</span></code> will be deprecated.
+This indicates a Python scalar type which represents the same values as
+the DType. This is the same type as used in the proposed <a class="reference internal" href="#class-getter">Class getter</a>
+and for <a class="reference internal" href="#dtype-discovery-during-array-coercion">DType discovery during array coercion</a>.
+(This can may also be set for abstract DTypes, this is necessary
+for array coercion.)</p></li>
+<li><p>A new <code class="docutils literal notranslate"><span class="pre">self.canonical</span></code> property generalizes the notion of byte order to
+indicate whether data has been stored in a default/canonical way. For
+existing code, “canonical” will just signify native byte order, but it can
+take on new meanings in new DTypes – for instance, to distinguish a
+complex-conjugated instance of Complex which stores <code class="docutils literal notranslate"><span class="pre">real</span> <span class="pre">-</span> <span class="pre">imag</span></code> instead
+of <code class="docutils literal notranslate"><span class="pre">real</span> <span class="pre">+</span> <span class="pre">imag</span></code>. The ISNBO (“is
+native byte order”) flag might be repurposed as the canonical flag.</p></li>
+<li><p>Support is included for parametric DTypes. A DType will be deemed parametric
+if it inherits from ParametricDType.</p></li>
+<li><p>DType methods may resemble or even reuse existing Python slots. Thus Python
+special slots are off-limits for user-defined DTypes (for instance, defining
+<code class="docutils literal notranslate"><span class="pre">Unit(&quot;m&quot;)</span> <span class="pre">&gt;</span> <span class="pre">Unit(&quot;cm&quot;)</span></code>), since we may want to develop a meaning for these
+operators that is common to all DTypes.</p></li>
+<li><p>Sorting functions are moved to the DType class. They may be implemented by
+defining a method <code class="docutils literal notranslate"><span class="pre">dtype_get_sort_function(self,</span> <span class="pre">sortkind=&quot;stable&quot;)</span> <span class="pre">-&gt;</span>
+<span class="pre">sortfunction</span></code> that must return <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> if the given <code class="docutils literal notranslate"><span class="pre">sortkind</span></code>
+is not known.</p></li>
+<li><p>Functions that cannot be removed are implemented as special methods.
+Many of these were previously defined part of the <a class="reference external" href="https://numpy.org/devdocs/reference/c-api/types-and-structures.html#c.PyArray_ArrFuncs" title="(in NumPy v2.5.dev0)"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyArray_ArrFuncs</span></code></a>
+slot of the dtype instance (<code class="docutils literal notranslate"><span class="pre">PyArray_Descr</span> <span class="pre">*</span></code>) and include functions
+such as <code class="docutils literal notranslate"><span class="pre">nonzero</span></code>, <code class="docutils literal notranslate"><span class="pre">fill</span></code> (used for <code class="docutils literal notranslate"><span class="pre">np.arange</span></code>), and
+<code class="docutils literal notranslate"><span class="pre">fromstr</span></code> (used to parse text files).
+These old methods will be deprecated and replacements
+following the new design principles added.
+The API is not defined here. Since these methods can be deprecated and renamed
+replacements added, it is acceptable if these new methods have to be modified.</p></li>
+<li><p>Use of <code class="docutils literal notranslate"><span class="pre">kind</span></code> for non-built-in types is discouraged in favor of
+<code class="docutils literal notranslate"><span class="pre">isinstance</span></code> checks.  <code class="docutils literal notranslate"><span class="pre">kind</span></code> will return the <code class="docutils literal notranslate"><span class="pre">__qualname__</span></code> of the
+object to ensure uniqueness for all DTypes. On the C side, <code class="docutils literal notranslate"><span class="pre">kind</span></code> and
+<code class="docutils literal notranslate"><span class="pre">char</span></code> are set to <code class="docutils literal notranslate"><span class="pre">\0</span></code> (NULL character).
+While <code class="docutils literal notranslate"><span class="pre">kind</span></code> will be discouraged, the current <code class="docutils literal notranslate"><span class="pre">np.issubdtype</span></code>
+may remain the preferred method for this type of check.</p></li>
+<li><p>A method <code class="docutils literal notranslate"><span class="pre">ensure_canonical(self)</span> <span class="pre">-&gt;</span> <span class="pre">dtype</span></code> returns a new dtype (or
+<code class="docutils literal notranslate"><span class="pre">self</span></code>) with the <code class="docutils literal notranslate"><span class="pre">canonical</span></code> flag set.</p></li>
+<li><p>Since NumPy’s approach is to provide functionality through unfuncs,
+functions like sorting that will be implemented in DTypes might eventually be
+reimplemented as generalized ufuncs.</p></li>
+</ul>
+</section>
+</section>
+<section id="casting">
+<span id="nep-42-casting"></span><h2>Casting<a class="headerlink" href="#casting" title="Link to this heading">#</a></h2>
+<p>We review here the operations related to casting arrays:</p>
+<ul class="simple">
+<li><p>Finding the “common dtype,” returned by <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.promote_types.html#numpy.promote_types" title="(in NumPy v2.5.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.promote_types()</span></code></a> and
+<a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.result_type.html#numpy.result_type" title="(in NumPy v2.5.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.result_type()</span></code></a></p></li>
+<li><p>The result of calling <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.can_cast.html#numpy.can_cast" title="(in NumPy v2.5.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.can_cast()</span></code></a></p></li>
+</ul>
+<p>We show how casting arrays with <code class="docutils literal notranslate"><span class="pre">astype(new_dtype)</span></code> will be implemented.</p>
+<section id="common-dtype-operations">
+<h3><cite>Common DType</cite> operations<a class="headerlink" href="#common-dtype-operations" title="Link to this heading">#</a></h3>
+<p>When input types are mixed, a first step is to find a DType that can hold
+the result without loss of information – a “common DType.”</p>
+<p>Array coercion and concatenation both return a common dtype instance. Most
+universal functions use the common DType for dispatching, though they might
+not use it for a result (for instance, the result of a comparison is always
+bool).</p>
+<p>We propose the following implementation:</p>
+<ul>
+<li><p>For two DType classes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">__common_dtype__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">other</span> <span class="p">:</span> <span class="n">DTypeMeta</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DTypeMeta</span>
+</pre></div>
+</div>
+<p>Returns a new DType, often one of the inputs, which can represent values
+of both input DTypes.  This should usually be minimal:
+the common DType of <code class="docutils literal notranslate"><span class="pre">Int16</span></code> and <code class="docutils literal notranslate"><span class="pre">Uint16</span></code> is <code class="docutils literal notranslate"><span class="pre">Int32</span></code> and not <code class="docutils literal notranslate"><span class="pre">Int64</span></code>.
+<code class="docutils literal notranslate"><span class="pre">__common_dtype__</span></code>  may return NotImplemented to defer to other and,
+like Python operators, subclasses take precedence (their
+<code class="docutils literal notranslate"><span class="pre">__common_dtype__</span></code> method is tried first).</p>
+</li>
+<li><p>For two instances of the same DType:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">__common_instance__</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">SelfT</span><span class="p">,</span> <span class="n">other</span> <span class="p">:</span> <span class="n">SelfT</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SelfT</span>
+</pre></div>
+</div>
+<p>For nonparametric built-in dtypes, this returns a canonicalized copy of
+<code class="docutils literal notranslate"><span class="pre">self</span></code>, preserving metadata. For nonparametric user types, this provides
+a default implementation.</p>
+</li>
+<li><p>For instances of different DTypes, for example <code class="docutils literal notranslate"><span class="pre">&gt;float64</span></code> and <code class="docutils literal notranslate"><span class="pre">S8</span></code>,
+the operation is done in three steps:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Float64.__common_dtype__(type(&gt;float64),</span> <span class="pre">type(S8))</span></code>
+returns <code class="docutils literal notranslate"><span class="pre">String</span></code> (or defers to <code class="docutils literal notranslate"><span class="pre">String.__common_dtype__</span></code>).</p></li>
+<li><p>The casting machinery (explained in detail below) provides the
+information that <code class="docutils literal notranslate"><span class="pre">&quot;&gt;float64&quot;</span></code> casts to <code class="docutils literal notranslate"><span class="pre">&quot;S32&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">String.__common_instance__(&quot;S8&quot;,</span> <span class="pre">&quot;S32&quot;)</span></code> returns the final <code class="docutils literal notranslate"><span class="pre">&quot;S32&quot;</span></code>.</p></li>
+</ol>
+</li>
+</ul>
+<p>The benefit of this handoff is to reduce duplicated code and keep concerns
+separate. DType implementations don’t need to know how to cast, and the
+results of casting can be extended to new types, such as a new string encoding.</p>
+<p>This means the implementation will work like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">common_dtype</span><span class="p">(</span><span class="n">DType1</span><span class="p">,</span> <span class="n">DType2</span><span class="p">):</span>
+    <span class="n">common_dtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dtype1</span><span class="p">)</span><span class="o">.</span><span class="n">__common_dtype__</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dtype2</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">common_dtype</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+        <span class="n">common_dtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dtype2</span><span class="p">)</span><span class="o">.</span><span class="n">__common_dtype__</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dtype1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">common_dtype</span> <span class="ow">is</span> <span class="bp">NotImplemented</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;no common dtype&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">common_dtype</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">promote_types</span><span class="p">(</span><span class="n">dtype1</span><span class="p">,</span> <span class="n">dtype2</span><span class="p">):</span>
+    <span class="n">common</span> <span class="o">=</span> <span class="n">common_dtype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dtype1</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">dtype2</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">dtype1</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">common</span><span class="p">:</span>
+        <span class="c1"># Find what dtype1 is cast to when cast to the common DType</span>
+        <span class="c1"># by using the CastingImpl as described below:</span>
+        <span class="n">castingimpl</span> <span class="o">=</span> <span class="n">get_castingimpl</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dtype1</span><span class="p">),</span> <span class="n">common</span><span class="p">)</span>
+        <span class="n">safety</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">dtype1</span><span class="p">)</span> <span class="o">=</span> <span class="n">castingimpl</span><span class="o">.</span><span class="n">resolve_descriptors</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">common</span><span class="p">,</span> <span class="n">common</span><span class="p">),</span> <span class="p">(</span><span class="n">dtype1</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="n">safety</span> <span class="o">==</span> <span class="s2">&quot;safe&quot;</span>  <span class="c1"># promotion should normally be a safe cast</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">dtype2</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">common</span><span class="p">:</span>
+        <span class="c1"># Same as above branch for dtype1.</span>
+
+    <span class="k">if</span> <span class="n">dtype1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">dtype2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">common</span><span class="o">.</span><span class="n">__common_instance__</span><span class="p">(</span><span class="n">dtype1</span><span class="p">,</span> <span class="n">dtype2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Some of these steps may be optimized for nonparametric DTypes.</p>
+<p>Since the type returned by <code class="docutils literal notranslate"><span class="pre">__common_dtype__</span></code> is not necessarily one of the
+two arguments, it’s not equivalent to NumPy’s “safe” casting.
+Safe casting works for <code class="docutils literal notranslate"><span class="pre">np.promote_types(int16,</span> <span class="pre">int64)</span></code>, which returns
+<code class="docutils literal notranslate"><span class="pre">int64</span></code>, but fails for:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">promote_types</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">,</span> <span class="s2">&quot;float32&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It is the responsibility of the DType author to ensure that the inputs
+can be safely cast to the <code class="docutils literal notranslate"><span class="pre">__common_dtype__</span></code>.</p>
+<p>Exceptions may apply. For example, casting <code class="docutils literal notranslate"><span class="pre">int32</span></code> to
+a (long enough) string is  at least at this time  considered “safe”.
+However <code class="docutils literal notranslate"><span class="pre">np.promote_types(int32,</span> <span class="pre">String)</span></code> will <em>not</em> be defined.</p>
+<p><strong>Example:</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">object</span></code> always chooses <code class="docutils literal notranslate"><span class="pre">object</span></code> as the common DType.  For
+<code class="docutils literal notranslate"><span class="pre">datetime64</span></code> type promotion is defined with no other datatype, but if
+someone were to implement a new higher precision datetime, then:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">HighPrecisionDatetime</span><span class="o">.</span><span class="n">__common_dtype__</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>would return <code class="docutils literal notranslate"><span class="pre">HighPrecisionDatetime</span></code>, and the casting implementation,
+as described below, may need to decide how to handle the datetime unit.</p>
+<p><strong>Alternatives:</strong></p>
+<ul>
+<li><p>We’re pushing the decision on common DTypes to the DType classes. Suppose
+instead we could turn to a universal algorithm based on safe casting,
+imposing a total order on DTypes and returning the first type that both
+arguments could cast to safely.</p>
+<p>It would be difficult to devise a reasonable total order, and it would have
+to accept new entries. Beyond that, the approach is flawed because
+importing a type can change the behavior of a program. For example, a
+program requiring the common DType of <code class="docutils literal notranslate"><span class="pre">int16</span></code> and <code class="docutils literal notranslate"><span class="pre">uint16</span></code> would
+ordinarily get the built-in type <code class="docutils literal notranslate"><span class="pre">int32</span></code> as the first match; if the
+program adds <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">int24</span></code>, the first match becomes <code class="docutils literal notranslate"><span class="pre">int24</span></code> and the
+smaller type might make the program overflow for the first time. <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+</li>
+<li><p>A more flexible common DType could be implemented in the future where
+<code class="docutils literal notranslate"><span class="pre">__common_dtype__</span></code> relies on information from the casting logic.
+Since <code class="docutils literal notranslate"><span class="pre">__commond_dtype__</span></code> is a method a such a default implementation
+could be added at a later time.</p></li>
+<li><p>The three-step handling of differing dtypes could, of course, be coalesced.
+It would lose the value of splitting in return for a possibly faster
+execution. But few cases would benefit. Most cases, such as array coercion,
+involve a single Python type (and thus dtype).</p></li>
+</ul>
+</section>
+<section id="the-cast-operation">
+<h3>The cast operation<a class="headerlink" href="#the-cast-operation" title="Link to this heading">#</a></h3>
+<p>Casting is perhaps the most complex and interesting DType operation. It
+is much like a typical universal function on arrays, converting one input to a
+new output, with two distinctions:</p>
+<ul class="simple">
+<li><p>Casting always requires an explicit output datatype.</p></li>
+<li><p>The NumPy iterator API requires access to functions that are lower-level
+than what universal functions currently need.</p></li>
+</ul>
+<p>Casting can be complex and may not implement all details of each input
+datatype (such as non-native byte order or unaligned access). So a complex
+type conversion might entail 3 steps:</p>
+<ol class="arabic simple">
+<li><p>The input datatype is normalized and prepared for the cast.</p></li>
+<li><p>The cast is performed.</p></li>
+<li><p>The result, which is in a normalized form, is cast to the requested
+form (non-native byte order).</p></li>
+</ol>
+<p>Further, NumPy provides different casting kinds or safety specifiers:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">equivalent</span></code>, allowing only byte-order changes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">safe</span></code>, requiring a type large enough to preserve value</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">same_kind</span></code>, requiring a safe cast or one within a kind, like float64 to float32</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unsafe</span></code>, allowing any data conversion</p></li>
+</ul>
+<p>and in some cases a cast may be just a view.</p>
+<p>We need to support the two current signatures of <code class="docutils literal notranslate"><span class="pre">arr.astype</span></code>:</p>
+<ul class="simple">
+<li><p>For DTypes: <code class="docutils literal notranslate"><span class="pre">arr.astype(np.String)</span></code></p>
+<ul>
+<li><p>current spelling <code class="docutils literal notranslate"><span class="pre">arr.astype(&quot;S&quot;)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">np.String</span></code> can be an abstract DType</p></li>
+</ul>
+</li>
+<li><p>For dtypes: <code class="docutils literal notranslate"><span class="pre">arr.astype(np.dtype(&quot;S8&quot;))</span></code></p></li>
+</ul>
+<p>We also have two signatures of <code class="docutils literal notranslate"><span class="pre">np.can_cast</span></code>:</p>
+<ul class="simple">
+<li><p>Instance to class: <code class="docutils literal notranslate"><span class="pre">np.can_cast(dtype,</span> <span class="pre">DType,</span> <span class="pre">&quot;safe&quot;)</span></code></p></li>
+<li><p>Instance to instance: <code class="docutils literal notranslate"><span class="pre">np.can_cast(dtype,</span> <span class="pre">other_dtype,</span> <span class="pre">&quot;safe&quot;)</span></code></p></li>
+</ul>
+<p>On the Python level <code class="docutils literal notranslate"><span class="pre">dtype</span></code> is overloaded to mean class or instance.</p>
+<p>A third <code class="docutils literal notranslate"><span class="pre">can_cast</span></code> signature, <code class="docutils literal notranslate"><span class="pre">np.can_cast(DType,</span> <span class="pre">OtherDType,</span> <span class="pre">&quot;safe&quot;)</span></code>,may be used
+internally but need not be exposed to Python.</p>
+<p>During DType creation, DTypes will be able to pass a list of <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code>
+objects, which can define casting to and from the DType.</p>
+<p>One of them should define the cast between instances of that DType. It can be
+omitted if the DType has only a single implementation and is nonparametric.</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> has a distinct DType signature:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">CastingImpl[InputDtype,</span> <span class="pre">RequestedDtype]</span></code></p>
+</div></blockquote>
+<p>and implements the following methods and attributes:</p>
+<ul>
+<li><p>To report safeness,</p>
+<p><code class="docutils literal notranslate"><span class="pre">resolve_descriptors(self,</span> <span class="pre">Tuple[DTypeMeta],</span> <span class="pre">Tuple[DType|None]</span> <span class="pre">:</span> <span class="pre">input)</span> <span class="pre">-&gt;</span> <span class="pre">casting,</span> <span class="pre">Tuple[DType]</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">casting</span></code> output reports safeness (safe, unsafe, or same-kind), and
+the tuple is used for more multistep casting, as in the example below.</p>
+</li>
+<li><p>To get a casting function,</p>
+<p><code class="docutils literal notranslate"><span class="pre">get_loop(...)</span> <span class="pre">-&gt;</span> <span class="pre">function_to_handle_cast</span> <span class="pre">(signature</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">decided)</span></code></p>
+<p>returns a low-level implementation of a strided casting function
+(“transfer function”) capable of performing the
+cast.</p>
+<p>Initially the implementation will be <em>private</em>, and users will only be
+able to provide strided loops with the signature.</p>
+</li>
+<li><p>For performance, a <code class="docutils literal notranslate"><span class="pre">casting</span></code> attribute taking a value of  <code class="docutils literal notranslate"><span class="pre">equivalent</span></code>, <code class="docutils literal notranslate"><span class="pre">safe</span></code>,
+<code class="docutils literal notranslate"><span class="pre">unsafe</span></code>, or <code class="docutils literal notranslate"><span class="pre">same-kind</span></code>.</p></li>
+</ul>
+<p><strong>Performing a cast</strong></p>
+<figure class="align-center align-default" id="nep42-cast-figure">
+<img alt="_images/casting_flow.svg" src="_images/casting_flow.svg" /></figure>
+<p>The above figure illustrates a multistep
+cast of an <code class="docutils literal notranslate"><span class="pre">int24</span></code> with a value of <code class="docutils literal notranslate"><span class="pre">42</span></code> to a string of length 20
+(<code class="docutils literal notranslate"><span class="pre">&quot;S20&quot;</span></code>).</p>
+<p>We’ve picked an example where the implementer has only provided limited
+functionality: a function to cast an <code class="docutils literal notranslate"><span class="pre">int24</span></code> to an <code class="docutils literal notranslate"><span class="pre">S8</span></code> string (which can
+hold all 24-bit integers). This means multiple conversions are needed.</p>
+<p>The full process is:</p>
+<ol class="arabic">
+<li><p>Call</p>
+<p><code class="docutils literal notranslate"><span class="pre">CastingImpl[Int24,</span> <span class="pre">String].resolve_descriptors((Int24,</span> <span class="pre">String),</span> <span class="pre">(int24,</span> <span class="pre">&quot;S20&quot;))</span></code>.</p>
+<p>This provides the information that <code class="docutils literal notranslate"><span class="pre">CastingImpl[Int24,</span> <span class="pre">String]</span></code> only
+implements the cast of <code class="docutils literal notranslate"><span class="pre">int24</span></code> to <code class="docutils literal notranslate"><span class="pre">&quot;S8&quot;</span></code>.</p>
+</li>
+<li><p>Since <code class="docutils literal notranslate"><span class="pre">&quot;S8&quot;</span></code> does not match <code class="docutils literal notranslate"><span class="pre">&quot;S20&quot;</span></code>, use</p>
+<p><code class="docutils literal notranslate"><span class="pre">CastingImpl[String,</span> <span class="pre">String].get_loop()</span></code></p>
+<p>to find the transfer (casting) function to convert an <code class="docutils literal notranslate"><span class="pre">&quot;S8&quot;</span></code> into an <code class="docutils literal notranslate"><span class="pre">&quot;S20&quot;</span></code></p>
+</li>
+<li><p>Fetch the transfer function to convert an <code class="docutils literal notranslate"><span class="pre">int24</span></code> to an <code class="docutils literal notranslate"><span class="pre">&quot;S8&quot;</span></code> using</p>
+<p><code class="docutils literal notranslate"><span class="pre">CastingImpl[Int24,</span> <span class="pre">String].get_loop()</span></code></p>
+</li>
+<li><p>Perform the actual cast using the two transfer functions:</p>
+<p><code class="docutils literal notranslate"><span class="pre">int24(42)</span> <span class="pre">-&gt;</span> <span class="pre">S8(&quot;42&quot;)</span> <span class="pre">-&gt;</span> <span class="pre">S20(&quot;42&quot;)</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> allows the implementation for</p>
+<p><code class="docutils literal notranslate"><span class="pre">np.array(42,</span> <span class="pre">dtype=int24).astype(String)</span></code></p>
+<p>to call</p>
+<p><code class="docutils literal notranslate"><span class="pre">CastingImpl[Int24,</span> <span class="pre">String].resolve_descriptors((Int24,</span> <span class="pre">String),</span> <span class="pre">(int24,</span> <span class="pre">None))</span></code>.</p>
+<p>In this case the result of <code class="docutils literal notranslate"><span class="pre">(int24,</span> <span class="pre">&quot;S8&quot;)</span></code> defines the correct cast:</p>
+<p><code class="docutils literal notranslate"><span class="pre">np.array(42,</span> <span class="pre">dtype=int24).astype(String)</span> <span class="pre">==</span> <span class="pre">np.array(&quot;42&quot;,</span> <span class="pre">dtype=&quot;S8&quot;)</span></code>.</p>
+</li>
+</ol>
+<p><strong>Casting safety</strong></p>
+<p>To compute <code class="docutils literal notranslate"><span class="pre">np.can_cast(int24,</span> <span class="pre">&quot;S20&quot;,</span> <span class="pre">casting=&quot;safe&quot;)</span></code>, only the
+<code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function is required and
+is called in the same way as in <a class="reference internal" href="#nep42-cast-figure"><span class="std std-ref">the figure describing a cast</span></a>.</p>
+<p>In this case, the calls to <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code>, will also provide the
+information that <code class="docutils literal notranslate"><span class="pre">int24</span> <span class="pre">-&gt;</span> <span class="pre">&quot;S8&quot;</span></code> as well as <code class="docutils literal notranslate"><span class="pre">&quot;S8&quot;</span> <span class="pre">-&gt;</span> <span class="pre">&quot;S20&quot;</span></code> are safe
+casts, and thus also the <code class="docutils literal notranslate"><span class="pre">int24</span> <span class="pre">-&gt;</span> <span class="pre">&quot;S20&quot;</span></code> is a safe cast.</p>
+<p>In some cases, no cast is necessary. For example, on most Linux systems
+<code class="docutils literal notranslate"><span class="pre">np.dtype(&quot;long&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">np.dtype(&quot;longlong&quot;)</span></code> are different dtypes but are
+both 64-bit integers. In this case, the cast can be performed using
+<code class="docutils literal notranslate"><span class="pre">long_arr.view(&quot;longlong&quot;)</span></code>. The information that a cast is a view will be
+handled by an additional flag.  Thus the <code class="docutils literal notranslate"><span class="pre">casting</span></code> can have the 8 values in
+total: the original 4 of <code class="docutils literal notranslate"><span class="pre">equivalent</span></code>, <code class="docutils literal notranslate"><span class="pre">safe</span></code>, <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>, and <code class="docutils literal notranslate"><span class="pre">same-kind</span></code>,
+plus <code class="docutils literal notranslate"><span class="pre">equivalent+view</span></code>, <code class="docutils literal notranslate"><span class="pre">safe+view</span></code>, <code class="docutils literal notranslate"><span class="pre">unsafe+view</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">same-kind+view</span></code>. NumPy currently defines <code class="docutils literal notranslate"><span class="pre">dtype1</span> <span class="pre">==</span> <span class="pre">dtype2</span></code> to be True
+only if byte order matches. This functionality can be replaced with the
+combination of “equivalent” casting and the “view” flag.</p>
+<p>(For more information on the <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> signature see the
+<a class="reference internal" href="#nep42-c-api"><span class="std std-ref">Public C-API</span></a> section below and <a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a>.)</p>
+<p><strong>Casting between instances of the same DType</strong></p>
+<p>To keep down the number of casting
+steps, CastingImpl must be capable of any conversion between all instances
+of this DType.</p>
+<p>In general the DType implementer must include <code class="docutils literal notranslate"><span class="pre">CastingImpl[DType,</span> <span class="pre">DType]</span></code>
+unless there is only a singleton instance.</p>
+<p><strong>General multistep casting</strong></p>
+<p>We could implement certain casts, such as <code class="docutils literal notranslate"><span class="pre">int8</span></code> to <code class="docutils literal notranslate"><span class="pre">int24</span></code>,
+even if the user provides only an <code class="docutils literal notranslate"><span class="pre">int16</span> <span class="pre">-&gt;</span> <span class="pre">int24</span></code> cast. This proposal does
+not provide that, but future work might find such casts dynamically, or at least
+allow <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> to return arbitrary <code class="docutils literal notranslate"><span class="pre">dtypes</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">CastingImpl[Int8,</span> <span class="pre">Int24].resolve_descriptors((Int8,</span> <span class="pre">Int24),</span> <span class="pre">(int8,</span> <span class="pre">int24))</span></code>
+returns <code class="docutils literal notranslate"><span class="pre">(int16,</span> <span class="pre">int24)</span></code>, the actual casting process could be extended to include
+the <code class="docutils literal notranslate"><span class="pre">int8</span> <span class="pre">-&gt;</span> <span class="pre">int16</span></code> cast. This adds a step.</p>
+<p><strong>Example:</strong></p>
+<p>The implementation for casting integers to datetime would generally
+say that this cast is unsafe (because it is always an unsafe cast).
+Its <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function may look like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">resolve_descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DTypes</span><span class="p">,</span> <span class="n">given_dtypes</span><span class="p">):</span>
+   <span class="n">from_dtype</span><span class="p">,</span> <span class="n">to_dtype</span> <span class="o">=</span> <span class="n">given_dtypes</span>
+   <span class="n">from_dtype</span> <span class="o">=</span> <span class="n">from_dtype</span><span class="o">.</span><span class="n">ensure_canonical</span><span class="p">()</span>  <span class="c1"># ensure not byte-swapped</span>
+   <span class="k">if</span> <span class="n">to_dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+       <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Cannot convert to a NumPy datetime without a unit&quot;</span><span class="p">)</span>
+   <span class="n">to_dtype</span> <span class="o">=</span> <span class="n">to_dtype</span><span class="o">.</span><span class="n">ensure_canonical</span><span class="p">()</span>  <span class="c1"># ensure not byte-swapped</span>
+
+   <span class="c1"># This is always an &quot;unsafe&quot; cast, but for int64, we can represent</span>
+   <span class="c1"># it by a simple view (if the dtypes are both canonical).</span>
+   <span class="c1"># (represented as C-side flags here).</span>
+   <span class="n">safety_and_view</span> <span class="o">=</span> <span class="n">NPY_UNSAFE_CASTING</span> <span class="o">|</span> <span class="n">_NPY_CAST_IS_VIEW</span>
+   <span class="k">return</span> <span class="n">safety_and_view</span><span class="p">,</span> <span class="p">(</span><span class="n">from_dtype</span><span class="p">,</span> <span class="n">to_dtype</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While NumPy currently defines integer-to-datetime casts, with the possible
+exception of the unit-less <code class="docutils literal notranslate"><span class="pre">timedelta64</span></code> it may be better to not define
+these casts at all.  In general we expect that user defined DTypes will be
+using custom methods such as <code class="docutils literal notranslate"><span class="pre">unit.drop_unit(arr)</span></code> or <code class="docutils literal notranslate"><span class="pre">arr</span> <span class="pre">*</span>
+<span class="pre">unit.seconds</span></code>.</p>
+</div>
+<p><strong>Alternatives:</strong></p>
+<ul>
+<li><p>Our design objectives are:
+-  Minimize the number of DType methods and avoid code duplication.
+-  Mirror the implementation of universal functions.</p></li>
+<li><p>The decision to use only the DType classes in the first step of finding the
+correct <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> in addition to defining <code class="docutils literal notranslate"><span class="pre">CastingImpl.casting</span></code>,
+allows to retain the current default implementation of
+<code class="docutils literal notranslate"><span class="pre">__common_dtype__</span></code> for existing user defined dtypes, which could be
+expanded in the future.</p></li>
+<li><p>The split into multiple steps may seem to add complexity rather than reduce
+it, but it consolidates the signatures of <code class="docutils literal notranslate"><span class="pre">np.can_cast(dtype,</span> <span class="pre">DTypeClass)</span></code>
+and <code class="docutils literal notranslate"><span class="pre">np.can_cast(dtype,</span> <span class="pre">other_dtype)</span></code>.</p>
+<p>Further, the API guarantees separation of concerns for user DTypes. The user
+<code class="docutils literal notranslate"><span class="pre">Int24</span></code> dtype does not have to handle all string lengths if it does not
+wish to do so.  Further, an encoding added to the <code class="docutils literal notranslate"><span class="pre">String</span></code> DType would
+not affect the overall cast. The <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> function
+can keep returning the default encoding and the <code class="docutils literal notranslate"><span class="pre">CastingImpl[String,</span>
+<span class="pre">String]</span></code> can take care of any necessary encoding changes.</p>
+</li>
+<li><p>The main alternative is moving most of the information that is here pushed
+into the <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> directly into methods on the DTypes. But this
+obscures the similarity between casting and universal functions. It does
+reduce indirection, as noted below.</p></li>
+<li><p>An earlier proposal defined two methods <code class="docutils literal notranslate"><span class="pre">__can_cast_to__(self,</span> <span class="pre">other)</span></code> to
+dynamically return <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code>. This
+removes the requirement to define all possible casts at DType creation
+(of one of the involved DTypes).</p>
+<p>Such an API could be added later. It resembles Python’s <code class="docutils literal notranslate"><span class="pre">__getattr__</span></code> in
+providing additional control over attribute lookup.</p>
+</li>
+</ul>
+<p><strong>Notes:</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> is used as a name in this NEP to clarify that it implements
+all functionality related to a cast. It is meant to be identical to the
+<code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code> proposed in NEP 43 as part of restructuring ufuncs to handle
+new DTypes. All type definitions are expected to be named <code class="docutils literal notranslate"><span class="pre">ArrayMethod</span></code>.</p>
+<p>The way dispatching works for <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> is planned to be limited
+initially and fully opaque. In the future, it may or may not be moved into a
+special UFunc, or behave more like a universal function.</p>
+</section>
+<section id="coercion-to-and-from-python-objects">
+<span id="nep42-array-coercion"></span><h3>Coercion to and from Python objects<a class="headerlink" href="#coercion-to-and-from-python-objects" title="Link to this heading">#</a></h3>
+<p>When storing a single value in an array or taking it out, it is necessary to
+coerce it – that is, convert it – to and from the low-level representation
+inside the array.</p>
+<p>Coercion is slightly more complex than typical casts. One reason is that a
+Python object could itself be a 0-dimensional array or scalar with an
+associated DType.</p>
+<p>Coercing to and from Python scalars requires two to three
+methods that largely correspond to the current definitions:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__dtype_setitem__(self,</span> <span class="pre">item_pointer,</span> <span class="pre">value)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__dtype_getitem__(self,</span> <span class="pre">item_pointer,</span> <span class="pre">base_obj)</span> <span class="pre">-&gt;</span> <span class="pre">object</span></code>;
+<code class="docutils literal notranslate"><span class="pre">base_obj</span></code> is for memory management and usually ignored; it points to
+an object owning the data. Its only role is to support structured datatypes
+with subarrays within NumPy, which currently return views into the array.
+The function returns an equivalent Python scalar (i.e. typically a NumPy
+scalar).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__dtype_get_pyitem__(self,</span> <span class="pre">item_pointer,</span> <span class="pre">base_obj)</span> <span class="pre">-&gt;</span> <span class="pre">object</span></code> (initially
+hidden for new-style user-defined datatypes, may be exposed on user
+request). This corresponds to the <code class="docutils literal notranslate"><span class="pre">arr.item()</span></code> method also used by
+<code class="docutils literal notranslate"><span class="pre">arr.tolist()</span></code> and returns Python floats, for example, instead of NumPy
+floats.</p></li>
+</ol>
+<p>(The above is meant for C-API. A Python-side API would have to use byte
+buffers or similar to implement this, which may be useful for prototyping.)</p>
+<p>When a certain scalar
+has a known (different) dtype, NumPy may in the future use casting instead of
+<code class="docutils literal notranslate"><span class="pre">__dtype_setitem__</span></code>.</p>
+<p>A user datatype is (initially) expected to implement
+<code class="docutils literal notranslate"><span class="pre">__dtype_setitem__</span></code> for its own <code class="docutils literal notranslate"><span class="pre">DType.type</span></code> and all basic Python scalars
+it wishes to support (e.g. <code class="docutils literal notranslate"><span class="pre">int</span></code> and <code class="docutils literal notranslate"><span class="pre">float</span></code>). In the future a
+function <code class="docutils literal notranslate"><span class="pre">known_scalar_type</span></code> may be made public to allow a user dtype to signal
+which Python scalars it can store directly.</p>
+<p><strong>Implementation:</strong> The pseudocode implementation for setting a single item in
+an array from an arbitrary Python object <code class="docutils literal notranslate"><span class="pre">value</span></code> is (some
+functions here are defined later):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">PyArray_Pack</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">item_pointer</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="n">DType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">DType</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DType</span><span class="o">.</span><span class="n">known_scalartype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="o">.</span><span class="n">__dtype_setitem__</span><span class="p">(</span><span class="n">item_pointer</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="c1"># The dtype cannot handle the value, so try casting:</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">is</span> <span class="nb">object</span> <span class="ow">or</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># not a numpy or user scalar; try using the dtype after all:</span>
+        <span class="k">return</span> <span class="n">dtype</span><span class="o">.</span><span class="n">__dtype_setitem__</span><span class="p">(</span><span class="n">item_pointer</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+     <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+     <span class="n">item_pointer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">arr</span><span class="p">[()])</span>
+</pre></div>
+</div>
+<p>where the call to <code class="docutils literal notranslate"><span class="pre">np.array()</span></code> represents the dtype discovery and is
+not actually performed.</p>
+<p><strong>Example:</strong> Current <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> returns <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code> scalars and can
+be assigned from <code class="docutils literal notranslate"><span class="pre">np.datetime64</span></code>. However, the datetime
+<code class="docutils literal notranslate"><span class="pre">__dtype_setitem__</span></code> also allows assignment from date strings (“2016-05-01”)
+or Python integers. Additionally the datetime <code class="docutils literal notranslate"><span class="pre">__dtype_get_pyitem__</span></code>
+function actually returns a Python <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code> object (most of the
+time).</p>
+<p><strong>Alternatives:</strong> This functionality could also be implemented as a cast to and
+from the <code class="docutils literal notranslate"><span class="pre">object</span></code> dtype.
+However, coercion is slightly more complex than typical casts.
+One reason is that in general a Python object could itself be a
+zero-dimensional array or scalar with an associated DType.
+Such an object has a DType, and the correct cast to another DType is already
+defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>is identical to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Implementing the first <code class="docutils literal notranslate"><span class="pre">object</span></code> to <code class="docutils literal notranslate"><span class="pre">np.float64</span></code> cast explicitly,
+would require the user to take to duplicate or fall back to existing
+casting functionality.</p>
+<p>It is certainly possible to describe the coercion to and from Python objects
+using the general casting machinery, but the <code class="docutils literal notranslate"><span class="pre">object</span></code> dtype is special and
+important enough to be handled by NumPy using the presented methods.</p>
+<p><strong>Further issues and discussion:</strong></p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">__dtype_setitem__</span></code> function duplicates some code, such as coercion
+from a string.</p>
+<p><code class="docutils literal notranslate"><span class="pre">datetime64</span></code> allows assignment from string, but the same conversion also
+occurs for casting from the string dtype to <code class="docutils literal notranslate"><span class="pre">datetime64</span></code>.</p>
+<p>We may in the future expose the <code class="docutils literal notranslate"><span class="pre">known_scalartype</span></code> function to allow the
+user to implement such duplication.</p>
+<p>For example, NumPy would normally use</p>
+<p><code class="docutils literal notranslate"><span class="pre">np.array(np.string_(&quot;2019&quot;)).astype(datetime64)</span></code></p>
+<p>but <code class="docutils literal notranslate"><span class="pre">datetime64</span></code> could choose to use its <code class="docutils literal notranslate"><span class="pre">__dtype_setitem__</span></code> instead
+for performance reasons.</p>
+</li>
+<li><p>There is an issue about how subclasses of scalars should be handled. We
+anticipate to stop automatically detecting the dtype for
+<code class="docutils literal notranslate"><span class="pre">np.array(float64_subclass)</span></code> to be float64. The user can still provide
+<code class="docutils literal notranslate"><span class="pre">dtype=np.float64</span></code>. However, the above automatic casting using
+<code class="docutils literal notranslate"><span class="pre">np.array(scalar_subclass).astype(requested_dtype)</span></code> will fail. In many
+cases, this is not an issue, since the Python <code class="docutils literal notranslate"><span class="pre">__float__</span></code> protocol can be
+used instead.  But in some cases, this will mean that subclasses of Python
+scalars will behave differently.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><em>Example:</em> <code class="docutils literal notranslate"><span class="pre">np.complex256</span></code> should not use <code class="docutils literal notranslate"><span class="pre">__float__</span></code> in its
+<code class="docutils literal notranslate"><span class="pre">__dtype_setitem__</span></code> method in the future unless it is a known floating
+point type.  If the scalar is a subclass of a different high precision
+floating point type (e.g. <code class="docutils literal notranslate"><span class="pre">np.float128</span></code>) then this currently loses
+precision without notifying the user.
+In that case <code class="docutils literal notranslate"><span class="pre">np.array(float128_subclass(3),</span> <span class="pre">dtype=np.complex256)</span></code>
+may fail unless the <code class="docutils literal notranslate"><span class="pre">float128_subclass</span></code> is first converted to the
+<code class="docutils literal notranslate"><span class="pre">np.float128</span></code> base class.</p>
+</div>
+</section>
+<section id="dtype-discovery-during-array-coercion">
+<h3>DType discovery during array coercion<a class="headerlink" href="#dtype-discovery-during-array-coercion" title="Link to this heading">#</a></h3>
+<p>An important step in the use of NumPy arrays is creation of the array from
+collections of generic Python objects.</p>
+<p><strong>Motivation:</strong> Although the distinction is not clear currently, there are two main needs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">4.</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>needs to guess the correct dtype based on the Python objects inside.
+Such an array may include a mix of datatypes, as long as they can be
+promoted.
+A second use case is when users provide the output DType class, but not the
+specific DType instance:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">object</span><span class="p">(),</span> <span class="kc">None</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">])</span>  <span class="c1"># (or `dtype=&quot;S&quot;`)</span>
+</pre></div>
+</div>
+<p>In this case the user indicates that <code class="docutils literal notranslate"><span class="pre">object()</span></code> and <code class="docutils literal notranslate"><span class="pre">None</span></code> should be
+interpreted as strings.
+The need to consider the user provided DType also arises for a future
+<code class="docutils literal notranslate"><span class="pre">Categorical</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">Categorical</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which must interpret the numbers as unique categorical values rather than
+integers.</p>
+<p>There are three further issues to consider:</p>
+<ol class="arabic simple">
+<li><p>It may be desirable to create datatypes associated
+with normal Python scalars (such as <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code>) that do not
+have a <code class="docutils literal notranslate"><span class="pre">dtype</span></code> attribute already.</p></li>
+<li><p>In general, a datatype could represent a sequence, however, NumPy currently
+assumes that sequences are always collections of elements
+(the sequence cannot be an element itself).
+An example would be a <code class="docutils literal notranslate"><span class="pre">vector</span></code> DType.</p></li>
+<li><p>An array may itself contain arrays with a specific dtype (even
+general Python objects).  For example:
+<code class="docutils literal notranslate"><span class="pre">np.array([np.array(None,</span> <span class="pre">dtype=object)],</span> <span class="pre">dtype=np.String)</span></code>
+poses the issue of how to handle the included array.</p></li>
+</ol>
+<p>Some of these difficulties arise because finding the correct shape
+of the output array and finding the correct datatype are closely related.</p>
+<p><strong>Implementation:</strong> There are two distinct cases above:</p>
+<ol class="arabic simple">
+<li><p>The user has provided no dtype information.</p></li>
+<li><p>The user provided a DType class  – as represented, for example, by <code class="docutils literal notranslate"><span class="pre">&quot;S&quot;</span></code>
+representing a string of any length.</p></li>
+</ol>
+<p>In the first case, it is necessary to establish a mapping from the Python type(s)
+of the constituent elements to the DType class.
+Once the DType class is known, the correct dtype instance needs to be found.
+In the case of strings, this requires to find the string length.</p>
+<p>These two cases shall be implemented by leveraging two pieces of information:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DType.type</span></code>: The current type attribute to indicate which Python scalar
+type is associated with the DType class (this is a <em>class</em> attribute that always
+exists for any datatype and is not limited to array coercion).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">__discover_descr_from_pyobject__(cls,</span> <span class="pre">obj)</span> <span class="pre">-&gt;</span> <span class="pre">dtype</span></code>: A classmethod that
+returns the correct descriptor given the input object.
+Note that only parametric DTypes have to implement this.
+For nonparametric DTypes using the default instance will always be acceptable.</p></li>
+</ol>
+<p>The Python scalar type which is already associated with a DType through the
+<code class="docutils literal notranslate"><span class="pre">DType.type</span></code> attribute maps from the DType to the Python scalar type.
+At registration time, a DType may choose to allow automatically discover for
+this Python scalar type.
+This requires a lookup in the opposite direction, which will be implemented
+using global a mapping (dictionary-like) of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">known_python_types</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span> <span class="o">=</span> <span class="n">DType</span>
+</pre></div>
+</div>
+<p>Correct garbage collection requires additional care.
+If both the Python scalar type (<code class="docutils literal notranslate"><span class="pre">pytype</span></code>) and <code class="docutils literal notranslate"><span class="pre">DType</span></code> are created dynamically,
+they will potentially be deleted again.
+To allow this, it must be possible to make the above mapping weak.
+This requires that the <code class="docutils literal notranslate"><span class="pre">pytype</span></code> holds a reference of <code class="docutils literal notranslate"><span class="pre">DType</span></code> explicitly.
+Thus, in addition to building the global mapping, NumPy will store the <code class="docutils literal notranslate"><span class="pre">DType</span></code> as
+<code class="docutils literal notranslate"><span class="pre">pytype.__associated_array_dtype__</span></code> in the Python type.
+This does <em>not</em> define the mapping and should <em>not</em> be accessed directly.
+In particular potential inheritance of the attribute does not mean that NumPy will use the
+superclasses <code class="docutils literal notranslate"><span class="pre">DType</span></code> automatically. A new <code class="docutils literal notranslate"><span class="pre">DType</span></code> must be created for the
+subclass.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Python integers do not have a clear/concrete NumPy type associated right
+now. This is because during array coercion NumPy currently finds the first
+type capable of representing their value in the list of <cite>long</cite>, <cite>unsigned
+long</cite>, <cite>int64</cite>, <cite>unsigned int64</cite>, and <cite>object</cite> (on many machines <cite>long</cite> is
+64 bit).</p>
+<p>Instead they will need to be implemented using an <code class="docutils literal notranslate"><span class="pre">AbstractPyInt</span></code>. This
+DType class can then provide <code class="docutils literal notranslate"><span class="pre">__discover_descr_from_pyobject__</span></code> and
+return the actual dtype which is e.g. <code class="docutils literal notranslate"><span class="pre">np.dtype(&quot;int64&quot;)</span></code>. For
+dispatching/promotion in ufuncs, it will also be necessary to dynamically
+create <code class="docutils literal notranslate"><span class="pre">AbstractPyInt[value]</span></code> classes (creation can be cached), so that
+they can provide the current value based promotion functionality provided
+by <code class="docutils literal notranslate"><span class="pre">np.result_type(python_integer,</span> <span class="pre">array)</span></code> <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> .</p>
+</div>
+<p>To allow for a DType to accept inputs as scalars that are not basic Python
+types or instances of <code class="docutils literal notranslate"><span class="pre">DType.type</span></code>, we use <code class="docutils literal notranslate"><span class="pre">known_scalar_type</span></code> method.
+This can allow discovery of a <code class="docutils literal notranslate"><span class="pre">vector</span></code> as a scalar (element) instead of a sequence
+(for the command <code class="docutils literal notranslate"><span class="pre">np.array(vector,</span> <span class="pre">dtype=VectorDType)</span></code>) even when <code class="docutils literal notranslate"><span class="pre">vector</span></code> is itself a
+sequence or even an array subclass. This will <em>not</em> be public API initially,
+but may be made public at a later time.</p>
+<p><strong>Example:</strong> The current datetime DType requires a
+<code class="docutils literal notranslate"><span class="pre">__discover_descr_from_pyobject__</span></code> which returns the correct unit for string
+inputs.  This allows it to support:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;2020-01-02&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-01-02 11:24&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;M8&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>By inspecting the date strings. Together with the common dtype
+operation, this allows it to automatically find that the datetime64 unit
+should be “minutes”.</p>
+<p><strong>NumPy internal implementation:</strong> The implementation to find the correct dtype
+will work similar to the following pseudocode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">find_dtype</span><span class="p">(</span><span class="n">array_like</span><span class="p">):</span>
+    <span class="n">common_dtype</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">array_like</span><span class="p">:</span>
+        <span class="c1"># default to object dtype, if unknown</span>
+        <span class="n">DType</span> <span class="o">=</span> <span class="n">known_python_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">element</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="nb">object</span><span class="p">])</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">DType</span><span class="o">.</span><span class="n">__discover_descr_from_pyobject__</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">common_dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">common_dtype</span> <span class="o">=</span> <span class="n">dtype</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">common_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">promote_types</span><span class="p">(</span><span class="n">common_dtype</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In practice, the input to <code class="docutils literal notranslate"><span class="pre">np.array()</span></code> is a mix of sequences and array-like
+objects, so that deciding what is an element requires to check whether it
+is a sequence.
+The full algorithm (without user provided dtypes) thus looks more like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">find_dtype_recursive</span><span class="p">(</span><span class="n">array_like</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively find the dtype for a nested sequences (arrays are not</span>
+<span class="sd">    supported here).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DType</span> <span class="o">=</span> <span class="n">known_python_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">element</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">DType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">is_array_like</span><span class="p">(</span><span class="n">array_like</span><span class="p">):</span>
+        <span class="c1"># Code for a sequence, an array_like may have a DType we</span>
+        <span class="c1"># can use directly:</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">array_like</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">find_dtype_recursive</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dtype</span>
+
+    <span class="k">elif</span> <span class="n">DType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">DType</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span>
+
+    <span class="c1"># dtype discovery and promotion as in `find_dtype` above</span>
+</pre></div>
+</div>
+<p>If the user provides <code class="docutils literal notranslate"><span class="pre">DType</span></code>, then this DType will be tried first, and the
+<code class="docutils literal notranslate"><span class="pre">dtype</span></code> may need to be cast before the promotion is performed.</p>
+<p><strong>Limitations:</strong> The motivational point 3. of a nested array
+<code class="docutils literal notranslate"><span class="pre">np.array([np.array(None,</span> <span class="pre">dtype=object)],</span> <span class="pre">dtype=np.String)</span></code> is currently
+(sometimes) supported by inspecting all elements of the nested array.
+User DTypes will implicitly handle these correctly if the nested array
+is of <code class="docutils literal notranslate"><span class="pre">object</span></code> dtype.
+In some other cases NumPy will retain backward compatibility for existing
+functionality only.
+NumPy uses such functionality to allow code such as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;2020-05-05&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;S&quot;</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">)</span>
+<span class="go">array([[&#39;2020-05-05&#39;]], dtype=&#39;datetime64[D]&#39;)</span>
+</pre></div>
+</div>
+<p>which discovers the datetime unit <code class="docutils literal notranslate"><span class="pre">D</span></code> (days).
+This possibility will not be accessible to user DTypes without an
+intermediate cast to <code class="docutils literal notranslate"><span class="pre">object</span></code> or a custom function.</p>
+<p>The use of a global type map means that an error or warning has to be given if
+two DTypes wish to map to the same Python type. In most cases user DTypes
+should only be implemented for types defined within the same library to avoid
+the potential for conflicts. It will be the DType implementor’s responsibility
+to be careful about this and use avoid registration when in doubt.</p>
+<p><strong>Alternatives:</strong></p>
+<ul>
+<li><p>Instead of a global mapping, we could rely on the scalar attribute
+<code class="docutils literal notranslate"><span class="pre">scalar.__associated_array_dtype__</span></code>. This only creates a difference in
+behavior for subclasses, and the exact implementation can be undefined
+initially. Scalars will be expected to derive from a NumPy scalar. In
+principle NumPy could, for a time, still choose to rely on the attribute.</p></li>
+<li><p>An earlier proposal for the <code class="docutils literal notranslate"><span class="pre">dtype</span></code> discovery algorithm used a two-pass
+approach, first finding the correct <code class="docutils literal notranslate"><span class="pre">DType</span></code> class and only then
+discovering the parametric <code class="docutils literal notranslate"><span class="pre">dtype</span></code> instance. It was rejected as
+needlessly complex. But it would have enabled value-based promotion
+in universal functions, allowing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">),</span> <span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>to return a <code class="docutils literal notranslate"><span class="pre">uint8</span></code> result (instead of <code class="docutils literal notranslate"><span class="pre">int16</span></code>), which currently happens for:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(note the list <code class="docutils literal notranslate"><span class="pre">[4]</span></code> instead of scalar <code class="docutils literal notranslate"><span class="pre">4</span></code>).
+This is not a feature NumPy currently has or desires to support.</p>
+</li>
+</ul>
+<p><strong>Further issues and discussion:</strong> It is possible to create a DType
+such as Categorical, array, or vector which can only be used if <code class="docutils literal notranslate"><span class="pre">dtype=DType</span></code>
+is provided. Such DTypes cannot roundtrip correctly. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">Categorical</span><span class="p">)[()])</span>
+</pre></div>
+</div>
+<p>will result in an integer array. To get the original <code class="docutils literal notranslate"><span class="pre">Categorical</span></code> array
+<code class="docutils literal notranslate"><span class="pre">dtype=Categorical</span></code> will need to be passed explicitly.
+This is a general limitation, but round-tripping is always possible if
+<code class="docutils literal notranslate"><span class="pre">dtype=original_arr.dtype</span></code> is passed.</p>
+</section>
+</section>
+<section id="public-c-api">
+<span id="nep42-c-api"></span><h2>Public C-API<a class="headerlink" href="#public-c-api" title="Link to this heading">#</a></h2>
+<section id="dtype-creation">
+<h3>DType creation<a class="headerlink" href="#dtype-creation" title="Link to this heading">#</a></h3>
+<p>To create a new DType the user will need to define the methods and attributes
+outlined in the <a class="reference internal" href="#usage-and-impact">Usage and impact</a> section and detailed throughout this
+proposal.</p>
+<p>In addition, some methods similar to those in <a class="reference external" href="https://numpy.org/devdocs/reference/c-api/types-and-structures.html#c.PyArray_ArrFuncs" title="(in NumPy v2.5.dev0)"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyArray_ArrFuncs</span></code></a> will
+be needed for the slots struct below.</p>
+<p>As mentioned in <a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a>, the interface to define this DType
+class in C is modeled after <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0384/"><strong>PEP 384</strong></a>: Slots and some additional information
+will be passed in a slots struct and identified by <code class="docutils literal notranslate"><span class="pre">ssize_t</span></code> integers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">static</span> <span class="n">struct</span> <span class="n">PyArrayMethodDef</span> <span class="n">slots</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="n">NPY_dt_method</span><span class="p">,</span> <span class="n">method_implementation</span><span class="p">},</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="n">NULL</span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">typedef</span> <span class="n">struct</span><span class="p">{</span>
+  <span class="n">PyTypeObject</span> <span class="o">*</span><span class="n">typeobj</span><span class="p">;</span>    <span class="o">/*</span> <span class="nb">type</span> <span class="n">of</span> <span class="n">python</span> <span class="n">scalar</span> <span class="ow">or</span> <span class="n">NULL</span> <span class="o">*/</span>
+  <span class="nb">int</span> <span class="n">flags</span>                 <span class="o">/*</span> <span class="n">flags</span><span class="p">,</span> <span class="n">including</span> <span class="n">parametric</span> <span class="ow">and</span> <span class="n">abstract</span> <span class="o">*/</span>
+  <span class="o">/*</span> <span class="n">NULL</span> <span class="n">terminated</span> <span class="n">CastingImpl</span><span class="p">;</span> <span class="ow">is</span> <span class="n">copied</span> <span class="ow">and</span> <span class="n">references</span> <span class="n">are</span> <span class="n">stolen</span> <span class="o">*/</span>
+  <span class="n">CastingImpl</span> <span class="o">*</span><span class="n">castingimpls</span><span class="p">[];</span>
+  <span class="n">PyType_Slot</span> <span class="o">*</span><span class="n">slots</span><span class="p">;</span>
+  <span class="n">PyTypeObject</span> <span class="o">*</span><span class="n">baseclass</span><span class="p">;</span>  <span class="o">/*</span> <span class="n">Baseclass</span> <span class="ow">or</span> <span class="n">NULL</span> <span class="o">*/</span>
+<span class="p">}</span> <span class="n">PyArrayDTypeMeta_Spec</span><span class="p">;</span>
+
+<span class="n">PyObject</span><span class="o">*</span> <span class="n">PyArray_InitDTypeMetaFromSpec</span><span class="p">(</span><span class="n">PyArrayDTypeMeta_Spec</span> <span class="o">*</span><span class="n">dtype_spec</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>All of this is passed by copying.</p>
+<p><strong>TODO:</strong> The DType author should be able to define new methods for the
+DType, up to defining a full object, and, in the future, possibly even
+extending the <code class="docutils literal notranslate"><span class="pre">PyArrayDTypeMeta_Type</span></code> struct. We have to decide what to make
+available initially. A solution may be to allow inheriting only from an
+existing class: <code class="docutils literal notranslate"><span class="pre">class</span> <span class="pre">MyDType(np.dtype,</span> <span class="pre">MyBaseclass)</span></code>. If <code class="docutils literal notranslate"><span class="pre">np.dtype</span></code> is
+first in the method resolution order, this also prevents an undesirable
+override of slots like <code class="docutils literal notranslate"><span class="pre">==</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">slots</span></code> will be identified by names which are prefixed with <code class="docutils literal notranslate"><span class="pre">NPY_dt_</span></code>
+and are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">is_canonical(self)</span> <span class="pre">-&gt;</span> <span class="pre">{0,</span> <span class="pre">1}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ensure_canonical(self)</span> <span class="pre">-&gt;</span> <span class="pre">dtype</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">default_descr(self)</span> <span class="pre">-&gt;</span> <span class="pre">dtype</span></code> (return must be native and should normally be a singleton)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">setitem(self,</span> <span class="pre">char</span> <span class="pre">*item_ptr,</span> <span class="pre">PyObject</span> <span class="pre">*value)</span> <span class="pre">-&gt;</span> <span class="pre">{-1,</span> <span class="pre">0}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">getitem(self,</span> <span class="pre">char</span> <span class="pre">*item_ptr,</span> <span class="pre">PyObject</span> <span class="pre">(base_obj)</span> <span class="pre">-&gt;</span> <span class="pre">object</span> <span class="pre">or</span> <span class="pre">NULL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">discover_descr_from_pyobject(cls,</span> <span class="pre">PyObject)</span> <span class="pre">-&gt;</span> <span class="pre">dtype</span> <span class="pre">or</span> <span class="pre">NULL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">common_dtype(cls,</span> <span class="pre">other)</span> <span class="pre">-&gt;</span> <span class="pre">DType,</span> <span class="pre">NotImplemented,</span> <span class="pre">or</span> <span class="pre">NULL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">common_instance(self,</span> <span class="pre">other)</span> <span class="pre">-&gt;</span> <span class="pre">dtype</span> <span class="pre">or</span> <span class="pre">NULL</span></code></p></li>
+</ul>
+<p>Where possible, a default implementation will be provided if the slot is
+omitted or set to <code class="docutils literal notranslate"><span class="pre">NULL</span></code>. Nonparametric dtypes do not have to implement:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">discover_descr_from_pyobject</span></code> (uses <code class="docutils literal notranslate"><span class="pre">default_descr</span></code> instead)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">common_instance</span></code> (uses <code class="docutils literal notranslate"><span class="pre">default_descr</span></code> instead)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ensure_canonical</span></code> (uses <code class="docutils literal notranslate"><span class="pre">default_descr</span></code> instead).</p></li>
+</ul>
+<p>Sorting is expected to be implemented using:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_sort_function(self,</span> <span class="pre">NPY_SORTKIND</span> <span class="pre">sort_kind)</span> <span class="pre">-&gt;</span> <span class="pre">{out_sortfunction,</span> <span class="pre">NotImplemented,</span> <span class="pre">NULL}</span></code>.</p></li>
+</ul>
+<p>For convenience, it will be sufficient if the user implements only:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">compare(self,</span> <span class="pre">char</span> <span class="pre">*item_ptr1,</span> <span class="pre">char</span> <span class="pre">*item_ptr2,</span> <span class="pre">int</span> <span class="pre">*res)</span> <span class="pre">-&gt;</span> <span class="pre">{-1,</span> <span class="pre">0,</span> <span class="pre">1}</span></code></p></li>
+</ul>
+<p><strong>Limitations:</strong> The <code class="docutils literal notranslate"><span class="pre">PyArrayDTypeMeta_Spec</span></code> struct is clumsy to extend (for
+instance, by adding a version tag to the <code class="docutils literal notranslate"><span class="pre">slots</span></code> to indicate a new, longer
+version). We could use a function to provide the struct; it would require
+memory management but would allow ABI-compatible extension (the struct is
+freed again when the DType is created).</p>
+</section>
+<section id="castingimpl">
+<h3>CastingImpl<a class="headerlink" href="#castingimpl" title="Link to this heading">#</a></h3>
+<p>The external API for <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> will be limited initially to defining:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">casting</span></code> attribute, which can be one of the supported casting kinds.
+This is the safest cast possible. For example, casting between two NumPy
+strings is of course “safe” in general, but may be “same kind” in a specific
+instance if the second string is shorter. If neither type is parametric the
+<code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code> must use it.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">resolve_descriptors(PyArrayMethodObject</span> <span class="pre">*self,</span> <span class="pre">PyArray_DTypeMeta</span> <span class="pre">*DTypes[2],</span>
+<span class="pre">PyArray_Descr</span> <span class="pre">*dtypes_in[2],</span> <span class="pre">PyArray_Descr</span> <span class="pre">*dtypes_out[2],</span> <span class="pre">NPY_CASTING</span> <span class="pre">*casting_out)</span>
+<span class="pre">-&gt;</span> <span class="pre">int</span> <span class="pre">{0,</span> <span class="pre">-1}</span></code> The out
+dtypes must be set correctly to dtypes which the strided loop
+(transfer function) can handle.  Initially the result must have instances
+of the same DType class as the <code class="docutils literal notranslate"><span class="pre">CastingImpl</span></code> is defined for. The
+<code class="docutils literal notranslate"><span class="pre">casting</span></code> will be set to <code class="docutils literal notranslate"><span class="pre">NPY_EQUIV_CASTING</span></code>, <code class="docutils literal notranslate"><span class="pre">NPY_SAFE_CASTING</span></code>,
+<code class="docutils literal notranslate"><span class="pre">NPY_UNSAFE_CASTING</span></code>, or <code class="docutils literal notranslate"><span class="pre">NPY_SAME_KIND_CASTING</span></code>.
+A new, additional flag,
+<code class="docutils literal notranslate"><span class="pre">_NPY_CAST_IS_VIEW</span></code>, can be set to indicate that no cast is necessary and a
+view is sufficient to perform the cast. The cast should return
+<code class="docutils literal notranslate"><span class="pre">-1</span></code> when an error occurred. If a cast is not possible (but no error
+occurred), a <code class="docutils literal notranslate"><span class="pre">-1</span></code> result should be returned <em>without</em> an error set.
+<em>This point is under consideration, we may use ``-1`` to indicate
+a general error, and use a different return value for an impossible cast.</em>
+This means that it is <em>not</em> possible to inform the user about why a cast is
+impossible.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">strided_loop(char</span> <span class="pre">**args,</span> <span class="pre">npy_intp</span> <span class="pre">*dimensions,</span> <span class="pre">npy_intp</span> <span class="pre">*strides,</span>
+<span class="pre">...)</span> <span class="pre">-&gt;</span> <span class="pre">int</span> <span class="pre">{0,</span> <span class="pre">-1}</span></code> (signature will be fully defined in <a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a>)</p></li>
+</ul>
+<p>This is identical to the proposed API for ufuncs. The additional <code class="docutils literal notranslate"><span class="pre">...</span></code>
+part of the signature will include information such as the two <code class="docutils literal notranslate"><span class="pre">dtype</span></code>s.
+More optimized loops are in use internally, and
+will be made available to users in the future (see notes).</p>
+<p>Although verbose, the API will mimic the one for creating a new DType:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="p">{</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span><span class="w">                  </span><span class="cm">/* e.g. whether the cast requires the API */</span>
+<span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">nin</span><span class="p">,</span><span class="w"> </span><span class="n">nout</span><span class="p">;</span><span class="w">              </span><span class="cm">/* Number of Input and outputs (always 1) */</span>
+<span class="w">  </span><span class="n">NPY_CASTING</span><span class="w"> </span><span class="n">casting</span><span class="p">;</span><span class="w">        </span><span class="cm">/* The &quot;minimal casting level&quot; */</span>
+<span class="w">  </span><span class="n">PyArray_DTypeMeta</span><span class="w"> </span><span class="o">*</span><span class="n">dtypes</span><span class="p">;</span><span class="w">  </span><span class="cm">/* input and output DType class */</span>
+<span class="w">  </span><span class="cm">/* NULL terminated slots defining the methods */</span>
+<span class="w">  </span><span class="n">PyType_Slot</span><span class="w"> </span><span class="o">*</span><span class="n">slots</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">PyArrayMethod_Spec</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The focus differs between casting and general ufuncs.  For example, for casts
+<code class="docutils literal notranslate"><span class="pre">nin</span> <span class="pre">==</span> <span class="pre">nout</span> <span class="pre">==</span> <span class="pre">1</span></code> is always correct, while for ufuncs <code class="docutils literal notranslate"><span class="pre">casting</span></code> is
+expected to be usually <cite>“no”</cite>.</p>
+<p><strong>Notes:</strong> We may initially allow users to define only a single loop.
+Internally NumPy optimizes far more, and this should be made public
+incrementally in one of two ways:</p>
+<ul class="simple">
+<li><p>Allow multiple versions, such as:</p>
+<ul>
+<li><p>contiguous inner loop</p></li>
+<li><p>strided inner loop</p></li>
+<li><p>scalar inner loop</p></li>
+</ul>
+</li>
+<li><p>Or, more likely, expose the <code class="docutils literal notranslate"><span class="pre">get_loop</span></code> function which is passed additional
+information, such as the fixed strides (similar to our internal API).</p></li>
+<li><p>The casting level denotes the minimal guaranteed casting level and can be
+<code class="docutils literal notranslate"><span class="pre">-1</span></code> if the cast may be impossible.  For most non-parametric casts, this
+value will be the casting level.  NumPy may skip the <code class="docutils literal notranslate"><span class="pre">resolve_descriptors</span></code>
+call for <code class="docutils literal notranslate"><span class="pre">np.can_cast()</span></code> when the result is <code class="docutils literal notranslate"><span class="pre">True</span></code> based on this level.</p></li>
+</ul>
+<p>The example does not yet include setup and error handling. Since these are
+similar to the UFunc machinery, they  will be defined in <a class="reference internal" href="nep-0043-extensible-ufuncs.html#nep43"><span class="std std-ref">NEP 43</span></a> and then
+incorporated identically into casting.</p>
+<p>The slots/methods used will be prefixed with <code class="docutils literal notranslate"><span class="pre">NPY_meth_</span></code>.</p>
+<p><strong>Alternatives:</strong></p>
+<ul class="simple">
+<li><p>Aside from name changes and signature tweaks, there seem to be few
+alternatives to the above structure. The proposed API using <code class="docutils literal notranslate"><span class="pre">*_FromSpec</span></code>
+function is a good way to achieve a stable and extensible API. The slots
+design is extensible and can be changed without breaking binary
+compatibility. Convenience functions can still be provided to allow creation
+with less code.</p></li>
+<li><p>One downside is that compilers cannot warn about function-pointer
+incompatibilities.</p></li>
+</ul>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>Steps for implementation are outlined in the Implementation section of
+<a class="reference internal" href="nep-0041-improved-dtype-support.html#nep41"><span class="std std-ref">NEP 41</span></a>. In brief, we first will rewrite the internals of
+casting and array coercion. After that, the new public API will be added
+incrementally. We plan to expose it in a preliminary state initially to gain
+experience. All functionality currently implemented on the dtypes will be
+replaced systematically as new features are added.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>The space of possible implementations is large, so there have been many
+discussions, conceptions, and design documents. These are listed in
+<a class="reference internal" href="nep-0040-legacy-datatype-impl.html#nep40"><span class="std std-ref">NEP 40</span></a>. Alternatives were also been discussed in the
+relevant sections above.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>To be clear, the program is broken: It should not have stored a value
+in the common DType that was below the lowest int16 or above the highest
+uint16. It avoided overflow earlier by an accident of implementation.
+Nonetheless,  we insist that program behavior not be altered just by
+importing a type.</p>
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>NumPy currently inspects the value to allow the operations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.</span>
+</pre></div>
+</div>
+<p>to return a <code class="docutils literal notranslate"><span class="pre">uint8</span></code> or <code class="docutils literal notranslate"><span class="pre">float32</span></code> array respectively.  This is
+further described in the documentation for <a class="reference external" href="https://numpy.org/devdocs/reference/generated/numpy.result_type.html#numpy.result_type" title="(in NumPy v2.5.dev0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">numpy.result_type()</span></code></a>.</p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#definitions">Definitions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-dtype-class">The DType class</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#class-getter">Class getter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hierarchy-and-abstract-classes">Hierarchy and abstract classes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#miscellaneous-methods-and-attributes">Miscellaneous methods and attributes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#casting">Casting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#common-dtype-operations"><cite>Common DType</cite> operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cast-operation">The cast operation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#coercion-to-and-from-python-objects">Coercion to and from Python objects</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dtype-discovery-during-array-coercion">DType discovery during array coercion</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#public-c-api">Public C-API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dtype-creation">DType creation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#castingimpl">CastingImpl</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

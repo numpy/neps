@@ -1,0 +1,884 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 49 — Data allocation strategies &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0049-data-allocation-strategies';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 50 — Promotion rules for Python scalars" href="nep-0050-scalar-promotion.html" />
+    <link rel="prev" title="NEP 40 — Legacy datatype implementation in NumPy" href="nep-0040-legacy-datatype-impl.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="finished.html" class="nav-link">Finished NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 49 — Data allocation strategies</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-49-data-allocation-strategies">
+<span id="nep49"></span><h1>NEP 49 — Data allocation strategies<a class="headerlink" href="#nep-49-data-allocation-strategies" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Matti Picus</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Final</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2021-04-18</p>
+</dd>
+<dt class="field-odd">Resolution<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/YZ3PNTXZUT27B6ITFAD3WRSM3T3SRVK4/#PKYXCTG4R5Q6LIRZC4SEWLNBM6GLRF26">NumPy Discussion</a></p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> requires additional memory allocations
+to hold <code class="docutils literal notranslate"><span class="pre">numpy.ndarray.strides</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.ndarray.shape</span></code> and
+<code class="docutils literal notranslate"><span class="pre">numpy.ndarray.data</span></code> attributes. These attributes are specially allocated
+after creating the python object in <code class="docutils literal notranslate"><span class="pre">__new__</span></code> method.</p>
+<p>This NEP proposes a mechanism to override the memory management strategy used
+for <code class="docutils literal notranslate"><span class="pre">ndarray-&gt;data</span></code> with user-provided alternatives. This allocation holds
+the data and can be very large. As accessing this data often becomes
+a performance bottleneck, custom allocation strategies to guarantee data
+alignment or pinning allocations to specialized memory hardware can enable
+hardware-specific optimizations. The other allocations remain unchanged.</p>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>Users may wish to override the internal data memory routines with ones of their
+own. Two such use-cases are to ensure data alignment and to pin certain
+allocations to certain NUMA cores. This desire for alignment was discussed
+multiple times on the mailing list <a class="reference external" href="https://numpy-discussion.scipy.narkive.com/MvmMkJcK/numpy-arrays-data-allocation-and-simd-alignement">in 2005</a>,  and in <a class="reference external" href="https://github.com/numpy/numpy/issues/5312">issue 5312</a> in 2014,
+which led to <a class="reference external" href="https://github.com/numpy/numpy/pull/5457">PR 5457</a> and more mailing list discussions <a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/YPC5BGPUMKT2MLBP6O3FMPC35LFM2CCH/#YPC5BGPUMKT2MLBP6O3FMPC35LFM2CCH">here</a> <a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/IQK3EPIIRE3V4BPNAMJ2ZST3NUG2MK2A/#IQK3EPIIRE3V4BPNAMJ2ZST3NUG2MK2A">and here</a>. In
+a comment on the issue <a class="reference external" href="https://github.com/numpy/numpy/issues/5312#issuecomment-315234656">from 2017</a>, a user described how 64-byte alignment
+improved performance by 40x.</p>
+<p>Also related is <a class="reference external" href="https://github.com/numpy/numpy/issues/14177">issue 14177</a> around the use of <code class="docutils literal notranslate"><span class="pre">madvise</span></code> and huge pages on
+Linux.</p>
+<p>Various tracing and profiling libraries like <a class="reference external" href="https://github.com/pythonspeed/filprofiler/blob/master/design/allocator-overrides.md">filprofiler</a> or <a class="reference external" href="https://github.com/boundarydevices/efence">electric fence</a>
+override <code class="docutils literal notranslate"><span class="pre">malloc</span></code>.</p>
+<p>The long CPython discussion of <a class="reference external" href="https://bugs.python.org/issue18835">BPO 18835</a>  began with discussing the need for
+<code class="docutils literal notranslate"><span class="pre">PyMem_Alloc32</span></code> and <code class="docutils literal notranslate"><span class="pre">PyMem_Alloc64</span></code>.  The early conclusion was that the
+cost (of wasted padding) vs. the benefit of aligned memory is best left to the
+user, but then evolves into a discussion of various proposals to deal with
+memory allocations, including <a class="reference external" href="https://www.python.org/dev/peps/pep-0445/">PEP 445</a> <a class="reference external" href="https://docs.python.org/3/c-api/memory.html#customize-memory-allocators">memory interfaces</a> to
+<code class="docutils literal notranslate"><span class="pre">PyTraceMalloc_Track</span></code> which apparently was explicitly added for NumPy.</p>
+<p>Allowing users to implement different strategies via the NumPy C-API will
+enable exploration of this rich area of possible optimizations. The intention
+is to create a flexible enough interface without burdening normative users.</p>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>The new functions can only be accessed via the NumPy C-API. An example is
+included later in this NEP. The added <code class="docutils literal notranslate"><span class="pre">struct</span></code> will increase the size of the
+<code class="docutils literal notranslate"><span class="pre">ndarray</span></code> object. It is a necessary price to pay for this approach. We
+can be reasonably sure that the change in size will have a minimal impact on
+end-user code because NumPy version 1.20 already changed the object size.</p>
+<p>The implementation preserves the use of <code class="docutils literal notranslate"><span class="pre">PyTraceMalloc_Track</span></code> to track
+allocations already present in NumPy.</p>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>The design will not break backward compatibility. Projects that were assigning
+to the <code class="docutils literal notranslate"><span class="pre">ndarray-&gt;data</span></code> pointer were already breaking the current memory
+management strategy and should restore
+<code class="docutils literal notranslate"><span class="pre">ndarray-&gt;data</span></code> before calling <code class="docutils literal notranslate"><span class="pre">Py_DECREF</span></code>. As mentioned above, the change
+in size should not impact end-users.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<section id="high-level-design">
+<h3>High level design<a class="headerlink" href="#high-level-design" title="Link to this heading">#</a></h3>
+<p>Users who wish to change the NumPy data memory management routines will use
+<a class="reference internal" href="#c.PyDataMem_SetHandler" title="PyDataMem_SetHandler"><code class="xref c c-func docutils literal notranslate"><span class="pre">PyDataMem_SetHandler()</span></code></a>, which uses a <a class="reference internal" href="#c.PyDataMem_Handler" title="PyDataMem_Handler"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyDataMem_Handler</span></code></a>
+structure to hold pointers to functions used to manage the data memory. In
+order to allow lifetime management of the <code class="docutils literal notranslate"><span class="pre">context</span></code>, the structure is wrapped
+in a <code class="docutils literal notranslate"><span class="pre">PyCapsule</span></code>.</p>
+<p>Since a call to <code class="docutils literal notranslate"><span class="pre">PyDataMem_SetHandler</span></code> will change the default functions, but
+that function may be called during the lifetime of an <code class="docutils literal notranslate"><span class="pre">ndarray</span></code> object, each
+<code class="docutils literal notranslate"><span class="pre">ndarray</span></code> will carry with it the <code class="docutils literal notranslate"><span class="pre">PyDataMem_Handler</span></code>-wrapped PyCapsule used
+at the time of its instantiation, and these will be used to reallocate or free
+the data memory of the instance. Internally NumPy may use <code class="docutils literal notranslate"><span class="pre">memcpy</span></code> or
+<code class="docutils literal notranslate"><span class="pre">memset</span></code> on the pointer to the data memory.</p>
+<p>The name of the handler will be exposed on the python level via a
+<code class="docutils literal notranslate"><span class="pre">numpy.core.multiarray.get_handler_name(arr)</span></code> function. If called as
+<code class="docutils literal notranslate"><span class="pre">numpy.core.multiarray.get_handler_name()</span></code> it will return the name of the
+handler that will be used to allocate data for the next new <cite>ndarrray</cite>.</p>
+<p>The version of the handler will be exposed on the python level via a
+<code class="docutils literal notranslate"><span class="pre">numpy.core.multiarray.get_handler_version(arr)</span></code> function. If called as
+<code class="docutils literal notranslate"><span class="pre">numpy.core.multiarray.get_handler_version()</span></code> it will return the version of the
+handler that will be used to allocate data for the next new <cite>ndarrray</cite>.</p>
+<p>The version, currently 1, allows for future enhancements to the
+<code class="docutils literal notranslate"><span class="pre">PyDataMemAllocator</span></code>. If fields are added, they must be added to the end.</p>
+</section>
+<section id="numpy-c-api-functions">
+<h3>NumPy C-API functions<a class="headerlink" href="#numpy-c-api-functions" title="Link to this heading">#</a></h3>
+<dl class="c type">
+<dt class="sig sig-object c" id="c.PyDataMem_Handler">
+<span class="k"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyDataMem_Handler</span></span></span><a class="headerlink" href="#c.PyDataMem_Handler" title="Link to this definition">#</a><br /></dt>
+<dd><p>A struct to hold function pointers used to manipulate memory</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">name</span><span class="p">[</span><span class="mi">127</span><span class="p">];</span><span class="w">  </span><span class="cm">/* multiple of 64 to keep the struct aligned */</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">version</span><span class="p">;</span><span class="w"> </span><span class="cm">/* currently 1 */</span>
+<span class="w">    </span><span class="n">PyDataMemAllocator</span><span class="w"> </span><span class="n">allocator</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">PyDataMem_Handler</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>where the allocator structure is</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/* The declaration of free differs from PyMemAllocatorEx */</span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">malloc</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">calloc</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">nelem</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">elsize</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">realloc</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ptr</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">new_size</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">free</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">ptr</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+<span class="p">}</span><span class="w"> </span><span class="n">PyDataMemAllocator</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The use of a <code class="docutils literal notranslate"><span class="pre">size</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">free</span></code> differentiates this struct from
+the <a class="reference external" href="https://docs.python.org/dev/c-api/memory.html#c.PyMemAllocatorEx" title="(in Python v3.15)"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyMemAllocatorEx</span></code></a> struct in Python. This call signature is
+used internally in NumPy currently, and also in other places for instance
+<cite>C++98 &lt;https://en.cppreference.com/w/cpp/memory/allocator/deallocate&gt;</cite>,
+<cite>C++11 &lt;https://en.cppreference.com/w/cpp/memory/allocator_traits/deallocate&gt;</cite>, and
+<cite>Rust (allocator_api) &lt;https://doc.rust-lang.org/std/alloc/trait.Allocator.html#tymethod.deallocate&gt;</cite>.</p>
+<p>The consumer of the <cite>PyDataMemAllocator</cite> interface must keep track of <code class="docutils literal notranslate"><span class="pre">size</span></code> and make sure it is
+consistent with the parameter passed to the <code class="docutils literal notranslate"><span class="pre">(m|c|re)alloc</span></code>  functions.</p>
+<p>NumPy itself may violate this requirement when the shape of the requested
+array contains a <code class="docutils literal notranslate"><span class="pre">0</span></code>, so authors of PyDataMemAllocators should relate to
+the <code class="docutils literal notranslate"><span class="pre">size</span></code> parameter as a best-guess. Work to fix this is ongoing in PRs
+<a class="reference external" href="https://github.com/numpy/numpy/pull/15780">15780</a> and <a class="reference external" href="https://github.com/numpy/numpy/pull/15788">15788</a> but has not yet been resolved. When it is this NEP should
+be revisited.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyDataMem_SetHandler">
+<a class="reference external" href="https://docs.python.org/dev/c-api/structures.html#c.PyObject" title="(in Python v3.15)"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyDataMem_SetHandler</span></span></span><span class="sig-paren">(</span><a class="reference external" href="https://docs.python.org/dev/c-api/structures.html#c.PyObject" title="(in Python v3.15)"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">handler</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyDataMem_SetHandler" title="Link to this definition">#</a><br /></dt>
+<dd><p>Sets a new allocation policy. If the input value is <code class="docutils literal notranslate"><span class="pre">NULL</span></code>, will reset
+the policy to the default. Return the previous policy, or
+return NULL if an error has occurred. We wrap the user-provided
+so they will still call the Python and NumPy memory management callback
+hooks. All the function pointers must be filled in, <code class="docutils literal notranslate"><span class="pre">NULL</span></code> is not
+accepted.</p>
+</dd></dl>
+
+<dl class="c function">
+<dt class="sig sig-object c" id="c.PyDataMem_GetHandler">
+<span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/dev/c-api/structures.html#c.PyObject" title="(in Python v3.15)"><span class="n"><span class="pre">PyObject</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">PyDataMem_GetHandler</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.PyDataMem_GetHandler" title="Link to this definition">#</a><br /></dt>
+<dd><p>Return the current policy that will be used to allocate data for the
+next <code class="docutils literal notranslate"><span class="pre">PyArrayObject</span></code>. On failure, return <code class="docutils literal notranslate"><span class="pre">NULL</span></code>.</p>
+</dd></dl>
+
+</section>
+<section id="pydatamem-handler-thread-safety-and-lifetime">
+<h3><code class="docutils literal notranslate"><span class="pre">PyDataMem_Handler</span></code> thread safety and lifetime<a class="headerlink" href="#pydatamem-handler-thread-safety-and-lifetime" title="Link to this heading">#</a></h3>
+<p>The active handler is stored in the current <a class="reference external" href="https://docs.python.org/dev/library/contextvars.html#contextvars.Context" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a>
+via a <a class="reference external" href="https://docs.python.org/dev/library/contextvars.html#contextvars.ContextVar" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContextVar</span></code></a>. This ensures it can be configured both
+per-thread and per-async-coroutine.</p>
+<p>There is currently no lifetime management of <code class="docutils literal notranslate"><span class="pre">PyDataMem_Handler</span></code>.
+The user of <cite>PyDataMem_SetHandler</cite> must ensure that the argument remains alive
+for as long as any objects allocated with it, and while it is the active handler.
+In practice, this means the handler must be immortal.</p>
+<p>As an implementation detail, currently this <code class="docutils literal notranslate"><span class="pre">ContextVar</span></code> contains a <code class="docutils literal notranslate"><span class="pre">PyCapsule</span></code>
+object storing a pointer to a <code class="docutils literal notranslate"><span class="pre">PyDataMem_Handler</span></code> with no destructor,
+but this should not be relied upon.</p>
+</section>
+<section id="sample-code">
+<h3>Sample code<a class="headerlink" href="#sample-code" title="Link to this heading">#</a></h3>
+<p>This code adds a 64-byte header to each <code class="docutils literal notranslate"><span class="pre">data</span></code> pointer and stores information
+about the allocation in the header. Before calling <code class="docutils literal notranslate"><span class="pre">free</span></code>, a check ensures
+the <code class="docutils literal notranslate"><span class="pre">sz</span></code> argument is correct.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;numpy/arrayobject.h&gt;</span>
+<span class="n">NPY_NO_EXPORT</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">malloc</span><span class="p">)(</span><span class="kt">size_t</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">calloc</span><span class="p">)(</span><span class="kt">size_t</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="o">*</span><span class="n">realloc</span><span class="p">)(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="p">);</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">free</span><span class="p">)(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">);</span>
+<span class="p">}</span><span class="w"> </span><span class="n">Allocator</span><span class="p">;</span>
+
+<span class="n">NPY_NO_EXPORT</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span>
+<span class="n">shift_alloc</span><span class="p">(</span><span class="n">Allocator</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">sz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">real</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">malloc</span><span class="p">(</span><span class="n">sz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">real</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">snprintf</span><span class="p">(</span><span class="n">real</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;originally allocated %ld&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="n">sz</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)(</span><span class="n">real</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">NPY_NO_EXPORT</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span>
+<span class="n">shift_zero</span><span class="p">(</span><span class="n">Allocator</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">sz</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">cnt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">real</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">calloc</span><span class="p">(</span><span class="n">sz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">cnt</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">real</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">snprintf</span><span class="p">(</span><span class="n">real</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;originally allocated %ld via zero&quot;</span><span class="p">,</span>
+<span class="w">             </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="n">sz</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)(</span><span class="n">real</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">NPY_NO_EXPORT</span><span class="w"> </span><span class="kt">void</span>
+<span class="n">shift_free</span><span class="p">(</span><span class="n">Allocator</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">npy_uintp</span><span class="w"> </span><span class="n">sz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">real</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">real</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;originally allocated&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;uh-oh, unmatched shift_free, &quot;</span>
+<span class="w">                </span><span class="s">&quot;no appropriate prefix</span><span class="se">\\</span><span class="s">n&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="cm">/* Make C runtime crash by calling free on the wrong address */</span>
+<span class="w">        </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">((</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">10</span><span class="p">);</span>
+<span class="w">        </span><span class="cm">/* ctx-&gt;free(real); */</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">npy_uintp</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">npy_uintp</span><span class="p">)</span><span class="n">atoi</span><span class="p">(</span><span class="n">real</span><span class="w"> </span><span class="o">+</span><span class="mi">20</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">sz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;uh-oh, unmatched shift_free&quot;</span>
+<span class="w">                    </span><span class="s">&quot;(ptr, %ld) but allocated %ld</span><span class="se">\\</span><span class="s">n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sz</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+<span class="w">            </span><span class="cm">/* This happens when the shape has a 0, only print */</span>
+<span class="w">            </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">real</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">free</span><span class="p">(</span><span class="n">real</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">NPY_NO_EXPORT</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span>
+<span class="n">shift_realloc</span><span class="p">(</span><span class="n">Allocator</span><span class="w"> </span><span class="o">*</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">npy_uintp</span><span class="w"> </span><span class="n">sz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">real</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">strncmp</span><span class="p">(</span><span class="n">real</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;originally allocated&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;uh-oh, unmatched shift_realloc</span><span class="se">\\</span><span class="s">n&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">realloc</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">sz</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)((</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">realloc</span><span class="p">(</span><span class="n">real</span><span class="p">,</span><span class="w"> </span><span class="n">sz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">real</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">ctx</span><span class="o">-&gt;</span><span class="n">realloc</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">sz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">real</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">snprintf</span><span class="p">(</span><span class="n">real</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;originally allocated &quot;</span>
+<span class="w">                 </span><span class="s">&quot;%ld  via realloc&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="p">)</span><span class="n">sz</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="p">)(</span><span class="n">real</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">Allocator</span><span class="w"> </span><span class="n">new_handler_ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">malloc</span><span class="p">,</span>
+<span class="w">    </span><span class="n">calloc</span><span class="p">,</span>
+<span class="w">    </span><span class="n">realloc</span><span class="p">,</span>
+<span class="w">    </span><span class="n">free</span>
+<span class="p">};</span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">PyDataMem_Handler</span><span class="w"> </span><span class="n">new_handler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s">&quot;secret_data_allocator&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">new_handler_ctx</span><span class="p">,</span>
+<span class="w">        </span><span class="n">shift_alloc</span><span class="p">,</span><span class="w">      </span><span class="cm">/* malloc */</span>
+<span class="w">        </span><span class="n">shift_zero</span><span class="p">,</span><span class="w"> </span><span class="cm">/* calloc */</span>
+<span class="w">        </span><span class="n">shift_realloc</span><span class="p">,</span><span class="w">      </span><span class="cm">/* realloc */</span>
+<span class="w">        </span><span class="n">shift_free</span><span class="w">       </span><span class="cm">/* free */</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<p>This NEP is being tracked by the <a class="reference external" href="https://quansight.github.io/pnumpy/stable/index.html">pnumpy</a> project and a <a class="reference external" href="https://github.com/numpy/numpy/pull/17582#issuecomment-809145547">comment in the PR</a>
+mentions use in orchestrating FPGA DMAs.</p>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>This NEP has been implemented in <a class="reference external" href="https://github.com/numpy/numpy/pull/17582">PR  17582</a>.</p>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>These were discussed in <a class="reference external" href="https://github.com/numpy/numpy/issues/17467">issue 17467</a>. <a class="reference external" href="https://github.com/numpy/numpy/pull/5457">PR 5457</a>  and <a class="reference external" href="https://github.com/numpy/numpy/pull/5470">PR 5470</a> proposed a
+global interface for specifying aligned allocations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PyArray_malloc_aligned</span></code> and friends were added to NumPy with the
+<cite>numpy.random</cite> module API refactor. and are used there for performance.</p>
+<p><a class="reference external" href="https://github.com/numpy/numpy/pull/390">PR 390</a> had two parts: expose <code class="docutils literal notranslate"><span class="pre">PyDataMem_*</span></code> via the NumPy C-API, and a hook
+mechanism. The PR was merged with no example code for using these features.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<p>The discussion on the mailing list led to the <code class="docutils literal notranslate"><span class="pre">PyDataMemAllocator</span></code> struct
+with a <code class="docutils literal notranslate"><span class="pre">context</span></code> field like <a class="reference external" href="https://docs.python.org/dev/c-api/memory.html#c.PyMemAllocatorEx" title="(in Python v3.15)"><code class="xref c c-type docutils literal notranslate"><span class="pre">PyMemAllocatorEx</span></code></a> but with a different
+signature for <code class="docutils literal notranslate"><span class="pre">free</span></code>.</p>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">1</a><span class="fn-bracket">]</span></span>
+<p>Each NEP must either be explicitly labeled as placed in the public domain (see
+this NEP as an example) or licensed under the <a class="reference external" href="https://www.opencontent.org/openpub/">Open Publication License</a>.</p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain. <a class="footnote-reference brackets" href="#id1" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#high-level-design">High level design</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#numpy-c-api-functions">NumPy C-API functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pydatamem-handler-thread-safety-and-lifetime"><code class="docutils literal notranslate"><span class="pre">PyDataMem_Handler</span></code> thread safety and lifetime</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sample-code">Sample code</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

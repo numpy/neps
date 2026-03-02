@@ -1,0 +1,1244 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 31 — Context-local and global overrides of the NumPy API &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0031-uarray';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="NEP 37 — A dispatch protocol for NumPy-like modules" href="nep-0037-array-module.html" />
+    <link rel="prev" title="NEP 30 — Duck typing for NumPy arrays - implementation" href="nep-0030-duck-array-protocol.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Mar 02, 2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrarys.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="deferred.html" class="nav-link">Deferred and Superseded NEPs</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 31 — Context-local and global overrides of the NumPy API</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-31-context-local-and-global-overrides-of-the-numpy-api">
+<span id="nep31"></span><h1>NEP 31 — Context-local and global overrides of the NumPy API<a class="headerlink" href="#nep-31-context-local-and-global-overrides-of-the-numpy-api" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Hameer Abbasi &lt;<a class="reference external" href="mailto:habbasi&#37;&#52;&#48;quansight&#46;com">habbasi<span>&#64;</span>quansight<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Author<span class="colon">:</span></dt>
+<dd class="field-even"><p>Ralf Gommers &lt;<a class="reference external" href="mailto:rgommers&#37;&#52;&#48;quansight&#46;com">rgommers<span>&#64;</span>quansight<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Peter Bell &lt;<a class="reference external" href="mailto:pbell&#37;&#52;&#48;quansight&#46;com">pbell<span>&#64;</span>quansight<span>&#46;</span>com</a>&gt;</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Superseded</p>
+</dd>
+<dt class="field-odd">Replaced-By<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="nep-0056-array-api-main-namespace.html#nep56"><span class="std std-ref">NEP 56 — Array API standard support in NumPy’s main namespace</span></a></p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Standards Track</p>
+</dd>
+<dt class="field-odd">Created<span class="colon">:</span></dt>
+<dd class="field-odd"><p>2019-08-22</p>
+</dd>
+<dt class="field-even">Resolution<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/Z6AA5CL47NHBNEPTFWYOTSUVSRDGHYPN/">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/Z6AA5CL47NHBNEPTFWYOTSUVSRDGHYPN/</a></p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>This NEP proposes to make all of NumPy’s public API overridable via an
+extensible backend mechanism.</p>
+<p>Acceptance of this NEP means NumPy would provide global and context-local
+overrides in a separate namespace, as well as a dispatch mechanism similar
+to NEP-18 <a class="footnote-reference brackets" href="#id21" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. First experiences with <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> show that it
+is necessary to be able to override NumPy functions that <em>do not take an
+array-like argument</em>, and hence aren’t overridable via
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>. The most pressing need is array creation and coercion
+functions, such as <code class="docutils literal notranslate"><span class="pre">numpy.zeros</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy.asarray</span></code>; see e.g. NEP-30 <a class="footnote-reference brackets" href="#id28" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>.</p>
+<p>This NEP proposes to allow, in an opt-in fashion, overriding any part of the
+NumPy API. It is intended as a comprehensive resolution to NEP-22 <a class="footnote-reference brackets" href="#id22" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>, and
+obviates the need to add an ever-growing list of new protocols for each new
+type of function or object that needs to become overridable.</p>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>The primary end-goal of this NEP is to make the following possible:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># On the library side</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.overridable</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">unp</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">library_function</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">unp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="c1"># Code using unumpy as usual</span>
+    <span class="k">return</span> <span class="n">array</span>
+
+<span class="c1"># On the user side:</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy.overridable</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">unp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ua</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">da</span>
+
+<span class="n">ua</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="n">da</span><span class="p">)</span> <span class="c1"># Can be done within Dask itself</span>
+
+<span class="n">library_function</span><span class="p">(</span><span class="n">dask_array</span><span class="p">)</span>  <span class="c1"># works and returns dask_array</span>
+
+<span class="k">with</span> <span class="n">unp</span><span class="o">.</span><span class="n">set_backend</span><span class="p">(</span><span class="n">da</span><span class="p">):</span>
+    <span class="n">library_function</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>  <span class="c1"># actually returns a Dask array.</span>
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">backend</span></code> can be any compatible object defined either by NumPy or an
+external library, such as Dask or CuPy. Ideally, it should be the module
+<code class="docutils literal notranslate"><span class="pre">dask.array</span></code> or <code class="docutils literal notranslate"><span class="pre">cupy</span></code> itself.</p>
+<p>These kinds of overrides are useful for both the end-user as well as library
+authors. End-users may have written or wish to write code that they then later
+speed up or move to a different implementation, say PyData/Sparse. They can do
+this simply by setting a backend. Library authors may also wish to write code
+that is portable across array implementations, for example <code class="docutils literal notranslate"><span class="pre">sklearn</span></code> may wish
+to write code for a machine learning algorithm that is portable across array
+implementations while also using array creation functions.</p>
+<p>This NEP takes a holistic approach: It assumes that there are parts of
+the API that need to be overridable, and that these will grow over time. It
+provides a general framework and a mechanism to avoid a design of a new
+protocol each time this is required. This was the goal of <code class="docutils literal notranslate"><span class="pre">uarray</span></code>: to
+allow for overrides in an API without needing the design of a new protocol.</p>
+<p>This NEP proposes the following: That <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> <a class="footnote-reference brackets" href="#id27" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>  becomes the
+recommended override mechanism for the parts of the NumPy API not yet covered
+by <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> or <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code>, and that <code class="docutils literal notranslate"><span class="pre">uarray</span></code> is
+vendored into a new namespace within NumPy to give users and downstream
+dependencies access to these overrides.  This vendoring mechanism is similar
+to what SciPy decided to do for making <code class="docutils literal notranslate"><span class="pre">scipy.fft</span></code> overridable (see <a class="footnote-reference brackets" href="#id29" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>10<span class="fn-bracket">]</span></a>).</p>
+<p>The motivation behind <code class="docutils literal notranslate"><span class="pre">uarray</span></code> is manyfold: First, there have been several
+attempts to allow dispatch of parts of the NumPy API, including (most
+prominently), the <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> protocol in NEP-13 <a class="footnote-reference brackets" href="#id23" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>, and the
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> protocol in NEP-18 <a class="footnote-reference brackets" href="#id21" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>, but this has shown the need
+for further protocols to be developed, including a protocol for coercion (see
+<a class="footnote-reference brackets" href="#id24" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>5<span class="fn-bracket">]</span></a>, <a class="footnote-reference brackets" href="#id28" id="id9" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a>). The reasons these overrides are needed have been extensively
+discussed in the references, and this NEP will not attempt to go into the
+details of why these are needed; but in short: It is necessary for library
+authors to be able to coerce arbitrary objects into arrays of their own types,
+such as CuPy needing to coerce to a CuPy array, for example, instead of
+a NumPy array. In simpler words, one needs things like <code class="docutils literal notranslate"><span class="pre">np.asarray(...)</span></code> or
+an alternative to “just work” and return duck-arrays.</p>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>This NEP allows for global and context-local overrides, as well as
+automatic overrides a-la <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>.</p>
+<p>Here are some use-cases this NEP would enable, besides the
+first one stated in the motivation section:</p>
+<p>The first is allowing alternate dtypes to return their
+respective arrays.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Returns an XND array</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">unp</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">xnd_dtype</span><span class="p">)</span> <span class="c1"># Or torch dtype</span>
+</pre></div>
+</div>
+<p>The second is allowing overrides for parts of the API.
+This is to allow alternate and/or optimized implementations
+for <code class="docutils literal notranslate"><span class="pre">np.linalg</span></code>, BLAS, and <code class="docutils literal notranslate"><span class="pre">np.random</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyfftw</span> <span class="c1"># Or mkl_fft</span>
+
+<span class="c1"># Makes pyfftw the default for FFT</span>
+<span class="n">np</span><span class="o">.</span><span class="n">set_global_backend</span><span class="p">(</span><span class="n">pyfftw</span><span class="p">)</span>
+
+<span class="c1"># Uses pyfftw without monkeypatching</span>
+<span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">numpy_array</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">set_backend</span><span class="p">(</span><span class="n">pyfftw</span><span class="p">)</span> <span class="c1"># Or mkl_fft, or numpy</span>
+    <span class="c1"># Uses the backend you specified</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft</span><span class="p">(</span><span class="n">numpy_array</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will allow an official way for overrides to work with NumPy without
+monkeypatching or distributing a modified version of NumPy.</p>
+<p>Here are a few other use-cases, implied but not already
+stated:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="s1">&#39;myfile.zarr&#39;</span><span class="p">)</span>
+<span class="c1"># result should still be dask, all things being equal</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">library_function</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">to_zarr</span><span class="p">(</span><span class="s1">&#39;output.zarr&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This second one would work if <code class="docutils literal notranslate"><span class="pre">magic_library</span></code> was built
+on top of <code class="docutils literal notranslate"><span class="pre">unumpy</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dask</span><span class="w"> </span><span class="kn">import</span> <span class="n">array</span> <span class="k">as</span> <span class="n">da</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">magic_library</span><span class="w"> </span><span class="kn">import</span> <span class="n">pytorch_predict</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="s1">&#39;myfile.zarr&#39;</span><span class="p">)</span>
+<span class="c1"># normally here one would use e.g. data.map_overlap</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pytorch_predict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">result</span><span class="o">.</span><span class="n">to_zarr</span><span class="p">(</span><span class="s1">&#39;output.zarr&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are some backends which may depend on other backends, for example xarray
+depending on <cite>numpy.fft</cite>, and transforming a time axis into a frequency axis,
+or Dask/xarray holding an array other than a NumPy array inside it. This would
+be handled in the following manner inside code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">ua</span><span class="o">.</span><span class="n">set_backend</span><span class="p">(</span><span class="n">cupy</span><span class="p">),</span> <span class="n">ua</span><span class="o">.</span><span class="n">set_backend</span><span class="p">(</span><span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+    <span class="c1"># Code that has distributed GPU arrays here</span>
+</pre></div>
+</div>
+</section>
+<section id="backward-compatibility">
+<h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>There are no backward incompatible changes proposed in this NEP.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<section id="proposals">
+<h3>Proposals<a class="headerlink" href="#proposals" title="Link to this heading">#</a></h3>
+<p>The only change this NEP proposes at its acceptance, is to make <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> the
+officially recommended way to override NumPy, along with making some submodules
+overridable by default via <code class="docutils literal notranslate"><span class="pre">uarray</span></code>. <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> will remain a separate
+repository/package (which we propose to vendor to avoid a hard dependency, and
+use the separate <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> package only if it is installed, rather than depend
+on for the time being). In concrete terms, <code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code> becomes an
+alias for <code class="docutils literal notranslate"><span class="pre">unumpy</span></code>, if available with a fallback to the a vendored version if
+not. <code class="docutils literal notranslate"><span class="pre">uarray</span></code> and <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> and will be developed primarily with the input
+of duck-array authors and secondarily, custom dtype authors, via the usual
+GitHub workflow. There are a few reasons for this:</p>
+<ul class="simple">
+<li><p>Faster iteration in the case of bugs or issues.</p></li>
+<li><p>Faster design changes, in the case of needed functionality.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unumpy</span></code> will work with older versions of NumPy as well.</p></li>
+<li><p>The user and library author opt-in to the override process,
+rather than breakages happening when it is least expected.
+In simple terms, bugs in <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> mean that <code class="docutils literal notranslate"><span class="pre">numpy</span></code> remains
+unaffected.</p></li>
+<li><p>For <code class="docutils literal notranslate"><span class="pre">numpy.fft</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.linalg</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy.random</span></code>, the functions in
+the main namespace will mirror those in the <code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code> namespace.
+The reason for this is that there may exist functions in the in these
+submodules that need backends, even for <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> inputs.</p></li>
+</ul>
+<section id="advantages-of-unumpy-over-other-solutions">
+<h4>Advantages of <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> over other solutions<a class="headerlink" href="#advantages-of-unumpy-over-other-solutions" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">unumpy</span></code> offers a number of advantages over the approach of defining a new
+protocol for every problem encountered: Whenever there is something requiring
+an override, <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> will be able to offer a unified API with very minor
+changes. For example:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ufunc</span></code> objects can be overridden via their <code class="docutils literal notranslate"><span class="pre">__call__</span></code>, <code class="docutils literal notranslate"><span class="pre">reduce</span></code> and
+other methods.</p></li>
+<li><p>Other functions can be overridden in a similar fashion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">np.asduckarray</span></code> goes away, and becomes <code class="docutils literal notranslate"><span class="pre">np.overridable.asarray</span></code> with a
+backend set.</p></li>
+<li><p>The same holds for array creation functions such as <code class="docutils literal notranslate"><span class="pre">np.zeros</span></code>,
+<code class="docutils literal notranslate"><span class="pre">np.empty</span></code> and so on.</p></li>
+</ul>
+<p>This also holds for the future: Making something overridable would require only
+minor changes to <code class="docutils literal notranslate"><span class="pre">unumpy</span></code>.</p>
+<p>Another promise <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> holds is one of default implementations. Default
+implementations can be provided for any multimethod, in terms of others. This
+allows one to override a large part of the NumPy API by defining only a small
+part of it. This is to ease the creation of new duck-arrays, by providing
+default implementations of many functions that can be easily expressed in
+terms of others, as well as a repository of utility functions that help in the
+implementation of duck-arrays that most duck-arrays would require. This would
+allow us to avoid designing entire protocols, e.g., a protocol for stacking
+and concatenating would be replaced by simply implementing <code class="docutils literal notranslate"><span class="pre">stack</span></code> and/or
+<code class="docutils literal notranslate"><span class="pre">concatenate</span></code> and then providing default implementations for everything else
+in that class. The same applies for transposing, and many other functions for
+which protocols haven’t been proposed, such as <code class="docutils literal notranslate"><span class="pre">isin</span></code> in terms of <code class="docutils literal notranslate"><span class="pre">in1d</span></code>,
+<code class="docutils literal notranslate"><span class="pre">setdiff1d</span></code> in terms of <code class="docutils literal notranslate"><span class="pre">unique</span></code>, and so on.</p>
+<p>It also allows one to override functions in a manner which
+<code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> simply cannot, such as overriding <code class="docutils literal notranslate"><span class="pre">np.einsum</span></code> with the
+version from the <code class="docutils literal notranslate"><span class="pre">opt_einsum</span></code> package, or Intel MKL overriding FFT, BLAS
+or <code class="docutils literal notranslate"><span class="pre">ufunc</span></code> objects. They would define a backend with the appropriate
+multimethods, and the user would select them via a <code class="docutils literal notranslate"><span class="pre">with</span></code> statement, or
+registering them as a backend.</p>
+<p>The last benefit is a clear way to coerce to a given backend (via the
+<code class="docutils literal notranslate"><span class="pre">coerce</span></code> keyword in <code class="docutils literal notranslate"><span class="pre">ua.set_backend</span></code>), and a protocol
+for coercing not only arrays, but also <code class="docutils literal notranslate"><span class="pre">dtype</span></code> objects and <code class="docutils literal notranslate"><span class="pre">ufunc</span></code> objects
+with similar ones from other libraries. This is due to the existence of actual,
+third party dtype packages, and their desire to blend into the NumPy ecosystem
+(see <a class="footnote-reference brackets" href="#id25" id="id10" role="doc-noteref"><span class="fn-bracket">[</span>6<span class="fn-bracket">]</span></a>). This is a separate issue compared to the C-level dtype redesign
+proposed in <a class="footnote-reference brackets" href="#id26" id="id11" role="doc-noteref"><span class="fn-bracket">[</span>7<span class="fn-bracket">]</span></a>, it’s about allowing third-party dtype implementations to
+work with NumPy, much like third-party array implementations. These can provide
+features such as, for example, units, jagged arrays or other such features that
+are outside the scope of NumPy.</p>
+</section>
+<section id="mixing-numpy-and-unumpy-in-the-same-file">
+<h4>Mixing NumPy and <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> in the same file<a class="headerlink" href="#mixing-numpy-and-unumpy-in-the-same-file" title="Link to this heading">#</a></h4>
+<p>Normally, one would only want to import only one of <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy</span></code>,
+you would import it as <code class="docutils literal notranslate"><span class="pre">np</span></code> for familiarity. However, there may be situations
+where one wishes to mix NumPy and the overrides, and there are a few ways to do
+this, depending on the user’s style:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">overridable</span> <span class="k">as</span> <span class="n">unp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</pre></div>
+</div>
+<p>or:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="c1"># Use unumpy via np.overridable</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="duck-array-coercion">
+<h3>Duck-array coercion<a class="headerlink" href="#duck-array-coercion" title="Link to this heading">#</a></h3>
+<p>There are inherent problems about returning objects that are not NumPy arrays
+from <code class="docutils literal notranslate"><span class="pre">numpy.array</span></code> or <code class="docutils literal notranslate"><span class="pre">numpy.asarray</span></code>, particularly in the context of C/C++
+or Cython code that may get an object with a different memory layout than the
+one it expects. However, we believe this problem may apply not only to these
+two functions but all functions that return NumPy arrays. For this reason,
+overrides are opt-in for the user, by using the submodule <code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code>
+rather than <code class="docutils literal notranslate"><span class="pre">numpy</span></code>. NumPy will continue to work unaffected by anything in
+<code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code>.</p>
+<p>If the user wishes to obtain a NumPy array, there are two ways of doing it:</p>
+<ol class="arabic simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">numpy.asarray</span></code> (the non-overridable version).</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">numpy.overridable.asarray</span></code> with the NumPy backend set and coercion
+enabled</p></li>
+</ol>
+</section>
+<section id="aliases-outside-of-the-numpy-overridable-namespace">
+<h3>Aliases outside of the <code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code> namespace<a class="headerlink" href="#aliases-outside-of-the-numpy-overridable-namespace" title="Link to this heading">#</a></h3>
+<p>All functionality in <code class="docutils literal notranslate"><span class="pre">numpy.random</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.linalg</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy.fft</span></code>
+will be aliased to their respective overridable versions inside
+<code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code>. The reason for this is that there are alternative
+implementations of RNGs (<code class="docutils literal notranslate"><span class="pre">mkl-random</span></code>), linear algebra routines (<code class="docutils literal notranslate"><span class="pre">eigen</span></code>,
+<code class="docutils literal notranslate"><span class="pre">blis</span></code>) and FFT routines (<code class="docutils literal notranslate"><span class="pre">mkl-fft</span></code>, <code class="docutils literal notranslate"><span class="pre">pyFFTW</span></code>) that need to operate on
+<code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> inputs, but still need the ability to switch behaviour.</p>
+<p>This is different from monkeypatching in a few different ways:</p>
+<ul class="simple">
+<li><p>The caller-facing signature of the function is always the same,
+so there is at least the loose sense of an API contract. Monkeypatching
+does not provide this ability.</p></li>
+<li><p>There is the ability of locally switching the backend.</p></li>
+<li><p>It has been <a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/message/PS7EN3CRT6XERNTCN56MAYOXFFFEC55G/">suggested</a>
+that the reason that 1.17 hasn’t landed in the Anaconda defaults channel is
+due to the incompatibility between monkeypatching and <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>,
+as monkeypatching would bypass the protocol completely.</p></li>
+<li><p>Statements of the form <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">numpy</span> <span class="pre">import</span> <span class="pre">x;</span> <span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">np.x</span></code> would have
+different results depending on whether the import was made before or
+after monkeypatching happened.</p></li>
+</ul>
+<p>All this isn’t possible at all with <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> or
+<code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code>.</p>
+<p>It has been formally realized (at least in part) that a backend system is
+needed for this, in the <a class="reference external" href="https://numpy.org/neps/roadmap.html#other-functionality">NumPy roadmap</a>.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">numpy.random</span></code>, it’s still necessary to make the C-API fit the one
+proposed in <a class="reference internal" href="nep-0019-rng-policy.html#nep19"><span class="std std-ref">NEP-19</span></a>.
+This is impossible for <cite>mkl-random</cite>, because then it would need to be
+rewritten to fit that framework. The guarantees on stream
+compatibility will be the same as before, but if there’s a backend that affects
+<code class="docutils literal notranslate"><span class="pre">numpy.random</span></code> set, we make no guarantees about stream compatibility, and it
+is up to the backend author to provide their own guarantees.</p>
+</section>
+<section id="providing-a-way-for-implicit-dispatch">
+<h3>Providing a way for implicit dispatch<a class="headerlink" href="#providing-a-way-for-implicit-dispatch" title="Link to this heading">#</a></h3>
+<p>It has been suggested that the ability to dispatch methods which do not take
+a dispatchable is needed, while guessing that backend from another dispatchable.</p>
+<p>As a concrete example, consider the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">unumpy</span><span class="o">.</span><span class="n">determine_backend</span><span class="p">(</span><span class="n">array_like</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="n">unumpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">array_like</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>While this does not exist yet in <code class="docutils literal notranslate"><span class="pre">uarray</span></code>, it is trivial to add it. The need for
+this kind of code exists because one might want to have an alternative for the
+proposed <code class="docutils literal notranslate"><span class="pre">*_like</span></code> functions, or the <code class="docutils literal notranslate"><span class="pre">like=</span></code> keyword argument. The need for these
+exists because there are functions in the NumPy API that do not take a dispatchable
+argument, but there is still the need to select a backend based on a different
+dispatchable.</p>
+</section>
+<section id="the-need-for-an-opt-in-module">
+<h3>The need for an opt-in module<a class="headerlink" href="#the-need-for-an-opt-in-module" title="Link to this heading">#</a></h3>
+<p>The need for an opt-in module is realized because of a few reasons:</p>
+<ul class="simple">
+<li><p>There are parts of the API (like <cite>numpy.asarray</cite>) that simply cannot be
+overridden due to incompatibility concerns with C/Cython extensions, however,
+one may want to coerce to a duck-array using <code class="docutils literal notranslate"><span class="pre">asarray</span></code> with a backend set.</p></li>
+<li><p>There are possible issues around an implicit option and monkeypatching, such
+as those mentioned above.</p></li>
+</ul>
+<p>NEP 18 notes that this may require maintenance of two separate APIs. However,
+this burden may be lessened by, for example, parameterizing all tests over
+<code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code> separately via a fixture. This also has the side-effect
+of thoroughly testing it, unlike <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>. We also feel that it
+provides an opportunity to separate the NumPy API contract properly from the
+implementation.</p>
+</section>
+<section id="benefits-to-end-users-and-mixing-backends">
+<h3>Benefits to end-users and mixing backends<a class="headerlink" href="#benefits-to-end-users-and-mixing-backends" title="Link to this heading">#</a></h3>
+<p>Mixing backends is easy in <code class="docutils literal notranslate"><span class="pre">uarray</span></code>, one only has to do:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Explicitly say which backends you want to mix</span>
+<span class="n">ua</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="n">backend1</span><span class="p">)</span>
+<span class="n">ua</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="n">backend2</span><span class="p">)</span>
+<span class="n">ua</span><span class="o">.</span><span class="n">register_backend</span><span class="p">(</span><span class="n">backend3</span><span class="p">)</span>
+
+<span class="c1"># Freely use code that mixes backends here.</span>
+</pre></div>
+</div>
+<p>The benefits to end-users extend beyond just writing new code. Old code
+(usually in the form of scripts) can be easily ported to different backends
+by a simple import switch and a line adding the preferred backend. This way,
+users may find it easier to port existing code to GPU or distributed computing.</p>
+</section>
+</section>
+<section id="related-work">
+<h2>Related work<a class="headerlink" href="#related-work" title="Link to this heading">#</a></h2>
+<section id="other-override-mechanisms">
+<h3>Other override mechanisms<a class="headerlink" href="#other-override-mechanisms" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>NEP-18, the <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> protocol. <a class="footnote-reference brackets" href="#id21" id="id12" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p></li>
+<li><p>NEP-13, the <code class="docutils literal notranslate"><span class="pre">__array_ufunc__</span></code> protocol. <a class="footnote-reference brackets" href="#id22" id="id13" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a></p></li>
+<li><p>NEP-30, the <code class="docutils literal notranslate"><span class="pre">__duck_array__</span></code> protocol. <a class="footnote-reference brackets" href="#id28" id="id14" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a></p></li>
+</ul>
+</section>
+<section id="existing-numpy-like-array-implementations">
+<h3>Existing NumPy-like array implementations<a class="headerlink" href="#existing-numpy-like-array-implementations" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Dask: <a class="reference external" href="https://dask.org/">https://dask.org/</a></p></li>
+<li><p>CuPy: <a class="reference external" href="https://cupy.chainer.org/">https://cupy.chainer.org/</a></p></li>
+<li><p>PyData/Sparse: <a class="reference external" href="https://sparse.pydata.org/">https://sparse.pydata.org/</a></p></li>
+<li><p>Xnd: <a class="reference external" href="https://xnd.readthedocs.io/">https://xnd.readthedocs.io/</a></p></li>
+<li><p>Astropy’s Quantity: <a class="reference external" href="https://docs.astropy.org/en/stable/units/">https://docs.astropy.org/en/stable/units/</a></p></li>
+</ul>
+</section>
+<section id="existing-and-potential-consumers-of-alternative-arrays">
+<h3>Existing and potential consumers of alternative arrays<a class="headerlink" href="#existing-and-potential-consumers-of-alternative-arrays" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Dask: <a class="reference external" href="https://dask.org/">https://dask.org/</a></p></li>
+<li><p>scikit-learn: <a class="reference external" href="https://scikit-learn.org/">https://scikit-learn.org/</a></p></li>
+<li><p>xarray: <a class="reference external" href="https://xarray.pydata.org/">https://xarray.pydata.org/</a></p></li>
+<li><p>TensorLy: <a class="reference external" href="http://tensorly.org/">http://tensorly.org/</a></p></li>
+</ul>
+</section>
+<section id="existing-alternate-dtype-implementations">
+<h3>Existing alternate dtype implementations<a class="headerlink" href="#existing-alternate-dtype-implementations" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ndtypes</span></code>: <a class="reference external" href="https://ndtypes.readthedocs.io/en/latest/">https://ndtypes.readthedocs.io/en/latest/</a></p></li>
+<li><p>Datashape: <a class="reference external" href="https://datashape.readthedocs.io">https://datashape.readthedocs.io</a></p></li>
+<li><p>Plum: <a class="reference external" href="https://plum-py.readthedocs.io/">https://plum-py.readthedocs.io/</a></p></li>
+</ul>
+</section>
+<section id="alternate-implementations-of-parts-of-the-numpy-api">
+<h3>Alternate implementations of parts of the NumPy API<a class="headerlink" href="#alternate-implementations-of-parts-of-the-numpy-api" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mkl_random</span></code>: <a class="github reference external" href="https://github.com/IntelPython/mkl_random">IntelPython/mkl_random</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mkl_fft</span></code>: <a class="github reference external" href="https://github.com/IntelPython/mkl_fft">IntelPython/mkl_fft</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bottleneck</span></code>: <a class="github reference external" href="https://github.com/pydata/bottleneck">pydata/bottleneck</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">opt_einsum</span></code>: <a class="github reference external" href="https://github.com/dgasmith/opt_einsum">dgasmith/opt_einsum</a></p></li>
+</ul>
+</section>
+</section>
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h2>
+<p>The implementation of this NEP will require the following steps:</p>
+<ul class="simple">
+<li><p>Implementation of <code class="docutils literal notranslate"><span class="pre">uarray</span></code> multimethods corresponding to the
+NumPy API, including classes for overriding <code class="docutils literal notranslate"><span class="pre">dtype</span></code>, <code class="docutils literal notranslate"><span class="pre">ufunc</span></code>
+and <code class="docutils literal notranslate"><span class="pre">array</span></code> objects, in the <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> repository, which are usually
+very easy to create.</p></li>
+<li><p>Moving backends from <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> into the respective array libraries.</p></li>
+</ul>
+<p>Maintenance can be eased by testing over <code class="docutils literal notranslate"><span class="pre">{numpy,</span> <span class="pre">unumpy}</span></code> via parameterized
+tests. If a new argument is added to a method, the corresponding argument
+extractor and replacer will need to be updated within <code class="docutils literal notranslate"><span class="pre">unumpy</span></code>.</p>
+<p>A lot of argument extractors can be re-used from the existing implementation
+of the <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code> protocol, and the replacers can be usually
+re-used across many methods.</p>
+<p>For the parts of the namespace which are going to be overridable by default,
+the main method will need to be renamed and hidden behind a <code class="docutils literal notranslate"><span class="pre">uarray</span></code> multimethod.</p>
+<p>Default implementations are usually seen in the documentation using the words
+“equivalent to”, and thus, are easily available.</p>
+<section id="uarray-primer">
+<h3><code class="docutils literal notranslate"><span class="pre">uarray</span></code> Primer<a class="headerlink" href="#uarray-primer" title="Link to this heading">#</a></h3>
+<p><strong>Note:</strong> <em>This section will not attempt to go into too much detail about
+uarray, that is the purpose of the uarray documentation.</em> <a class="footnote-reference brackets" href="#id20" id="id15" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+<em>However, the NumPy community will have input into the design of
+uarray, via the issue tracker.</em></p>
+<p><code class="docutils literal notranslate"><span class="pre">unumpy</span></code> is the interface that defines a set of overridable functions
+(multimethods) compatible with the numpy API. To do this, it uses the
+<code class="docutils literal notranslate"><span class="pre">uarray</span></code> library. <code class="docutils literal notranslate"><span class="pre">uarray</span></code> is a general purpose tool for creating
+multimethods that dispatch to one of multiple different possible backend
+implementations. In this sense, it is similar to the <code class="docutils literal notranslate"><span class="pre">__array_function__</span></code>
+protocol but with the key difference that the backend is explicitly installed
+by the end-user and not coupled into the array type.</p>
+<p>Decoupling the backend from the array type gives much more flexibility to
+end-users and backend authors. For example, it is possible to:</p>
+<ul class="simple">
+<li><p>override functions not taking arrays as arguments</p></li>
+<li><p>create backends out of source from the array type</p></li>
+<li><p>install multiple backends for the same array type</p></li>
+</ul>
+<p>This decoupling also means that <code class="docutils literal notranslate"><span class="pre">uarray</span></code> is not constrained to dispatching
+over array-like types. The backend is free to inspect the entire set of
+function arguments to determine if it can implement the function e.g. <code class="docutils literal notranslate"><span class="pre">dtype</span></code>
+parameter dispatching.</p>
+<section id="defining-backends">
+<h4>Defining backends<a class="headerlink" href="#defining-backends" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">uarray</span></code> consists of two main protocols: <code class="docutils literal notranslate"><span class="pre">__ua_convert__</span></code> and
+<code class="docutils literal notranslate"><span class="pre">__ua_function__</span></code>, called in that order, along with <code class="docutils literal notranslate"><span class="pre">__ua_domain__</span></code>.
+<code class="docutils literal notranslate"><span class="pre">__ua_convert__</span></code> is for conversion and coercion. It has the signature
+<code class="docutils literal notranslate"><span class="pre">(dispatchables,</span> <span class="pre">coerce)</span></code>, where <code class="docutils literal notranslate"><span class="pre">dispatchables</span></code> is an iterable of
+<code class="docutils literal notranslate"><span class="pre">ua.Dispatchable</span></code> objects and <code class="docutils literal notranslate"><span class="pre">coerce</span></code> is a boolean indicating whether or
+not to force the conversion. <code class="docutils literal notranslate"><span class="pre">ua.Dispatchable</span></code> is a simple class consisting
+of three simple values: <code class="docutils literal notranslate"><span class="pre">type</span></code>, <code class="docutils literal notranslate"><span class="pre">value</span></code>, and <code class="docutils literal notranslate"><span class="pre">coercible</span></code>.
+<code class="docutils literal notranslate"><span class="pre">__ua_convert__</span></code> returns an iterable of the converted values, or
+<code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> in the case of failure.</p>
+<p><code class="docutils literal notranslate"><span class="pre">__ua_function__</span></code> has the signature <code class="docutils literal notranslate"><span class="pre">(func,</span> <span class="pre">args,</span> <span class="pre">kwargs)</span></code> and defines
+the actual implementation of the function. It receives the function and its
+arguments. Returning <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> will cause a move to the default
+implementation of the function if one exists, and failing that, the next
+backend.</p>
+<p>Here is what will happen assuming a <code class="docutils literal notranslate"><span class="pre">uarray</span></code> multimethod is called:</p>
+<ol class="arabic simple">
+<li><p>We canonicalise the arguments so any arguments without a default
+are placed in <code class="docutils literal notranslate"><span class="pre">*args</span></code> and those with one are placed in <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>.</p></li>
+<li><p>We check the list of backends.</p>
+<ol class="loweralpha simple">
+<li><p>If it is empty, we try the default implementation.</p></li>
+</ol>
+</li>
+<li><p>We check if the backend’s <code class="docutils literal notranslate"><span class="pre">__ua_convert__</span></code> method exists. If it exists:</p>
+<ol class="loweralpha simple">
+<li><p>We pass it the output of the dispatcher,
+which is an iterable of <code class="docutils literal notranslate"><span class="pre">ua.Dispatchable</span></code> objects.</p></li>
+<li><p>We feed this output, along with the arguments,
+to the argument replacer. <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code> means we move to 3
+with the next backend.</p></li>
+<li><p>We store the replaced arguments as the new arguments.</p></li>
+</ol>
+</li>
+<li><p>We feed the arguments into <code class="docutils literal notranslate"><span class="pre">__ua_function__</span></code>, and return the output, and
+exit if it isn’t <code class="docutils literal notranslate"><span class="pre">NotImplemented</span></code>.</p></li>
+<li><p>If the default implementation exists, we try it with the current backend.</p></li>
+<li><p>On failure,  we move to 3 with the next backend. If there are no more
+backends, we move to 7.</p></li>
+<li><p>We raise a <code class="docutils literal notranslate"><span class="pre">ua.BackendNotImplementedError</span></code>.</p></li>
+</ol>
+</section>
+<section id="defining-overridable-multimethods">
+<h4>Defining overridable multimethods<a class="headerlink" href="#defining-overridable-multimethods" title="Link to this heading">#</a></h4>
+<p>To define an overridable function (a multimethod), one needs a few things:</p>
+<ol class="arabic simple">
+<li><p>A dispatcher that returns an iterable of <code class="docutils literal notranslate"><span class="pre">ua.Dispatchable</span></code> objects.</p></li>
+<li><p>A reverse dispatcher that replaces dispatchable values with the supplied
+ones.</p></li>
+<li><p>A domain.</p></li>
+<li><p>Optionally, a default implementation, which can be provided in terms of
+other multimethods.</p></li>
+</ol>
+<p>As an example, consider the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">uarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ua</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">full_argreplacer</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">dispatchables</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">),</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">dispatchables</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">order</span><span class="o">=</span><span class="n">order</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">full</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nd">@ua</span><span class="o">.</span><span class="n">create_multimethod</span><span class="p">(</span><span class="n">full_argreplacer</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;numpy&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">ua</span><span class="o">.</span><span class="n">Dispatchable</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">),)</span>
+</pre></div>
+</div>
+<p>A large set of examples can be found in the <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> repository, <a class="footnote-reference brackets" href="#id27" id="id16" role="doc-noteref"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></a>.
+This simple act of overriding callables allows us to override:</p>
+<ul class="simple">
+<li><p>Methods</p></li>
+<li><p>Properties, via <code class="docutils literal notranslate"><span class="pre">fget</span></code> and <code class="docutils literal notranslate"><span class="pre">fset</span></code></p></li>
+<li><p>Entire objects, via <code class="docutils literal notranslate"><span class="pre">__get__</span></code>.</p></li>
+</ul>
+</section>
+<section id="examples-for-numpy">
+<h4>Examples for NumPy<a class="headerlink" href="#examples-for-numpy" title="Link to this heading">#</a></h4>
+<p>A library that implements a NumPy-like API will use it in the following
+manner (as an example):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy.overridable</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">unp</span>
+<span class="n">_ua_implementations</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">__ua_domain__</span> <span class="o">=</span> <span class="s2">&quot;numpy&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__ua_function__</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">_ua_implementations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">if</span> <span class="n">fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">NotImplemented</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">implements</span><span class="p">(</span><span class="n">ua_func</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">_ua_implementations</span><span class="p">[</span><span class="n">ua_func</span><span class="p">]</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="k">return</span> <span class="n">func</span>
+
+    <span class="k">return</span> <span class="n">inner</span>
+
+<span class="nd">@implements</span><span class="p">(</span><span class="n">unp</span><span class="o">.</span><span class="n">asarray</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># Code here</span>
+    <span class="c1"># Either this method or __ua_convert__ must</span>
+    <span class="c1"># return NotImplemented for unsupported types,</span>
+    <span class="c1"># Or they shouldn&#39;t be marked as dispatchable.</span>
+
+<span class="c1"># Provides a default implementation for ones and zeros.</span>
+<span class="nd">@implements</span><span class="p">(</span><span class="n">unp</span><span class="o">.</span><span class="n">full</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
+    <span class="c1"># Code here</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="alternatives">
+<h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p>The current alternative to this problem is a combination of NEP-18 <a class="footnote-reference brackets" href="#id21" id="id17" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>,
+NEP-13 <a class="footnote-reference brackets" href="#id23" id="id18" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> and NEP-30 <a class="footnote-reference brackets" href="#id28" id="id19" role="doc-noteref"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></a> plus adding more protocols (not yet specified)
+in addition to it. Even then, some parts of the NumPy API will remain
+non-overridable, so it’s a partial alternative.</p>
+<p>The main alternative to vendoring <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> is to simply move it into NumPy
+completely and not distribute it as a separate package. This would also achieve
+the proposed goals, however we prefer to keep it a separate package for now,
+for reasons already stated above.</p>
+<p>The third alternative is to move <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> into the NumPy organisation and
+develop it as a NumPy project. This will also achieve the said goals, and is
+also a possibility that can be considered by this NEP. However, the act of
+doing an extra <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> or <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span></code> may discourage some users
+from adopting this method.</p>
+<p>An alternative to requiring opt-in is mainly to <em>not</em> override <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code>
+and <code class="docutils literal notranslate"><span class="pre">np.array</span></code>, and making the rest of the NumPy API surface overridable,
+instead providing <code class="docutils literal notranslate"><span class="pre">np.duckarray</span></code> and <code class="docutils literal notranslate"><span class="pre">np.asduckarray</span></code>
+as duck-array friendly alternatives that used the respective overrides. However,
+this has the downside of adding a minor overhead to NumPy calls.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">uarray</span></code> blogpost: <a class="reference external" href="https://labs.quansight.org/blog/2019/07/uarray-update-api-changes-overhead-and-comparison-to-__array_function__/">https://labs.quansight.org/blog/2019/07/uarray-update-api-changes-overhead-and-comparison-to-__array_function__/</a></p></li>
+<li><p>The discussion section of <a class="reference internal" href="nep-0018-array-function-protocol.html#nep18"><span class="std std-ref">NEP 18 — A dispatch mechanism for NumPy’s high level array functions</span></a></p></li>
+<li><p><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html#nep22"><span class="std std-ref">NEP 22 — Duck typing for NumPy arrays – high level overview</span></a></p></li>
+<li><p>Dask issue #4462: <a class="github reference external" href="https://github.com/dask/dask/issues/4462">dask/dask#4462</a></p></li>
+<li><p>PR #13046: <a class="github reference external" href="https://github.com/numpy/numpy/pull/13046">numpy/numpy#13046</a></p></li>
+<li><p>Dask issue #4883: <a class="github reference external" href="https://github.com/dask/dask/issues/4883">dask/dask#4883</a></p></li>
+<li><p>Issue #13831: <a class="github reference external" href="https://github.com/numpy/numpy/issues/13831">numpy/numpy#13831</a></p></li>
+<li><p>Discussion PR 1: <a class="github reference external" href="https://github.com/hameerabbasi/numpy/pull/3">hameerabbasi/numpy#3</a></p></li>
+<li><p>Discussion PR 2: <a class="github reference external" href="https://github.com/hameerabbasi/numpy/pull/4">hameerabbasi/numpy#4</a></p></li>
+<li><p>Discussion PR 3: <a class="github reference external" href="https://github.com/numpy/numpy/pull/14389">numpy/numpy#14389</a></p></li>
+</ul>
+</section>
+<section id="references-and-footnotes">
+<h2>References and footnotes<a class="headerlink" href="#references-and-footnotes" title="Link to this heading">#</a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id20" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id15">1</a><span class="fn-bracket">]</span></span>
+<p>uarray, A general dispatch mechanism for Python: <a class="reference external" href="https://uarray.readthedocs.io">https://uarray.readthedocs.io</a></p>
+</aside>
+<aside class="footnote brackets" id="id21" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id7">2</a>,<a role="doc-backlink" href="#id12">3</a>,<a role="doc-backlink" href="#id17">4</a>)</span>
+<p><a class="reference internal" href="nep-0018-array-function-protocol.html#nep18"><span class="std std-ref">NEP 18 — A dispatch mechanism for NumPy’s high level array functions</span></a></p>
+</aside>
+<aside class="footnote brackets" id="id22" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id3">1</a>,<a role="doc-backlink" href="#id13">2</a>)</span>
+<p><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html#nep22"><span class="std std-ref">NEP 22 — Duck typing for NumPy arrays – high level overview</span></a></p>
+</aside>
+<aside class="footnote brackets" id="id23" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id6">1</a>,<a role="doc-backlink" href="#id18">2</a>)</span>
+<p><a class="reference internal" href="nep-0013-ufunc-overrides.html#nep13"><span class="std std-ref">NEP 13 — A mechanism for overriding Ufuncs</span></a></p>
+</aside>
+<aside class="footnote brackets" id="id24" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">5</a><span class="fn-bracket">]</span></span>
+<p>Reply to Adding to the non-dispatched implementation of NumPy methods: <a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/5GUDMALWDIRHITG5YUOCV343J66QSX3U/#5GUDMALWDIRHITG5YUOCV343J66QSX3U">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/5GUDMALWDIRHITG5YUOCV343J66QSX3U/#5GUDMALWDIRHITG5YUOCV343J66QSX3U</a></p>
+</aside>
+<aside class="footnote brackets" id="id25" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">6</a><span class="fn-bracket">]</span></span>
+<p>Custom Dtype/Units discussion: <a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/RZYCVT6C3F7UDV6NA6FEV4MC5FKS6RDA/#RZYCVT6C3F7UDV6NA6FEV4MC5FKS6RDA">https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/RZYCVT6C3F7UDV6NA6FEV4MC5FKS6RDA/#RZYCVT6C3F7UDV6NA6FEV4MC5FKS6RDA</a></p>
+</aside>
+<aside class="footnote brackets" id="id26" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id11">7</a><span class="fn-bracket">]</span></span>
+<p>The epic dtype cleanup plan: <a class="github reference external" href="https://github.com/numpy/numpy/issues/2899">numpy/numpy#2899</a></p>
+</aside>
+<aside class="footnote brackets" id="id27" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>8<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id4">1</a>,<a role="doc-backlink" href="#id16">2</a>)</span>
+<p>unumpy: NumPy, but implementation-independent: <a class="reference external" href="https://unumpy.readthedocs.io">https://unumpy.readthedocs.io</a></p>
+</aside>
+<aside class="footnote brackets" id="id28" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>9<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id9">2</a>,<a role="doc-backlink" href="#id14">3</a>,<a role="doc-backlink" href="#id19">4</a>)</span>
+<p><a class="reference internal" href="nep-0030-duck-array-protocol.html#nep30"><span class="std std-ref">NEP 30 — Duck typing for NumPy arrays - implementation</span></a></p>
+</aside>
+<aside class="footnote brackets" id="id29" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">10</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="http://scipy.github.io/devdocs/fft.html#backend-control">http://scipy.github.io/devdocs/fft.html#backend-control</a></p>
+</aside>
+</aside>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#proposals">Proposals</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#advantages-of-unumpy-over-other-solutions">Advantages of <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> over other solutions</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mixing-numpy-and-unumpy-in-the-same-file">Mixing NumPy and <code class="docutils literal notranslate"><span class="pre">unumpy</span></code> in the same file</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#duck-array-coercion">Duck-array coercion</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#aliases-outside-of-the-numpy-overridable-namespace">Aliases outside of the <code class="docutils literal notranslate"><span class="pre">numpy.overridable</span></code> namespace</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#providing-a-way-for-implicit-dispatch">Providing a way for implicit dispatch</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-need-for-an-opt-in-module">The need for an opt-in module</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#benefits-to-end-users-and-mixing-backends">Benefits to end-users and mixing backends</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#related-work">Related work</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-override-mechanisms">Other override mechanisms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existing-numpy-like-array-implementations">Existing NumPy-like array implementations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existing-and-potential-consumers-of-alternative-arrays">Existing and potential consumers of alternative arrays</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#existing-alternate-dtype-implementations">Existing alternate dtype implementations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternate-implementations-of-parts-of-the-numpy-api">Alternate implementations of parts of the NumPy API</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#uarray-primer"><code class="docutils literal notranslate"><span class="pre">uarray</span></code> Primer</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-backends">Defining backends</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-overridable-multimethods">Defining overridable multimethods</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-for-numpy">Examples for NumPy</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references-and-footnotes">References and footnotes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
