@@ -1,0 +1,1116 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NEP 58 — A variable-width bytes DType &#8212; NumPy Enhancement Proposals</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+
+    <script src="_static/documentation_options.js?v=7f41d439"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'nep-0058-bytestring-dtype';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Finished NEPs" href="finished.html" />
+    <link rel="prev" title="NEP 57 — NumPy platform support" href="nep-0057-numpy-platform-support.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+    <meta name="docbuild:last-update" content="Sep 05, 2026"/>
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="content.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/numpylogo.svg" class="logo__image only-light" alt="NumPy Enhancement Proposals - Home"/>
+    <img src="_static/numpylogo_dark.svg" class="logo__image only-dark pst-js-only" alt="NumPy Enhancement Proposals - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Index
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="scope.html">
+    The Scope of NumPy
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="roadmap.html">
+    Current roadmap
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/numpy/numpy/issues?q=is%3Aopen+is%3Aissue+label%3A%2223+-+Wish+List%22">
+    Wishlist
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/numpy/numpy" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="scope.html">The Scope of NumPy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Current roadmap</a></li>
+</ul>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="meta.html">Meta-NEPs (NEPs about NEPs or active Processes)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0000.html">NEP 0 — Purpose and process</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0023-backwards-compatibility.html">NEP 23 — Backwards compatibility and deprecation policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0036-fair-play.html">NEP 36 — Fair play</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0045-c_style_guide.html">NEP 45 — C style guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0046-sponsorship-guidelines.html">NEP 46 — NumPy sponsorship guidelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0048-spending-project-funds.html">NEP 48 — Spending NumPy project funds</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-template.html">NEP X — Template and instructions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="provisional.html">Provisional NEPs (provisionally accepted; interface may change)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="accepted.html">Accepted NEPs (implementation in progress)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0041-improved-dtype-support.html">NEP 41 — First step towards a new datatype system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0042-new-dtypes.html">NEP 42 — New and extensible DTypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0044-restructuring-numpy-docs.html">NEP 44 — Restructuring the NumPy documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0051-scalar-representation.html">NEP 51 — Changing the representation of NumPy scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0054-simd-cpp-highway.html">NEP 54 — SIMD infrastructure evolution: adopting Google Highway when moving to C++</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="open.html">Open NEPs (under consideration)</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="nep-0043-extensible-ufuncs.html">NEP 43 — Enhancing the extensibility of UFuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0053-c-abi-evolution.html">NEP 53 — Evolving the NumPy C-API for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0057-numpy-platform-support.html">NEP 57 — NumPy platform support</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NEP 58 — A variable-width bytes DType</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="finished.html">Finished NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0001-npy-format.html">NEP 1 — A simple file format for NumPy arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0005-generalized-ufuncs.html">NEP 5 — Generalized universal functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0007-datetime-proposal.html">NEP 7 — A proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0010-new-iterator-ufunc.html">NEP 10 — Optimizing iterator/UFunc performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0013-ufunc-overrides.html">NEP 13 — A mechanism for overriding Ufuncs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0014-dropping-python2.7-proposal.html">NEP 14 — Plan for dropping Python 2.7 support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0015-merge-multiarray-umath.html">NEP 15 — Merging multiarray and umath</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0018-array-function-protocol.html">NEP 18 — A dispatch mechanism for NumPy's high level array functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0019-rng-policy.html">NEP 19 — Random number generator policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0020-gufunc-signature-enhancement.html">NEP 20 — Expansion of generalized universal function signatures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0022-ndarray-duck-typing-overview.html">NEP 22 — Duck typing for NumPy arrays – high level overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0027-zero-rank-arrays.html">NEP 27 — Zero rank arrays</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0028-website-redesign.html">NEP 28 — numpy.org website redesign</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0029-deprecation_policy.html">NEP 29 — Recommend Python and NumPy version support as a community policy standard</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0032-remove-financial-functions.html">NEP 32 — Remove the financial functions from NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0034-infer-dtype-is-object.html">NEP 34 — Disallow inferring ``dtype=object`` from sequences</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0035-array-creation-dispatch-with-array-function.html">NEP 35 — Array creation dispatching with __array_function__</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0038-SIMD-optimizations.html">NEP 38 — Using SIMD optimization instructions for performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0040-legacy-datatype-impl.html">NEP 40 — Legacy datatype implementation in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0049-data-allocation-strategies.html">NEP 49 — Data allocation strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0050-scalar-promotion.html">NEP 50 — Promotion rules for Python scalars</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0052-python-api-cleanup.html">NEP 52 — Python API cleanup for NumPy 2.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0055-string_dtype.html">NEP 55 — Add a UTF-8 variable-width string DType to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0056-array-api-main-namespace.html">NEP 56 — Array API standard support in NumPy's main namespace</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="deferred.html">Deferred and Superseded NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0002-warnfix.html">NEP 2 — A proposal to build numpy without warning with a big set of warning flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0003-math_config_clean.html">NEP 3 — Cleaning the math configuration of numpy.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0004-datetime-proposal3.html">NEP 4 — A (third) proposal for implementing some date/time types in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0006-newbugtracker.html">NEP 6 — Replacing Trac with a different bug tracker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0008-groupby_additions.html">NEP 8 — A proposal for adding groupby functionality to NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0009-structured_array_extensions.html">NEP 9 — Structured array extensions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0011-deferred-ufunc-evaluation.html">NEP 11 — Deferred UFunc evaluation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0012-missing-data.html">NEP 12 — Missing data functionality in NumPy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0021-advanced-indexing.html">NEP 21 — Simplified and explicit advanced indexing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0024-missing-data-2.html">NEP 24 — Missing data functionality - alternative 1 to NEP 12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0025-missing-data-3.html">NEP 25 — NA support via special dtypes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0026-missing-data-summary.html">NEP 26 — Summary of missing data NEPs and discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0030-duck-array-protocol.html">NEP 30 — Duck typing for NumPy arrays - implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0031-uarray.html">NEP 31 — Context-local and global overrides of the NumPy API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0037-array-module.html">NEP 37 — A dispatch protocol for NumPy-like modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0047-array-api-standard.html">NEP 47 — Adopting the array API standard</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="rejected.html">Rejected and Withdrawn NEPs</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="nep-0016-abstract-array.html">NEP 16 — An abstract base class for identifying "duck arrays"</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nep-0017-split-out-maskedarray.html">NEP 17 — Split out masked arrays</a></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="content.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Roadmap &amp; NumPy enhancement proposals</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="open.html" class="nav-link">Open NEPs (under consideration)</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">NEP 58 — A variable-width bytes DType</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="nep-58-a-variable-width-bytes-dtype">
+<span id="nep58"></span><h1>NEP 58 — A variable-width bytes DType<a class="headerlink" href="#nep-58-a-variable-width-bytes-dtype" title="Link to this heading">#</a></h1>
+<dl class="field-list simple">
+<dt class="field-odd">Author<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Nathan Goldbaum</p>
+</dd>
+<dt class="field-even">Status<span class="colon">:</span></dt>
+<dd class="field-even"><p>Draft</p>
+</dd>
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Standards Track</p>
+</dd>
+<dt class="field-even">Created<span class="colon">:</span></dt>
+<dd class="field-even"><p>2026-08-25</p>
+</dd>
+</dl>
+<section id="abstract">
+<h2>Abstract<a class="headerlink" href="#abstract" title="Link to this heading">#</a></h2>
+<p>I propose <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code>, a variable-width bytes data type: the bytes
+sibling of <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> (<a class="reference internal" href="nep-0055-string_dtype.html#nep55"><span class="std std-ref">NEP 55</span></a>). It reuses StringDType’s
+arena-backed storage, allocator, and missing-data machinery while</p>
+<ul class="simple">
+<li><p>storing Python <a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#bytes" title="(in Python v3.16)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bytes</span></code></a> and returning them as a NumPy scalar that
+subclasses <code class="docutils literal notranslate"><span class="pre">bytes</span></code>,</p></li>
+<li><p>supporting embedded and trailing NUL bytes by construction, and</p></li>
+<li><p>exposing only operations meaningful on raw bytes.</p></li>
+</ul>
+<p>Text and bytes never promote or cast implicitly. The only conversion between
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code> and <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> is via the
+<code class="docutils literal notranslate"><span class="pre">np.strings.encode</span></code>/<code class="docutils literal notranslate"><span class="pre">np.strings.decode</span></code> pair. These gain a C UFunc
+implementation, along with the ability to add codec-aware variable-width loops
+mirroring <a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#str.encode" title="(in Python v3.16)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">str.encode()</span></code></a> and <a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#bytes.decode" title="(in Python v3.16)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bytes.decode()</span></code></a>.</p>
+<p>A working prototype accompanies this NEP as its reference implementation.</p>
+</section>
+<section id="motivation-and-scope">
+<h2>Motivation and scope<a class="headerlink" href="#motivation-and-scope" title="Link to this heading">#</a></h2>
+<p>NumPy’s only bytes data type is the fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code> dtype
+(<code class="docutils literal notranslate"><span class="pre">np.dtypes.BytesDType</span></code>, scalar <code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code>). Because <code class="docutils literal notranslate"><span class="pre">S</span></code> is
+null-padded, it cannot represent trailing NUL bytes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="sa">b</span><span class="s2">"x</span><span class="se">\x00</span><span class="s2">"</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">b'x'</span>
+</pre></div>
+</div>
+<p>This makes <code class="docutils literal notranslate"><span class="pre">S</span></code> unsuitable for generic byte streams such as binary record
+formats, encoded blobs, and network data. The truncation cannot be fixed in
+place: existing code relies on it, so reports have been closed as not planned
+since 2011 (NumPy <a class="reference external" href="https://github.com/numpy/numpy/issues/2414">issue #2414</a>;
+more recently <a class="reference external" href="https://github.com/numpy/numpy/issues/25268">issue #25268</a>,
+which loses the final byte of a SHA-256 digest). <a class="reference internal" href="nep-0055-string_dtype.html#nep55"><span class="std std-ref">NEP 55</span></a> called
+this out, explicitly ruled a bytes/arbitrary-encoding dtype out of its scope, and
+listed an improved binary dtype as complementary future work.  NumPy <a class="reference external" href="https://github.com/numpy/numpy/issues/27701">issue
+#27701</a> is the open request for a
+StringDType equivalent for <code class="docutils literal notranslate"><span class="pre">bytes</span></code>. This NEP proposes that dtype.</p>
+<p>Many downstream libraries fall back to object arrays of <code class="docutils literal notranslate"><span class="pre">bytes</span></code>
+wherever they carry variable-width binary data, giving up NumPy’s flat
+memory layout and loop machinery. PyArrow materializes every Arrow binary
+column as an <a class="reference external" href="https://github.com/apache/arrow/blob/118892700b95fdfa9a6b3e482a6e5399563f5d75/python/pyarrow/src/arrow/python/arrow_to_pandas.cc#L154-L180">object array of boxed bytes objects</a>,
+and the reverse conversion from <code class="docutils literal notranslate"><span class="pre">S</span></code> has to guess each element’s length
+with <code class="docutils literal notranslate"><span class="pre">strnlen</span></code>, <a class="reference external" href="https://github.com/apache/arrow/blob/118892700b95fdfa9a6b3e482a6e5399563f5d75/python/pyarrow/src/arrow/python/numpy_to_arrow.cc#L567-L577">truncating at the first NUL</a>. The
+h5py library reads HDF5 variable-length byte strings <a class="reference external" href="https://github.com/h5py/h5py/blob/821e503405b5e26a1333b28f2b6418d1a2f8c88a/h5py/h5t.templ.pyx#L1900-L1903">as object arrays</a>.
+Zarr defines a first-class <code class="docutils literal notranslate"><span class="pre">variable_length_bytes</span></code> data type and
+<a class="reference external" href="https://github.com/zarr-developers/zarr-python/blob/20ba31e3e1142fae83b178d6e0a29538c2b18725/src/zarr/core/dtype/npy/bytes.py#L938-L963">stores it in object arrays</a>
+for the same reason.  Astropy holds FITS variable-length binary columns
+in object arrays and cannot round-trip fixed-width character columns
+without rewriting their padding (<a class="reference external" href="https://github.com/astropy/astropy/issues/11341">astropy#11341</a>). pandas inherits
+the <code class="docutils literal notranslate"><span class="pre">S</span></code> truncation for <code class="docutils literal notranslate"><span class="pre">bytes</span></code> columns (<a class="reference external" href="https://github.com/pandas-dev/pandas/issues/58205">pandas#58205</a>).</p>
+<p>In scope:</p>
+<ul class="simple">
+<li><p>A variable-width, NUL-transparent bytes DType with the same operation
+<em>set</em> as fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code> (ASCII case folding and predicates,
+byte-indexed search/slice), the same missing-data support as
+StringDType, and casts to/from <code class="docutils literal notranslate"><span class="pre">S</span></code>, void, and bool.</p></li>
+<li><p>A scalar type for the new DType that subclasses <code class="docutils literal notranslate"><span class="pre">bytes</span></code> and
+<code class="docutils literal notranslate"><span class="pre">np.generic</span></code>.</p></li>
+<li><p>Explicit, codec-aware <code class="docutils literal notranslate"><span class="pre">encode</span></code> and <code class="docutils literal notranslate"><span class="pre">decode</span></code> ufuncs as the only
+text-to-bytes path for the variable-width pair.</p></li>
+<li><p>As a structural side effect, StringDType’s UTF-8 assumptions are
+identified and confined to a small encoding-specific surface of the
+implementation.</p></li>
+</ul>
+<p>Out of scope:</p>
+<ul class="simple">
+<li><p>Changing how Python <code class="docutils literal notranslate"><span class="pre">bytes</span></code> values are inferred (<code class="docutils literal notranslate"><span class="pre">np.array([b&quot;x&quot;])</span></code>
+stays fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code>, as NEP 55 kept <code class="docutils literal notranslate"><span class="pre">str</span></code> inference at <code class="docutils literal notranslate"><span class="pre">U</span></code>).</p></li>
+<li><p>Exposing other encodings (latin-1, utf-16) as array dtypes. The
+encoding-specific surface identified here is a starting point for an
+encoding-parameterized StringDType, but that is a new user-facing
+semantic that would need its own proposal.</p></li>
+</ul>
+</section>
+<section id="usage-and-impact">
+<h2>Usage and impact<a class="headerlink" href="#usage-and-impact" title="Link to this heading">#</a></h2>
+<p>Because it uses the same representation and arena-backed storage as
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code>, the new <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> supports embedded and trailing
+NUL bytes automatically:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.dtypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ByteStringDType</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="sa">b</span><span class="s2">"x</span><span class="se">\x00</span><span class="s2">"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"a</span><span class="se">\x00</span><span class="s2">b"</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\xff\xfe</span><span class="s2">"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ByteStringDType</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>                <span class="c1"># trailing and embedded NULs survive</span>
+<span class="go">[b'x\x00', b'a\x00b', b'\xff\xfe']</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">strings</span><span class="o">.</span><span class="n">str_len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>     <span class="c1"># lengths are in bytes, length-explicit</span>
+<span class="go">array([2, 3, 2])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">strings</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="sa">b</span><span class="s2">"</span><span class="se">\x00</span><span class="s2">"</span><span class="p">)</span>
+<span class="go">array([ 1,  1, -1])</span>
+</pre></div>
+</div>
+<p>This dtype does not support the <code class="docutils literal notranslate"><span class="pre">coerce</span></code> argument that <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>
+supports, so data that is not bytes will be rejected by <code class="docutils literal notranslate"><span class="pre">np.array()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ByteStringDType</span><span class="p">())</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="gr">TypeError</span>: <span class="n">ByteStringDType only allows bytes data, got an instance of</span>
+<span class="x">'str'; convert text to bytes explicitly with str.encode(encoding)</span>
+</pre></div>
+</div>
+<p>Converting between <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> and <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> happens through
+<code class="docutils literal notranslate"><span class="pre">np.strings.encode</span></code> and <code class="docutils literal notranslate"><span class="pre">np.strings.decode</span></code>. While the <code class="docutils literal notranslate"><span class="pre">encode</span></code>
+default transitions (see <a class="reference internal" href="#backward-compatibility"><span class="std std-ref">Backward compatibility</span></a>), the ByteStringDType
+result is requested explicitly:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">"héllo"</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">StringDType</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">strings</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ByteStringDType</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">strings</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s2">"utf-8"</span><span class="p">)</span>
+<span class="go">array(['héllo'], dtype=StringDType())</span>
+</pre></div>
+</div>
+</section>
+<section id="backward-compatibility">
+<span id="id1"></span><h2>Backward compatibility<a class="headerlink" href="#backward-compatibility" title="Link to this heading">#</a></h2>
+<p>There is only one major backward compatibility concern: dealing with
+<code class="docutils literal notranslate"><span class="pre">np.strings.encode</span></code>. The function already exists and supports
+<code class="docutils literal notranslate"><span class="pre">StringDType</span></code>, but sub-optimally in a manner that cannot perserve trailing NUL
+bytes. This presents some awkward backward compatibility concerns for
+this proposal. In the prototype branch, <code class="docutils literal notranslate"><span class="pre">np.strings.encode</span></code> emits a
+<code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code> for StringDType input when the new <code class="docutils literal notranslate"><span class="pre">dtype=</span></code> argument is
+unspecified. Until the default flips to ByteStringDType in a later release, its
+behavior is otherwise unchanged: fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code> result, full codec and
+error-mode support, and 0-d arrays for 0-d input. See <a class="reference internal" href="#encoding-decoding"><span class="std std-ref">Text encoding and decoding</span></a>
+for more detail and <a class="reference internal" href="#open-questions"><span class="std std-ref">Open questions</span></a> for whether this deprecation should
+happen.</p>
+</section>
+<section id="detailed-description">
+<h2>Detailed Description<a class="headerlink" href="#detailed-description" title="Link to this heading">#</a></h2>
+<p>The new dtype is exposed as <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> in <code class="docutils literal notranslate"><span class="pre">np.dtypes</span></code>. The more
+natural name <code class="docutils literal notranslate"><span class="pre">BytesDType</span></code> is already taken by the fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code> dtype.</p>
+<p>Like <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>, it stores variable-length data and records each entry’s
+length explicitly, so embedded and trailing NUL bytes survive where the
+fixed-width bytes dtype would strip them. Unlike the <code class="docutils literal notranslate"><span class="pre">S</span></code> to <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>
+cast, which rejects bytes that are not valid UTF-8, the <code class="docutils literal notranslate"><span class="pre">S</span></code> to
+<code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> cast accepts any bytes.</p>
+<p>Any <code class="docutils literal notranslate"><span class="pre">bytes</span></code> instance may be stored, including subclasses like
+<code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code>, which are stored as their raw bytes. Elements are returned
+as instances of the scalar type described under <a class="reference internal" href="#nep58-scalar"><span class="std std-ref">Scalar type</span></a>.
+Whether to also accept buffer-protocol objects is an open question below.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> constructor does not support coercing data to bytes.
+Anything that is not bytes — including <code class="docutils literal notranslate"><span class="pre">str</span></code> — raises <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.  The
+dtype never assumes a text encoding. The only bridge between text and bytes is
+the codec-aware <code class="docutils literal notranslate"><span class="pre">encode</span></code>, which takes StringDType to ByteStringDType, and
+<code class="docutils literal notranslate"><span class="pre">decode</span></code>, which takes ByteStringDType to StringDType. Conversions from
+other dtypes are explicit casts, listed under <a class="reference internal" href="#nep58-casts"><span class="std std-ref">Casts</span></a>:
+<code class="docutils literal notranslate"><span class="pre">np.array([True]).astype(ByteStringDType())</span></code> gives <code class="docutils literal notranslate"><span class="pre">b&quot;True&quot;</span></code>, while
+<code class="docutils literal notranslate"><span class="pre">np.array([True],</span> <span class="pre">dtype=ByteStringDType())</span></code> raises because array
+construction goes through setitem.</p>
+<p>The supported operations are the same set the fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code> dtype and the
+Python <code class="docutils literal notranslate"><span class="pre">bytes</span></code> type support. Search, slicing, lengths, and widths are all
+measured in bytes.</p>
+<p>The type code and number are tentative and listed as an <a class="reference external" href="open_questions">open question</a> below: the character <code class="docutils literal notranslate"><span class="pre">'R'</span></code> (for <em>raw</em> bytes) with
+<code class="docutils literal notranslate"><span class="pre">NPY_VBYTES</span> <span class="pre">=</span> <span class="pre">2057</span></code>. No built-in dtype uses <code class="docutils literal notranslate"><span class="pre">'R'</span></code>, but the character is
+used for the <code class="docutils literal notranslate"><span class="pre">rational2</span></code> test dtype, but that is not exposed publicly. The
+<code class="docutils literal notranslate"><span class="pre">'Y'</span></code> code is also unused as a dtype character, but collides with the
+datetime YEAR unit character.</p>
+<section id="scalar-type">
+<span id="nep58-scalar"></span><h3>Scalar type<a class="headerlink" href="#scalar-type" title="Link to this heading">#</a></h3>
+<p>ByteStringDType gets its own scalar type, <code class="docutils literal notranslate"><span class="pre">np.vbytes</span></code>: a type that subclasses
+both <code class="docutils literal notranslate"><span class="pre">bytes</span></code> and <code class="docutils literal notranslate"><span class="pre">np.generic</span></code>, holds its own copy of the bytes, and follows
+the implementation of <code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code>. Non-null entries returns an <code class="docutils literal notranslate"><span class="pre">np.vbytes</span></code>
+instance for scalar acess and <code class="docutils literal notranslate"><span class="pre">na_object</span></code> for a null one; <code class="docutils literal notranslate"><span class="pre">.item()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">.tolist()</span></code> return plain <code class="docutils literal notranslate"><span class="pre">bytes</span></code>. <code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code> cannot serve as the scalar
+because NumPy needs a distinct scalar type to distinguish from <code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code>.</p>
+<p>NEP 55 chose <code class="docutils literal notranslate"><span class="pre">str</span></code> as StringDType’s scalar to avoid maintaining a subclass.
+On reflection, this was probably as mistake since it is an exception from the
+rest of NumPy and is difficult to capture in NumPy’s type stubs.  NumPy <a class="reference external" href="https://github.com/numpy/numpy/pull/28196">PR
+#28196</a> now prototyped a
+StringDType scalar (<code class="docutils literal notranslate"><span class="pre">np.vstr</span></code>). Review there converged on two points this NEP
+adopts: the scalar subclasses <code class="docutils literal notranslate"><span class="pre">str</span></code>, here <code class="docutils literal notranslate"><span class="pre">bytes</span></code>, as well as
+<code class="docutils literal notranslate"><span class="pre">np.generic</span></code>, and it owns a copy of its data instead of refencing data storing
+references to arena storage.</p>
+</section>
+<section id="missing-data">
+<span id="nep58-missing-data"></span><h3>Missing data<a class="headerlink" href="#missing-data" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">na_object</span></code> works as it does for <code class="docutils literal notranslate"><span class="pre">StringDType</span></code>: the sentinel may be a
+<code class="docutils literal notranslate"><span class="pre">bytes</span></code> object, a NaN-like object, or any other object, with the same
+null-propagation rules. The reasoning in NEP 55 applies unchanged, and the
+object arrays this dtype replaces show why the sentinel stays a free
+choice. pyarrow and polars export nulls in binary and string columns as
+<code class="docutils literal notranslate"><span class="pre">None</span></code>. pandas exports <code class="docutils literal notranslate"><span class="pre">float(&quot;nan&quot;)</span></code> from its default string dtype
+and <code class="docutils literal notranslate"><span class="pre">pd.NA</span></code> from nullable and Arrow-backed string and bytes columns, and
+<code class="docutils literal notranslate"><span class="pre">to_numpy(na_value=...)</span></code> lets the caller pick any other value.
+scikit-learn’s encoders treat <code class="docutils literal notranslate"><span class="pre">None</span></code> and <code class="docutils literal notranslate"><span class="pre">nan</span></code> in object arrays as two
+distinct missing categories. StringDType users make the same range of
+choices: <a class="reference external" href="https://github.com/scverse/anndata/blob/ca5234e62a5b757751a2f635803b42f2b5d61c5c/src/anndata/experimental/backed/_lazy_arrays.py#L186-L189">anndata</a>
+uses <code class="docutils literal notranslate"><span class="pre">pd.NA</span></code>, <a class="reference external" href="https://github.com/HDFGroup/h5col/blob/13d248afa1b4a9f7f83e8c8441e38a7e10ea45f4/src/h5col/strings.py#L40-L43">h5col</a>
+uses <code class="docutils literal notranslate"><span class="pre">None</span></code>, and the pyarrow pull request for StringDType conversion
+(<a class="reference external" href="https://github.com/apache/arrow/pull/50951">apache/arrow#50951</a>)
+tests <code class="docutils literal notranslate"><span class="pre">None</span></code>, a placeholder string, and <code class="docutils literal notranslate"><span class="pre">float(&quot;nan&quot;)</span></code>. <code class="docutils literal notranslate"><span class="pre">pd.NA</span></code> is a
+pandas object NumPy cannot enumerate, so a closed set of sentinels would
+exclude the arrays pandas produces (see <a class="reference internal" href="#nep58-alternatives"><span class="std std-ref">Alternatives</span></a>).</p>
+<p>Two reasons are specific to this NEP. <code class="docutils literal notranslate"><span class="pre">encode</span></code> and <code class="docutils literal notranslate"><span class="pre">decode</span></code> propagate
+nulls between the two dtypes (<a class="reference internal" href="#nep58-null-round-trip"><span class="std std-ref">Missing values round-trip between StringDType and ByteStringDType</span></a>), so the bytes
+side needs somewhere to put them. The missing-data machinery is shared, so
+leaving it out of ByteStringDType would remove capability without
+removing code.</p>
+<p>The stubs parametrize <code class="docutils literal notranslate"><span class="pre">StringDType</span></code> by the type of <code class="docutils literal notranslate"><span class="pre">na_object</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> is typed the same way. That is exact for <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+<code class="docutils literal notranslate"><span class="pre">pd.NA</span></code>, and other singleton sentinels. A NaN sentinel types as
+<code class="docutils literal notranslate"><span class="pre">float</span></code>, the same value-level imprecision NumPy typing accepts for
+integer ranges and fixed string widths.</p>
+</section>
+<section id="operation-surface">
+<span id="id2"></span><h3>Operation surface<a class="headerlink" href="#operation-surface" title="Link to this heading">#</a></h3>
+<p>The dtype supports the complete fixed-<code class="docutils literal notranslate"><span class="pre">S</span></code> operation set with
+length-explicit byte semantics, targeting feature parity with the Python
+<code class="docutils literal notranslate"><span class="pre">bytes</span></code> builtin:</p>
+<ul class="simple">
+<li><p>predicates: <code class="docutils literal notranslate"><span class="pre">isalpha</span></code>, <code class="docutils literal notranslate"><span class="pre">isalnum</span></code>, <code class="docutils literal notranslate"><span class="pre">isdigit</span></code>, <code class="docutils literal notranslate"><span class="pre">isspace</span></code>,
+<code class="docutils literal notranslate"><span class="pre">islower</span></code>, <code class="docutils literal notranslate"><span class="pre">isupper</span></code>, <code class="docutils literal notranslate"><span class="pre">istitle</span></code></p></li>
+<li><p>search: <code class="docutils literal notranslate"><span class="pre">find</span></code>, <code class="docutils literal notranslate"><span class="pre">rfind</span></code>, <code class="docutils literal notranslate"><span class="pre">index</span></code>, <code class="docutils literal notranslate"><span class="pre">rindex</span></code>, <code class="docutils literal notranslate"><span class="pre">count</span></code>,
+<code class="docutils literal notranslate"><span class="pre">startswith</span></code>, <code class="docutils literal notranslate"><span class="pre">endswith</span></code></p></li>
+<li><p>transforms: <code class="docutils literal notranslate"><span class="pre">replace</span></code>, <code class="docutils literal notranslate"><span class="pre">strip</span></code>/<code class="docutils literal notranslate"><span class="pre">lstrip</span></code>/<code class="docutils literal notranslate"><span class="pre">rstrip</span></code>,
+<code class="docutils literal notranslate"><span class="pre">expandtabs</span></code>, <code class="docutils literal notranslate"><span class="pre">center</span></code>/<code class="docutils literal notranslate"><span class="pre">ljust</span></code>/<code class="docutils literal notranslate"><span class="pre">rjust</span></code>, <code class="docutils literal notranslate"><span class="pre">zfill</span></code>,
+<code class="docutils literal notranslate"><span class="pre">upper</span></code>/<code class="docutils literal notranslate"><span class="pre">lower</span></code>/<code class="docutils literal notranslate"><span class="pre">swapcase</span></code>/<code class="docutils literal notranslate"><span class="pre">capitalize</span></code>/<code class="docutils literal notranslate"><span class="pre">title</span></code>,
+<code class="docutils literal notranslate"><span class="pre">translate</span></code>, <code class="docutils literal notranslate"><span class="pre">mod</span></code></p></li>
+<li><p>manipulation: <code class="docutils literal notranslate"><span class="pre">add</span></code>, <code class="docutils literal notranslate"><span class="pre">multiply</span></code>, <code class="docutils literal notranslate"><span class="pre">minimum</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum</span></code>,
+<code class="docutils literal notranslate"><span class="pre">partition</span></code>/<code class="docutils literal notranslate"><span class="pre">rpartition</span></code>, <code class="docutils literal notranslate"><span class="pre">slice</span></code></p></li>
+<li><p>excluded permanently: <code class="docutils literal notranslate"><span class="pre">isdecimal</span></code>, <code class="docutils literal notranslate"><span class="pre">isnumeric</span></code> (Unicode-only)</p></li>
+</ul>
+<p>The prototype registers <code class="docutils literal notranslate"><span class="pre">str_len</span></code>, <code class="docutils literal notranslate"><span class="pre">isnan</span></code>, the six comparisons, and
+one operation per loop-registration mechanism from the surface above:
+<code class="docutils literal notranslate"><span class="pre">isalpha</span></code>; <code class="docutils literal notranslate"><span class="pre">find</span></code> and <code class="docutils literal notranslate"><span class="pre">count</span></code>; the whitespace
+<code class="docutils literal notranslate"><span class="pre">strip</span></code>/<code class="docutils literal notranslate"><span class="pre">lstrip</span></code>/<code class="docutils literal notranslate"><span class="pre">rstrip</span></code>; <code class="docutils literal notranslate"><span class="pre">replace</span></code>; <code class="docutils literal notranslate"><span class="pre">add</span></code>, <code class="docutils literal notranslate"><span class="pre">multiply</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">minimum</span></code>/<code class="docutils literal notranslate"><span class="pre">maximum</span></code>; <code class="docutils literal notranslate"><span class="pre">partition</span></code>/<code class="docutils literal notranslate"><span class="pre">rpartition</span></code>; <code class="docutils literal notranslate"><span class="pre">slice</span></code>; and the
+encode/decode bridge. The remainder of the surface above is deferred to
+follow-up work.</p>
+<section id="python-bytes-scalars-in-mixed-operations">
+<span id="nep58-bytes-scalar-operands"></span><h4>Python <code class="docutils literal notranslate"><span class="pre">bytes</span></code> scalars in mixed operations<a class="headerlink" href="#python-bytes-scalars-in-mixed-operations" title="Link to this heading">#</a></h4>
+<p>Python <code class="docutils literal notranslate"><span class="pre">bytes</span></code> scalars still infer as fixed <code class="docutils literal notranslate"><span class="pre">S</span></code>, so a mixed operation
+promotes exactly as it would against an <code class="docutils literal notranslate"><span class="pre">S</span></code> array. Promotion only
+chooses the loop, though; once it resolves to ByteStringDType, an exact
+<code class="docutils literal notranslate"><span class="pre">bytes</span></code> operand is converted again from the original object. This is
+the bytes analogue of the <code class="docutils literal notranslate"><span class="pre">NPY_ARRAY_WAS_PYTHON_STR</span></code> mechanism
+StringDType gained in NumPy <a class="reference external" href="https://github.com/numpy/numpy/pull/32040">PR #32040</a>, and it mirrors its
+exact-type rule: subclasses, <code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code> included, keep fixed-width
+semantics, as <code class="docutils literal notranslate"><span class="pre">np.str_</span></code> does for StringDType. Trailing NULs therefore
+survive mixed operations with exact <code class="docutils literal notranslate"><span class="pre">bytes</span></code>: for a ByteStringDType
+array <code class="docutils literal notranslate"><span class="pre">arr</span></code>, <code class="docutils literal notranslate"><span class="pre">np.strings.find(arr,</span> <span class="pre">b&quot;\0&quot;)</span></code> searches for <code class="docutils literal notranslate"><span class="pre">b&quot;\0&quot;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">arr</span> <span class="pre">+</span> <span class="pre">b&quot;x\0&quot;</span></code> appends both bytes. Stores into an explicitly-typed
+array (<code class="docutils literal notranslate"><span class="pre">arr[i]</span> <span class="pre">=</span> <span class="pre">b&quot;q\0&quot;</span></code>, including <code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code> and other <code class="docutils literal notranslate"><span class="pre">bytes</span></code>
+subclass values) preserve trailing NULs; setitem accepts any <code class="docutils literal notranslate"><span class="pre">bytes</span></code>
+instance while the operand mechanism replaces only exact <code class="docutils literal notranslate"><span class="pre">bytes</span></code>.</p>
+<p>The rule these mechanisms implement, and the release gate for the
+<code class="docutils literal notranslate"><span class="pre">bytes</span></code> side, is: when an exact <code class="docutils literal notranslate"><span class="pre">bytes</span></code> scalar reaches an operation
+whose explicit or resolved target is ByteStringDType, the value is packed
+from the original object or the operation fails. It is never routed
+through fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code> first. Value-based conversions that infer <code class="docutils literal notranslate"><span class="pre">S</span></code>
+before the target descriptor is known (<code class="docutils literal notranslate"><span class="pre">np.full</span></code> fill values,
+<code class="docutils literal notranslate"><span class="pre">np.copyto</span></code> scalars, <code class="docutils literal notranslate"><span class="pre">np.where</span></code>, untyped <code class="docutils literal notranslate"><span class="pre">np.concatenate</span></code> operands)
+still strip trailing NULs in the prototype. NumPy <a class="reference external" href="https://github.com/numpy/numpy/pull/32356">PR #32356</a> fixes this for StringDType
+with NEP-50-style promotion outside ufuncs, and the <code class="docutils literal notranslate"><span class="pre">bytes</span></code> follow-up
+generalizes it.</p>
+<p>Python-level wrappers that convert untyped arguments with <code class="docutils literal notranslate"><span class="pre">np.asarray</span></code>
+before any target is known (<code class="docutils literal notranslate"><span class="pre">np.append</span></code>, <code class="docutils literal notranslate"><span class="pre">np.isin</span></code> and
+<code class="docutils literal notranslate"><span class="pre">np.setdiff1d</span></code>, <code class="docutils literal notranslate"><span class="pre">np.select</span></code>, <code class="docutils literal notranslate"><span class="pre">np.pad</span></code>) lose trailing NULs for
+StringDType and ByteStringDType alike; a typed array argument preserves
+them. NumPy <a class="reference external" href="https://github.com/numpy/numpy/issues/32431">issue #32431</a> tracks
+this problem.</p>
+</section>
+<section id="missing-values-round-trip-between-stringdtype-and-bytestringdtype">
+<span id="nep58-null-round-trip"></span><h4>Missing values round-trip between StringDType and ByteStringDType<a class="headerlink" href="#missing-values-round-trip-between-stringdtype-and-bytestringdtype" title="Link to this heading">#</a></h4>
+<p>Null elements propagate to null in both directions. A <code class="docutils literal notranslate"><span class="pre">str</span></code> or <code class="docutils literal notranslate"><span class="pre">bytes</span></code>
+<code class="docutils literal notranslate"><span class="pre">na_object</span></code> is converted along with the data, using the same codec and
+error mode, so the result’s sentinel is still a string sentinel. Every
+other sentinel (NaN-like or arbitrary objects) is reused unchanged.</p>
+<p>If the sentinel itself does not convert — <code class="docutils literal notranslate"><span class="pre">decode</span></code> on an array whose
+<code class="docutils literal notranslate"><span class="pre">na_object</span></code> is <code class="docutils literal notranslate"><span class="pre">b&quot;\xff&quot;</span></code>, say — the conversion raises up front, even
+when every array element converts. Keeping the unconverted <code class="docutils literal notranslate"><span class="pre">bytes</span></code>
+sentinel on the result instead would demote it from a string sentinel to
+an opaque object sentinel. String-sentinel nulls sort and compare like
+ordinary strings; object-sentinel nulls make those operations raise.</p>
+<p>The StringDType <code class="docutils literal notranslate"><span class="pre">coerce</span></code> parameter does not survive a round trip:
+ByteStringDType descriptors cannot carry it, so <code class="docutils literal notranslate"><span class="pre">decode</span></code> always produces
+a default <code class="docutils literal notranslate"><span class="pre">coerce=True</span></code> StringDType.</p>
+</section>
+<section id="text-encoding-and-decoding">
+<span id="encoding-decoding"></span><h4>Text encoding and decoding<a class="headerlink" href="#text-encoding-and-decoding" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">_encode</span></code>/<code class="docutils literal notranslate"><span class="pre">_decode</span></code> are <em>private</em> ufuncs. The prototype registers a single
+utf-8/strict loop pair; the wrappers reject other encodings and error modes
+on the variable-width paths. To enable future support for other encodings,
+the public wrappers expose <code class="docutils literal notranslate"><span class="pre">encoding</span></code> and <code class="docutils literal notranslate"><span class="pre">errors</span></code> arguments. Invalid
+bytes under <code class="docutils literal notranslate"><span class="pre">errors='strict'</span></code> raise <code class="docutils literal notranslate"><span class="pre">UnicodeDecodeError</span></code> with the same
+position and reason as <a class="reference external" href="https://docs.python.org/dev/library/stdtypes.html#bytes.decode" title="(in Python v3.16)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bytes.decode()</span></code></a>, whether the bytes are an
+array element or the <code class="docutils literal notranslate"><span class="pre">na_object</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">np.strings.encode</span></code> keeps its current behavior for StringDType input
+when the new <code class="docutils literal notranslate"><span class="pre">dtype=</span></code> argument is unspecified: the result is fixed-width
+<code class="docutils literal notranslate"><span class="pre">S</span></code> via the object round trip, with the full codec and error-mode table.
+A <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code> announces that the default will change to
+ByteStringDType in a future release.
+<code class="docutils literal notranslate"><span class="pre">dtype=np.dtypes.ByteStringDType()</span></code> opts in early; <code class="docutils literal notranslate"><span class="pre">dtype=np.bytes_</span></code>
+keeps the fixed-width result and silences the warning. The intent is to
+land the full encoding/errors matrix before the default flips, so that the
+flip changes the result dtype and one class of values: encoded output that
+ends in NUL bytes, which <code class="docutils literal notranslate"><span class="pre">S</span></code> strips and ByteStringDType keeps. That
+covers text with a trailing U+0000 under any codec, and ASCII text under
+UTF-16 or UTF-32. <code class="docutils literal notranslate"><span class="pre">np.strings.decode</span></code> needs no transition:
+ByteStringDType input is new, and fixed-width input keeps returning <code class="docutils literal notranslate"><span class="pre">U</span></code>.</p>
+</section>
+<section id="text-file-i-o">
+<h4>Text file I/O<a class="headerlink" href="#text-file-i-o" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">np.loadtxt</span></code> and <code class="docutils literal notranslate"><span class="pre">np.genfromtxt</span></code> read <em>text</em>, and ByteStringDType never
+assumes an encoding. Both readers therefore refuse <code class="docutils literal notranslate"><span class="pre">dtype=ByteStringDType()</span></code>
+unless explicit converters are given (<code class="docutils literal notranslate"><span class="pre">converters=str.encode</span></code>).</p>
+</section>
+<section id="storage-and-interchange">
+<h4>Storage and interchange<a class="headerlink" href="#storage-and-interchange" title="Link to this heading">#</a></h4>
+<p>The limits of StringDType’s arena storage carry over unchanged.
+ByteStringDType cannot be a structured field or a subarray element, does
+not support the buffer protocol or <code class="docutils literal notranslate"><span class="pre">np.memmap</span></code>, and <code class="docutils literal notranslate"><span class="pre">np.save</span></code> stores it
+through the pickle path for custom DTypes, so loading needs
+<code class="docutils literal notranslate"><span class="pre">allow_pickle=True</span></code>. <code class="docutils literal notranslate"><span class="pre">nbytes</span></code> and <code class="docutils literal notranslate"><span class="pre">tobytes</span></code> describe the packed
+16-byte-per-element representation, not a contiguous copy of the logical
+byte payload.</p>
+</section>
+<section id="casts">
+<span id="nep58-casts"></span><h4>Casts<a class="headerlink" href="#casts" title="Link to this heading">#</a></h4>
+<p>The prototype registers the casts below. Casting levels follow
+StringDType’s, except that the fixed-width <code class="docutils literal notranslate"><span class="pre">S</span></code> to ByteStringDType cast
+is <em>safe</em>: <code class="docutils literal notranslate"><span class="pre">S</span></code> cannot hold trailing NULs, so the cast loses nothing.
+NumPy <a class="reference external" href="https://github.com/numpy/numpy/pull/32095">PR #32095</a> makes the
+fixed-width to StringDType casts safe on the same grounds. Casts to and
+from numeric, datetime, <code class="docutils literal notranslate"><span class="pre">U</span></code>, and StringDType are not registered, so
+<code class="docutils literal notranslate"><span class="pre">astype</span></code> raises <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> for them.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 12.0%" />
+<col style="width: 58.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Cast</p></th>
+<th class="head"><p>Level</p></th>
+<th class="head"><p>Nulls and errors</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ByteStringDType to ByteStringDType, different <code class="docutils literal notranslate"><span class="pre">na_object</span></code></p></td>
+<td><p>unsafe</p></td>
+<td><p>null to null when both sides have a sentinel; when the target has
+none, a <code class="docutils literal notranslate"><span class="pre">bytes</span></code> sentinel is written as itself and any other
+sentinel as its <code class="docutils literal notranslate"><span class="pre">repr</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">S</span></code> to ByteStringDType</p></td>
+<td><p>safe</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">S</span></code> has no nulls; trailing NULs are already absent from <code class="docutils literal notranslate"><span class="pre">S</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>ByteStringDType to <code class="docutils literal notranslate"><span class="pre">S</span></code></p></td>
+<td><p>same kind</p></td>
+<td><p>a null is written as the sentinel bytes or its <code class="docutils literal notranslate"><span class="pre">repr</span></code>; values
+longer than the target width truncate; an unsized <code class="docutils literal notranslate"><span class="pre">S</span></code> raises
+<code class="docutils literal notranslate"><span class="pre">TypeError</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">V</span></code> to ByteStringDType and back</p></td>
+<td><p>same kind</p></td>
+<td><p>as for <code class="docutils literal notranslate"><span class="pre">S</span></code>, with no truncation of trailing NULs; an unsized or
+structured <code class="docutils literal notranslate"><span class="pre">V</span></code> raises <code class="docutils literal notranslate"><span class="pre">TypeError</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>bool to ByteStringDType and back</p></td>
+<td><p>same kind</p></td>
+<td><p>a NaN-like null is <code class="docutils literal notranslate"><span class="pre">True</span></code> and <code class="docutils literal notranslate"><span class="pre">None</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>; a <code class="docutils literal notranslate"><span class="pre">bytes</span></code>
+sentinel follows its own truthiness once the prerequisite bool-cast
+fix lands (see <a class="reference internal" href="#nep58-prerequisites"><span class="std std-ref">Related Issues</span></a>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="numeric-casts">
+<h4>Numeric casts<a class="headerlink" href="#numeric-casts" title="Link to this heading">#</a></h4>
+<p>The prototype registers no numeric casts. The semantics below are the
+proposal for the follow-up that adds them.</p>
+<p>Casting <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code> to integer or floating point dtypes parses the
+byte buffer directly, with the same semantics as calling Python <code class="docutils literal notranslate"><span class="pre">int</span></code> or
+<code class="docutils literal notranslate"><span class="pre">float</span></code> on a <code class="docutils literal notranslate"><span class="pre">bytes</span></code> value. Leading and trailing ASCII whitespace are
+tolerated; embedded NULs and trailing garbage are rejected. There is no
+cast in the other direction. <code class="docutils literal notranslate"><span class="pre">bytes(int)</span></code> is the surprising
+fill-with-zeros constructor (see <span class="target" id="index-0"></span><a class="pep reference external" href="https://peps.python.org/pep-0467/"><strong>PEP 467</strong></a>) and <code class="docutils literal notranslate"><span class="pre">bytes(float)</span></code> raises, so
+there is no Python behavior to mirror.</p>
+</section>
+<section id="public-c-api">
+<h4>Public C API<a class="headerlink" href="#public-c-api" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">PyArray_ByteStringDType</span></code> will be exposed in the public C API through the
+next free slot (40) of the DType API table, which takes the routine feature
+version bump when the feature ships. The prototype does not include the
+export. No other public C API is necessary: the existing <code class="docutils literal notranslate"><span class="pre">NpyString</span></code> C API
+is sufficient to access array data safely.</p>
+</section>
+</section>
+<section id="implementation">
+<h3>Implementation<a class="headerlink" href="#implementation" title="Link to this heading">#</a></h3>
+<p>Both DTypes use the existing <code class="docutils literal notranslate"><span class="pre">PyArray_StringDTypeObject</span></code> descriptor
+struct with an unchanged layout. The struct is public: it is defined in
+<code class="docutils literal notranslate"><span class="pre">ndarraytypes.h</span></code>, and <code class="docutils literal notranslate"><span class="pre">NpyString_acquire_allocator</span></code> takes a pointer to
+it, so C code written against the <code class="docutils literal notranslate"><span class="pre">NpyString</span></code> API works on
+ByteStringDType descriptors without changes. What makes the DTypes
+distinct is their <code class="docutils literal notranslate"><span class="pre">PyArray_DTypeMeta</span></code>, not the struct.</p>
+<p>The encoding-specific parts of the StringDType implementation (scalar
+construction, coercion to stored bytes, and <code class="docutils literal notranslate"><span class="pre">na_object</span></code> classification)
+dispatch at runtime on the descriptor’s type number; everything else is
+shared. Because <code class="docutils literal notranslate"><span class="pre">common_dtype</span></code> never promotes the two DTypes with each
+other, NumPy’s rule for non-promotable dtypes applies: <code class="docutils literal notranslate"><span class="pre">==</span></code> and <code class="docutils literal notranslate"><span class="pre">!=</span></code>
+return all-<code class="docutils literal notranslate"><span class="pre">False</span></code> and all-<code class="docutils literal notranslate"><span class="pre">True</span></code> arrays, while <code class="docutils literal notranslate"><span class="pre">np.equal</span></code> itself and
+the ordering operators raise <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>.</p>
+</section>
+<section id="open-questions">
+<span id="id3"></span><h3>Open questions<a class="headerlink" href="#open-questions" title="Link to this heading">#</a></h3>
+<p>Decisions the prototype makes provisionally, for review to ratify:</p>
+<ol class="arabic simple">
+<li><p>The type character <code class="docutils literal notranslate"><span class="pre">'R'</span></code> and the name <code class="docutils literal notranslate"><span class="pre">ByteStringDType</span></code>.</p></li>
+<li><p>Should setitem also accept buffer-protocol objects (<code class="docutils literal notranslate"><span class="pre">bytearray</span></code>,
+<code class="docutils literal notranslate"><span class="pre">memoryview</span></code>)? I prefer to defer support to a later iteration to
+reduce the complexity of the initial version.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">np.strings.encode</span></code> transition for StringDType input: this NEP
+proposes emitting a <code class="docutils literal notranslate"><span class="pre">DeprecationWarning</span></code> now and flipping the default
+result dtype to ByteStringDType in a later release, after the full
+encoding/errors matrix lands. The flip also changes values whose
+encoding ends in NUL bytes (see <a class="reference internal" href="#encoding-decoding"><span class="std std-ref">Text encoding and decoding</span></a>). Ratify the
+flip and its timing, or keep the variable-width result opt-in via
+<code class="docutils literal notranslate"><span class="pre">dtype=</span></code> indefinitely?</p></li>
+<li><p>The name of the scalar type. The prototype uses <code class="docutils literal notranslate"><span class="pre">np.vbytes</span></code>, since
+<code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code> belongs to the fixed-width dtype.</p></li>
+<li><p>Whether to expose a shared abstract base class for StringDType and
+ByteStringDType in <code class="docutils literal notranslate"><span class="pre">np.dtypes</span></code>. I prefer not to until a need for
+such a thing arises.</p></li>
+</ol>
+</section>
+<section id="reference-implementation">
+<h3>Reference implementation<a class="headerlink" href="#reference-implementation" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">bytestringdtype</span></code> <a class="reference external" href="https://github.com/numpy/numpy/compare/main...ngoldbaum:numpy:bytestringdtype">development branch</a>
+on my GitHub fork of NumPy implements the prototype functionality subset
+listed above (see <a class="reference internal" href="#operation-surface"><span class="std std-ref">Operation surface</span></a>). The StringDType suite passes
+unchanged. A shared suite parametrizes the encoding-agnostic storage,
+allocator, and dtype machinery over both DTypes. The test suite covers
+the scalar type, <code class="docutils literal notranslate"><span class="pre">np.bytes_</span></code> parity, the encode/decode bridge, and the
+cross-dtype comparison semantics.</p>
+</section>
+<section id="related-issues">
+<span id="nep58-prerequisites"></span><h3>Related Issues<a class="headerlink" href="#related-issues" title="Link to this heading">#</a></h3>
+<p>These StringDType changes or issues are for problems shared with
+ByteStringDType.</p>
+<ul class="simple">
+<li><p>NumPy <a class="reference external" href="https://github.com/numpy/numpy/pull/31825">PR #31825</a> makes float
+and complex NaN values map to a NaN-like <code class="docutils literal notranslate"><span class="pre">na_object</span></code> consistently in
+casts and setitem.</p></li>
+<li><p>NumPy <a class="reference external" href="https://github.com/numpy/numpy/pull/32356">PR #32356</a> adds the
+NEP-50-style string promotion outside ufuncs described above, which the
+planned <code class="docutils literal notranslate"><span class="pre">bytes</span></code> follow-up mirrors.</p></li>
+<li><p>numpy <a class="reference external" href="https://github.com/numpy/numpy/issues/32431">issue #32431</a> tracks
+<code class="docutils literal notranslate"><span class="pre">np.append</span></code>, <code class="docutils literal notranslate"><span class="pre">np.isin</span></code>, <code class="docutils literal notranslate"><span class="pre">np.select</span></code>, and <code class="docutils literal notranslate"><span class="pre">np.pad</span></code> not losing
+NUL bytes for python scalar or python sequence operands.</p></li>
+</ul>
+</section>
+<section id="acceptance-and-release-plan">
+<h3>Acceptance and release plan<a class="headerlink" href="#acceptance-and-release-plan" title="Link to this heading">#</a></h3>
+<p>Accepting this NEP ratifies the design. The prototype can be merged at that
+point. The NEP becomes Final when the scalar type, the deferred operations,
+the numeric casts, and the <code class="docutils literal notranslate"><span class="pre">bytes</span></code> scalar promotion for value-based
+conversions have landed.</p>
+</section>
+</section>
+<section id="alternatives">
+<span id="nep58-alternatives"></span><h2>Alternatives<a class="headerlink" href="#alternatives" title="Link to this heading">#</a></h2>
+<p><strong>A distinct descriptor struct.</strong> Cleaner in isolation, but it would
+require either duplicating the allocator API surface or adding a
+DType-dispatching accessor layer: new public functions for downstream code
+to learn, with no user-facing benefit. The shared struct costs one
+vestigial byte per descriptor.</p>
+<p><strong>C++ encoding-policy templates.</strong> The encoding-specific dispatch could
+be factored into compile-time policy structs, with the dtype slots as
+function templates over the policy. Nothing in this proposal blocks
+that; a future refactor could adopt it independently. I elected not to do
+this to simplify the prototype implementation.</p>
+<p><strong>A closed set of missing-data sentinels.</strong> Restricting <code class="docutils literal notranslate"><span class="pre">na_object</span></code> to
+<code class="docutils literal notranslate"><span class="pre">None</span></code> and NaN, or to an enum, was suggested so that an array element
+has an exact static type. The dtype’s type parameter already records the
+sentinel’s type and only NaN types imprecisely, while every sentinel
+outside the set, <code class="docutils literal notranslate"><span class="pre">pd.NA</span></code> included, would become unrepresentable. An
+enum stored as the element would also defeat the checks users choose NaN
+for, such as <code class="docutils literal notranslate"><span class="pre">np.isnan</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">!=</span> <span class="pre">x</span></code>.</p>
+</section>
+<section id="discussion">
+<h2>Discussion<a class="headerlink" href="#discussion" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>NumPy <a class="reference external" href="https://github.com/numpy/numpy/issues/27701">issue #27701</a>.</p></li>
+<li><p><a class="reference external" href="https://mail.python.org/archives/list/numpy-discussion&#64;python.org/thread/O4BIZE4YIYAS2SYOMXIENVS7BP2NNNWI/">Mailing list thread</a></p></li>
+</ul>
+</section>
+<section id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Link to this heading">#</a></h2>
+<p>This document has been placed in the public domain.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract">Abstract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivation-and-scope">Motivation and scope</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#usage-and-impact">Usage and impact</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#backward-compatibility">Backward compatibility</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#detailed-description">Detailed Description</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scalar-type">Scalar type</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-data">Missing data</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operation-surface">Operation surface</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#python-bytes-scalars-in-mixed-operations">Python <code class="docutils literal notranslate"><span class="pre">bytes</span></code> scalars in mixed operations</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-values-round-trip-between-stringdtype-and-bytestringdtype">Missing values round-trip between StringDType and ByteStringDType</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#text-encoding-and-decoding">Text encoding and decoding</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#text-file-i-o">Text file I/O</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#storage-and-interchange">Storage and interchange</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#casts">Casts</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#numeric-casts">Numeric casts</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#public-c-api">Public C API</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation">Implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#open-questions">Open questions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reference-implementation">Reference implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#related-issues">Related Issues</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#acceptance-and-release-plan">Acceptance and release plan</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#alternatives">Alternatives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#discussion">Discussion</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#copyright">Copyright</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2017-2026, NumPy Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
